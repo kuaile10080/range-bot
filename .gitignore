@@ -1,0 +1,10 @@
+src/static
+.idea
+.code
+go-cqhttp.bat
+venv
+__pycache__
+src/plugins/testport.py
+src/libraries/secrets.py
+/.env
+event.json().json
