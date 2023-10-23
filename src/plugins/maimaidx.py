@@ -9,7 +9,6 @@ from src.libraries.maimaidx_music import *
 from src.libraries.image import *
 from src.libraries.maimai_best_40 import generate
 from src.libraries.maimai_best_50 import generate50
-from src.libraries.secrets import dajiang_checker
 
 from PIL import Image
 import re
@@ -38,7 +37,7 @@ def inner_level_q(ds1, ds2=None):
     return result_set
 
 
-inner_level = on_command('inner_level ', aliases={'定数查歌 '}, rule = dajiang_checker, priority = 10, block = True)
+inner_level = on_command('inner_level ', aliases={'定数查歌 '}, priority = 10, block = True)
 
 @inner_level.handle()
 async def _(event: Event, message: Message = CommandArg()):
@@ -60,7 +59,7 @@ async def _(event: Event, message: Message = CommandArg()):
     await inner_level.finish(MessageSegment.image(f"base64://{str(image_to_base64(text_to_image(s)), encoding='utf-8')}"))
 
 
-spec_rand = on_regex(r"^随个(?:dx|sd|标准)?[绿黄红紫白]?[0-9]+\+?", rule = dajiang_checker, priority = 10, block = True)
+spec_rand = on_regex(r"^随个(?:dx|sd|标准)?[绿黄红紫白]?[0-9]+\+?", priority = 10, block = True)
 @spec_rand.handle()
 async def _(event: Event):
     #level_labels = ['绿', '黄', '红', '紫', '白']
@@ -90,13 +89,13 @@ async def _(event: Event):
         await spec_rand.finish("随机命令错误，请检查语法")
 
 
-mr = on_regex(r".*maimai.*什么", rule = dajiang_checker, priority = 10, block = True)
+mr = on_regex(r".*maimai.*什么", priority = 10, block = True)
 @mr.handle()
 async def _():
     await mr.finish(song_txt(total_list.random()))
 
 
-search_music = on_regex(r"^查歌.+", rule = dajiang_checker, priority = 10, block = True)
+search_music = on_regex(r"^查歌.+", priority = 10, block = True)
 @search_music.handle()
 async def _(event: Event):
     regex = "查歌(.+)"
@@ -122,7 +121,7 @@ async def _(event: Event):
         await search_music.finish(f"结果过多（{len(res)} 条），请缩小查询范围。")
 
 
-query_chart = on_regex(r"^([绿黄红紫白]?) ?id([0-9]+)" , rule = dajiang_checker, priority = 10, block = True)
+query_chart = on_regex(r"^([绿黄红紫白]?) ?id([0-9]+)" , priority = 10, block = True)
 @query_chart.handle()
 async def _(event: Event):
     regex = "([绿黄红紫白]?) ?id([0-9]+)"
@@ -200,7 +199,7 @@ BREAK: {chart['notes'][4]}
 
 wm_list = ['拼机', '推分', '越级', '下埋', '夜勤', '练底力', '练手法', '打旧框', '干饭', '抓绝赞', '收歌']
 
-jrwm = on_command('今日舞萌', aliases={'今日mai'}, rule = dajiang_checker, priority = 10, block = True)
+jrwm = on_command('今日舞萌', aliases={'今日mai'}, priority = 10, block = True)
 @jrwm.handle()
 async def _(event: Event, message: Message = CommandArg()):
     qq = int(event.get_user_id())
@@ -221,7 +220,7 @@ async def _(event: Event, message: Message = CommandArg()):
     await jrwm.finish(MessageSegment.text(s) + song_txt(music))
 
 
-query_score = on_command('分数线', rule = dajiang_checker, priority = 10, block = True)
+query_score = on_command('分数线', priority = 10, block = True)
 @query_score.handle()
 async def _(event: Event, message: Message = CommandArg()):
     r = "([绿黄红紫白])(id)?([0-9]+)"
@@ -264,7 +263,7 @@ BREAK 50落(一共{brk}个)等价于 {(break_50_reduce / 100):.3f} 个 TAP GREAT
             await query_chart.finish("格式错误，输入“分数线 帮助”以查看帮助信息")
 
 
-best_40_pic = on_command('b40', rule = dajiang_checker, priority = 10, block = True)
+best_40_pic = on_command('b40', priority = 10, block = True)
 
 
 @best_40_pic.handle()
@@ -282,7 +281,7 @@ async def _(event: Event, message: Message = CommandArg()):
     else:
         await best_40_pic.finish(MessageSegment.text("b40已停止维护，对结果不负责")+MessageSegment.image(f"base64://{str(image_to_base64(img), encoding='utf-8')}"))
 
-best_50_pic = on_command('b50', rule = dajiang_checker, priority = 10, block = True)
+best_50_pic = on_command('b50', priority = 10, block = True)
 
 
 @best_50_pic.handle()

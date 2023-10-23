@@ -5,7 +5,7 @@ from nonebot.adapters.onebot.v11 import Message, MessageSegment, exception
 from nonebot.matcher import Matcher
 
 from src.libraries.image import *
-from src.libraries.secrets import range_checker, setu_checker, dayday_checker, gre_checker, TEST_GROUP, RANGE, SQL_HOST, SQL_PASSWORD, SQL_PORT
+from src.libraries.secrets import zongqun_checker, setu_checker, dayday_checker, gre_checker, TEST_GROUP, RANGE, SQL_HOST, SQL_PASSWORD, SQL_PORT
 
 from PIL import Image, ImageDraw, ImageFont
 import matplotlib.pyplot as plt
@@ -20,8 +20,6 @@ db = pymysql.connect(   host = SQL_HOST,
                         database = 'bot')
 
 static_dir = "src/static/"
-
-SETU_TIMING = 30
 
 def readjson(path:str):
     try:
@@ -193,10 +191,10 @@ async def _(event: Event):
         await rghaishi.finish(haishilist[random.randint(0,len(haishilist)-1)].strip())
 
 
-
+SETU_TIMING = 30
 """-----------随机色图(开发中)-----------"""
 setu_dir = 'src/static/setu/'
-sjst = on_keyword(['色图','涩图','瑟图'], rule = setu_checker, priority = 100000, block = True) #取消priority = 10 
+sjst = on_keyword(['色图','涩图','瑟图'], rule = setu_checker, priority = 10000, block = True) #取消priority = 10 
 @sjst.handle()
 async def sjst_handle(event: Event):
     timelist = readjson(static_dir + "seturecord.json")
@@ -510,10 +508,24 @@ async def _daimao_edit(event: Event, message: Message = CommandArg()):
         encoded = base64.b64encode(fp.read())
     url = "base64://" + encoded.decode('utf-8')
     await daimao_edit.finish(MessageSegment.image(url))
-    
-mirror_img = on_command("mirror", priority = 10, block = True)
+
+MIRROR_TIMING = 30
+mirror_img = on_command("mirror", priority = 10, block = True, rule=zongqun_checker)
 @mirror_img.handle()
 async def _mirror_img(event: Event, message: Message = CommandArg()):
+    if type(re.match("group_(.+)_(.+)",event.get_session_id())) == re.Match:
+        groupid = str(re.match("group_(.+)_(.+)",event.get_session_id()).groups()[0])
+        timelist = readjson(static_dir + "mirrorrecord.json")
+        try:
+            a = (timelist[groupid])
+        except:
+            a = 0
+        rest = time.time() - a
+        if (rest < MIRROR_TIMING) & (groupid != TEST_GROUP) & (str(event.get_user_id()) != RANGE):
+            await mirror_img.finish("本群CD还剩" + str( MIRROR_TIMING - int(rest)) + "秒，请稍后再试") 
+        else:
+            timelist[groupid] = time.time()
+            writejson(static_dir + "mirrorrecord.json",timelist)
     msg_json = json.loads(event.json())["message"]
     if len(msg_json) != 2:
         return
@@ -569,6 +581,7 @@ async def _mirror_img(event: Event, message: Message = CommandArg()):
                 full_image.paste(right_half, (width//2, 0))
                 outframes.append(full_image)
                 del right_half, mirrored_img, full_image
+        
 
         output = io.BytesIO()
         if img.format == "GIF":

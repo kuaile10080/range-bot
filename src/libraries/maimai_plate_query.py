@@ -67,9 +67,9 @@ async def querydraw(song_played:dict,searchlist:list,diffcount:dict,platename:st
         img.paste(bg,(0,2000*i))
     hoffset = 100
     try:
-        plate = Image.open("src/static/mai/plate/"+ platename + ".png").convert('RGB')
+        plate = Image.open("src/static/mai/plate/"+ platename + ".png").convert('RGBA')
         plate = plate.resize((1440,232))
-        img.paste(plate,(280,hoffset))
+        img.paste(plate,(280,hoffset),mask=plate.split()[3])
     except:
         pass
     hoffset += 232+100
