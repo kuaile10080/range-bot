@@ -114,7 +114,7 @@ async def querydraw(song_played:dict,searchlist:list,diffcount:dict,platename:st
                 if platename[1] == '者':
                     if minfo['fc'][:2] == 'ap':
                         covertime = 1.7
-                        cover = minfo['fc']
+                        cover = fcfs_name_dict[minfo['fc']]
                         frame.paste(finish,(5,5),mask=finish.split()[3])
                         cover = Image.open("src/static/mai/pic/UI_MSS_MBase_Icon_"+ cover + ".png").convert('RGBA')
                     else:

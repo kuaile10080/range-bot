@@ -23,7 +23,8 @@ def draw_text(img_pil, text, offset_x):
     draw.text((x + offset_x, 360), text, font=font, fill=(255, 255, 255, 255))
 
 
-def text_to_image(text):
+def text_to_image(text:str)->Image:
+    text = text.replace(' ', '  ')
     font = ImageFont.truetype(fontpath, 24)
     padding = 10
     margin = 4

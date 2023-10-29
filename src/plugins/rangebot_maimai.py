@@ -761,7 +761,7 @@ async def _fslb(event: Event):
         if song['fs']:
             addstr += f"({song['fs']})"
         s += f"""
-{((page-1)*100 + i+1):>3}：{song['achievements']:>8.4f}% ({song['type']})({leveldict[song['level_index']]}) {song['title']} {addstr}"""
+{((page-1)*100 + i+1):>3}：【ID：{song['song_id']:>5}】{song['achievements']:>8.4f}% ({song['type']})({leveldict[song['level_index']]}) {song['title']} {addstr}"""
     s += f"""
 第{page}页，共{maxpage}页"""
     await fslb.finish(MessageSegment.image(f"base64://{str(image_to_base64(text_to_image(s)), encoding='utf-8')}"))
