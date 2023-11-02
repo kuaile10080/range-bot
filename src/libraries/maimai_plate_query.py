@@ -50,7 +50,7 @@ def not_exist_data(qq:str):
     else:
         return 1
 
-async def querydraw(song_played:dict,searchlist:list,diffcount:dict,platename:str,qq:str,flag = 1) -> Image:
+async def querydraw(song_played:dict,searchlist:list,diffcount:dict,platename:str,qq:str,flag = 1) -> Image.Image:
     iconsize = 140
     iconsizepro = 180
     k=0

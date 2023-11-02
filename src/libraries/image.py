@@ -50,7 +50,7 @@ def image_to_base64(img, format='PNG'):
     base64_str = base64.b64encode(byte_data)
     return base64_str
 
-def get_music_cover(mid) -> Image:
+def get_music_cover(mid) -> Image.Image:
     cover_path = cover_dir + f'{get_cover_len5_id(mid)}.png'
     if os.path.exists(cover_path):
         try:

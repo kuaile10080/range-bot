@@ -12,9 +12,10 @@ from src.libraries.maimai_best_40 import generate
 from src.libraries.maimai_best_50 import generate50
 from src.libraries.maimai_plate_query import *
 from src.libraries.secrets import range_checker,dajiang_checker
+from src.libraries.maimai_info import draw_new_info
 
 from PIL import Image,ImageDraw,ImageFont
-import re,base64
+import re,base64,random
 
 #OFFLINE
 cover_dir = 'src/static/mai/cover/'
@@ -502,29 +503,34 @@ async def _levelquery(event: Event):
 
 singlequery = on_command("info",priority = 10, block = True)
 @singlequery.handle()
-async def _levelquery(event: Event, message: Message = CommandArg()):
+async def _singlequery(event: Event, message: Message = CommandArg()):
+    msg = str(message).strip()
+    music = None
     try:
-        id = int(str(message).strip())
+        id = int(msg)
+        music = total_list.by_id(str(id))
+        if music == None:
+            raise Exception
     except:
-        if str(message).strip() == "":
+        if msg == "":
             await singlequery.finish("请输入正确的查询命令，格式：info+id或info+部分歌名。")
         else:
-            name = str(message).strip()
+            name = msg
             res = total_list.filter(title_search=name)
             if len(res) == 0:
                 return
                 await singlequery.finish("没有找到这样的乐曲。")
             elif len(res) == 1:
-                id = int(res[0]['id'])
+                music = res[0]
             else:
-                id = 0
                 for i in range(len(res)):
                     if res[i]['title'].lower().strip() == name.lower().strip():
-                        id = int(res[i]['id'])
+                        music = res[i]
                         break
-                if id == 0:
-                    id = int(random.choice(res)['id'])
-                #await singlequery.finish("曲名检索结果过多，请输入更精确的曲名或歌曲id")
+                if music == None:
+                    music = random.choice(res)
+    id = int(music.id)
+    
     qq = str(event.get_user_id())
     if not_exist_data(qq):
         await singlequery.send("每天第一次查询自动刷新成绩，可能需要较长时间。若需手动刷新成绩请发送“刷新成绩”")
@@ -532,103 +538,125 @@ async def _levelquery(event: Event, message: Message = CommandArg()):
     if success == 400:
         await singlequery.finish("未找到此玩家，请确登陆https://www.diving-fish.com/maimaidx/prober/ 录入分数，并正确填写用户名与QQ号。")
     records = [{},{},{},{},{}]
-    music = total_list.by_id(str(id))
     for rec in player_data['records']:
         if rec['song_id'] == id:
             records[4-rec['level_index']] = rec
-            musictype = rec['type']
-            musictitle = rec['title']
     if records == [{},{},{},{},{}]:
         await singlequery.finish("您还没有打过这首歌")
-    img = Image.open("src/static/platequery/bginfo.png").convert('RGBA')
-    cover = get_music_cover(id)
-    cover = cover.resize((200,200))
-    img.paste(cover,(60,90))
-    if musictype == "DX":
-        icon = Image.open("src/static/platequery/DX.png").convert('RGBA')
     else:
-        icon = Image.open("src/static/platequery/SD.png").convert('RGBA')
-    img.paste(icon,(50,50),mask=icon.split()[3])
-    draw = ImageDraw.Draw(img)
-    font = ImageFont.truetype("src/static/msyh.ttc", 37, encoding='utf-8')
-    y = 40
-    info_to_file_dict = {
-        "sssp": "SSSp",
-        "sss": "SSS",
-        "ssp": "SSp",
-        "ss": "SS",
-        "sp": "Sp",
-        "s": "S",
-        "aaa": "AAA",
-        "aa": "AA",
-        "a": "A",
-        "bbb": "BBB",
-        "bb": "BB",
-        "b": "B",
-        "c": "C",
-        "d": "D",
-        "fc": "FC",
-        "fcp": "FCp",
-        "ap": "AP",
-        "app": "APp",
-        "fs": "FS",
-        "fsp": "FSp",
-        "fsd": "FSD",
-        "fsdp": "FSDp"
-    }
-    for rec in records:
-        if rec != {}:
-            #draw dxstars
-            x = 330
-            dx_max = sum(music['charts'][rec['level_index']]['notes'])*3
-            if rec['dxScore']/dx_max > 0.99:
-                stars = 6
-            elif rec['dxScore']/dx_max > 0.97:
-                stars = 5
-            elif rec['dxScore']/dx_max > 0.95:
-                stars = 4
-            elif rec['dxScore']/dx_max > 0.93:
-                stars = 3
-            elif rec['dxScore']/dx_max > 0.90:
-                stars = 2
-            elif rec['dxScore']/dx_max > 0.85:
-                stars = 1
+        imgs = []
+        for rec in records:
+            if rec == {}:
+                continue
             else:
-                stars = 0
-            for i in range(stars):
-                star = Image.open(f"src/static/platequery/stars_{stars}.png").convert('RGBA')
-                img.paste(star,(x+40*i,y+16),mask=star.split()[3])
-            #draw achievement
-            x = 335
-            offset=22
-            if rec['achievements']<10:
-                x=x+offset*2
-            elif rec['achievements']<100:
-                x=x+offset
-            achi = "%.4f" % rec['achievements'] + "%"
-            y=y+4
-            draw.text((x-1,y+4),achi,(0,0,0),font)
-            draw.text((x-1,y+6),achi,(0,0,0),font)
-            draw.text((x+1,y+4),achi,(0,0,0),font)
-            draw.text((x+1,y+6),achi,(0,0,0),font)
-            draw.text((x,y+5),achi,(255,255,255),font)
-            #draw others
-            y=y-4
-            x=345
+                img = await draw_new_info(rec,music)
+                imgs.append(img)
+        width_sum = 5
+        imgs.reverse()
+        for img in imgs:
+            width_sum += img.size[0]+5
+        final_img = Image.new("RGB",(width_sum,imgs[0].size[1]+10),(255,255,255))
+        width_pos = 5
+        for img in imgs:
+            final_img.paste(img,(width_pos,5),img)
+            width_pos += img.size[0]+5
+        await singlequery.finish(MessageSegment.at(qq)+MessageSegment.image(f"base64://{str(image_to_base64(final_img), encoding='utf-8')}"))
 
-            rate = Image.open("src/static/mai/pic/UI_GAM_Rank_" + info_to_file_dict[rec["rate"]] + ".png").convert('RGBA')
-            img.paste(rate,(x+185,y+12),mask=rate.split()[3])
-            if rec["fs"] != "":
-                fs = Image.open("src/static/mai/pic/UI_MSS_MBase_Icon_" + info_to_file_dict[rec["fs"]] + ".png").convert('RGBA')
-                img.paste(fs,(x+283,y+12),mask=fs.split()[3])
-            if rec["fc"] != "":
-                fc = Image.open("src/static/mai/pic/UI_MSS_MBase_Icon_" + info_to_file_dict[rec["fc"]] + ".png").convert('RGBA')
-                img.paste(fc,(x+328,y+12),mask=fc.split()[3])
-        y = y + 60
-    font = ImageFont.truetype("src/static/msyh.ttc", 20, encoding='utf-8')
-    w ,h = draw.textsize(musictitle, font = font)
-    draw.text((160-w/2,310),musictitle,(0,0,0),font)
-    await singlequery.finish(MessageSegment.at(qq)+MessageSegment.image(f"base64://{str(image_to_base64(img), encoding='utf-8')}"))
+
+
+    
+    # img = Image.open("src/static/platequery/bginfo.png").convert('RGBA')
+    # cover = get_music_cover(id)
+    # cover = cover.resize((200,200))
+    # img.paste(cover,(60,90))
+    # if musictype == "DX":
+    #     icon = Image.open("src/static/platequery/DX.png").convert('RGBA')
+    # else:
+    #     icon = Image.open("src/static/platequery/SD.png").convert('RGBA')
+    # img.paste(icon,(50,50),mask=icon.split()[3])
+    # draw = ImageDraw.Draw(img)
+    # font = ImageFont.truetype("src/static/msyh.ttc", 37, encoding='utf-8')
+    # y = 40
+    # info_to_file_dict = {
+    #     "sssp": "SSSp",
+    #     "sss": "SSS",
+    #     "ssp": "SSp",
+    #     "ss": "SS",
+    #     "sp": "Sp",
+    #     "s": "S",
+    #     "aaa": "AAA",
+    #     "aa": "AA",
+    #     "a": "A",
+    #     "bbb": "BBB",
+    #     "bb": "BB",
+    #     "b": "B",
+    #     "c": "C",
+    #     "d": "D",
+    #     "fc": "FC",
+    #     "fcp": "FCp",
+    #     "ap": "AP",
+    #     "app": "APp",
+    #     "fs": "FS",
+    #     "fsp": "FSp",
+    #     "fsd": "FSD",
+    #     "fsdp": "FSDp"
+    # }
+    # for rec in records:
+    #     if rec != {}:
+    #         #draw dxstars
+    #         x = 330
+    #         dx_max = sum(music['charts'][rec['level_index']]['notes'])*3
+    #         if rec['dxScore']/dx_max > 0.99:
+    #             stars = 6
+    #         elif rec['dxScore']/dx_max > 0.97:
+    #             stars = 5
+    #         elif rec['dxScore']/dx_max > 0.95:
+    #             stars = 4
+    #         elif rec['dxScore']/dx_max > 0.93:
+    #             stars = 3
+    #         elif rec['dxScore']/dx_max > 0.90:
+    #             stars = 2
+    #         elif rec['dxScore']/dx_max > 0.85:
+    #             stars = 1
+    #         else:
+    #             stars = 0
+    #         for i in range(stars):
+    #             star = Image.open(f"src/static/platequery/stars_{stars}.png").convert('RGBA')
+    #             img.paste(star,(x+40*i,y+16),mask=star.split()[3])
+    #         #draw achievement
+    #         x = 335
+    #         offset=22
+    #         if rec['achievements']<10:
+    #             x=x+offset*2
+    #         elif rec['achievements']<100:
+    #             x=x+offset
+    #         achi = "%.4f" % rec['achievements'] + "%"
+    #         y=y+4
+    #         draw.text((x-1,y+4),achi,(0,0,0),font)
+    #         draw.text((x-1,y+6),achi,(0,0,0),font)
+    #         draw.text((x+1,y+4),achi,(0,0,0),font)
+    #         draw.text((x+1,y+6),achi,(0,0,0),font)
+    #         draw.text((x,y+5),achi,(255,255,255),font)
+    #         #draw others
+    #         y=y-4
+    #         x=345
+
+    #         rate = Image.open("src/static/mai/pic/UI_GAM_Rank_" + info_to_file_dict[rec["rate"]] + ".png").convert('RGBA')
+    #         img.paste(rate,(x+185,y+12),mask=rate.split()[3])
+    #         if rec["fs"] != "":
+    #             fs = Image.open("src/static/mai/pic/UI_MSS_MBase_Icon_" + info_to_file_dict[rec["fs"]] + ".png").convert('RGBA')
+    #             img.paste(fs,(x+283,y+12),mask=fs.split()[3])
+    #         if rec["fc"] != "":
+    #             fc = Image.open("src/static/mai/pic/UI_MSS_MBase_Icon_" + info_to_file_dict[rec["fc"]] + ".png").convert('RGBA')
+    #             img.paste(fc,(x+328,y+12),mask=fc.split()[3])
+    #     y = y + 60
+    # font = ImageFont.truetype("src/static/msyh.ttc", 20, encoding='utf-8')
+    # w ,h = draw.textsize(musictitle, font = font)
+    # draw.text((160-w/2,310),musictitle,(0,0,0),font)
+    # await singlequery.finish(MessageSegment.at(qq)+MessageSegment.image(f"base64://{str(image_to_base64(img), encoding='utf-8')}"))
+
+
+    
 
 with open("src/static/music_data_bkp.json", encoding="utf-8")as fp:
     music_data_bkp = json.load(fp)
@@ -743,7 +771,7 @@ async def _fslb(event: Event):
     if len(querylist) == 0:
         await fslb.finish("您还没有打过这个定数的谱面")
     querylist.sort(key = lambda x:x["achievements"],reverse=True)
-    leveldict = ["Bas","Adv","Exp","Mas","ReM"]
+    leveldict = ["绿","黄","红","紫","白"]
     s = f"""您的{res.group(1)}{res.group(2)}分数列表为:"""
     if res.group(3) == '':
         page = 1
@@ -761,7 +789,7 @@ async def _fslb(event: Event):
         if song['fs']:
             addstr += f"({song['fs']})"
         s += f"""
-{((page-1)*100 + i+1):>3}：【ID：{song['song_id']:>5}】{song['achievements']:>8.4f}% ({song['type']})({leveldict[song['level_index']]}) {song['title']} {addstr}"""
+{((page-1)*100 + i+1):>3}:【ID:{song['song_id']:>5}】{song['achievements']:>8.4f}% ({song['type']})({leveldict[song['level_index']]}) {song['title']}{addstr}"""
     s += f"""
 第{page}页，共{maxpage}页"""
     await fslb.finish(MessageSegment.image(f"base64://{str(image_to_base64(text_to_image(s)), encoding='utf-8')}"))
