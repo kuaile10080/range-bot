@@ -1,8 +1,6 @@
-from nonebot import on_command, on_notice
+from nonebot import on_command
 from nonebot.typing import T_State
-from nonebot.adapters.onebot.v11 import Message, Event, Bot, MessageSegment
-from nonebot.exception import IgnoredException
-from nonebot.message import event_preprocessor
+from nonebot.adapters.onebot.v11 import Event, Bot, MessageSegment
 from src.libraries.image import *
 
 
@@ -73,22 +71,3 @@ DX以后的查牌子不准，暂时没空写
 如果发现成绩不同步请发送 刷新成绩 
 b40/b50无需刷新，同步水鱼'''
     await help.finish(MessageSegment.image(f"base64://{str(image_to_base64(text_to_image(help_str)), encoding='utf-8')}"))
-
-'''
-async def _group_poke(bot: Bot, event: Event, state: dict) -> bool:
-    value = (event.notice_type == "notify" and event.sub_type == "poke" and event.target_id == int(bot.self_id))
-    return value
-
-poke = on_notice(rule=_group_poke, priority=10, block=True)
-
-@poke.handle()
-async def _(bot: Bot, event: Event, state: T_State):
-    if event.__getattribute__('group_id') is None:
-        event.__delattr__('group_id')
-    await poke.send(Message([{
-        "type": "poke",
-        "data": {
-            "qq": f"{event.sender_id}"
-        }
-    }]))
-'''

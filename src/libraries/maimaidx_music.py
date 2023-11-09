@@ -2,8 +2,9 @@ import json, random, requests, nltk
 from typing import Dict, List, Optional, Union, Tuple, Any
 from nonebot.adapters.onebot.v11 import MessageSegment
 from src.libraries.image import image_to_base64, get_music_cover
+from src.libraries.tool import convert_cn2jp
 from copy import deepcopy
-from zhconv import convert
+from src.libraries.secrets import alias_pre_process_add, alias_pre_process_remove
 
 def get_cover_len4_id(mid) -> str:
     return mid
@@ -82,7 +83,7 @@ class Chart(Dict):
     hold: Optional[int] = None
     touch: Optional[int] = None
     brk: Optional[int] = None
-    charter: Optional[int] = None
+    charter: Optional[str] = None
 
     def __getattribute__(self, item):
         if item == 'tap':
@@ -178,6 +179,7 @@ class MusicList(List[Music]):
     
     def filt_by_name(self,title_search:str):
         title_search = title_search.lower()
+        title_search_jp = convert_cn2jp(title_search)
         new_list = MusicList()
         title_temp = MusicList()
         alias_temp = MusicList()
@@ -190,7 +192,7 @@ class MusicList(List[Music]):
                 alias_temp.append(music)
             else:
                 for alias in music.alias:
-                    ngram_similarity = calculate_ngram_similarity(title_search, alias.lower(), 2)
+                    ngram_similarity = calculate_ngram_similarity(title_search, title_search_jp, alias.lower(), 2)
                     if ngram_similarity > ngrams:
                         ngrams = ngram_similarity
                         ngram_temp = music
@@ -223,6 +225,17 @@ def refresh_music_list():
     _music_data = obj_data
     _total_list: MusicList = MusicList(obj_data)
     _alias_data = obj_alias
+
+    for key in alias_pre_process_add:
+        for item in alias_pre_process_add[key]:
+            if item not in _alias_data[key]["Alias"]:
+                _alias_data[key]["Alias"].append(item)
+
+    for key in alias_pre_process_remove:
+        for item in alias_pre_process_remove[key]:
+            if item in _alias_data[key]["Alias"]:
+                _alias_data[key]["Alias"].remove(item)
+            
     for __i in range(len(_total_list)):
         _total_list[__i] = Music(_total_list[__i])
         _total_list[__i]['Alias'] = _alias_data[_total_list[__i]['id']]["Alias"]
@@ -238,9 +251,9 @@ def refresh_music_list():
 
 total_list, music_data, alias_data = refresh_music_list()
 
-def calculate_ngram_similarity(text1, text2, n):
-    ngrams0 = set(nltk.ngrams(convert(text1, 'zh-hant'), n))
-    ngrams1 = set(nltk.ngrams(text1, n))
+def calculate_ngram_similarity(text1_cn, text1_jp, text2, n):
+    ngrams0 = set(nltk.ngrams(text1_cn, n))
+    ngrams1 = set(nltk.ngrams(text1_jp, n))
     ngrams2 = set(nltk.ngrams(text2, n))
     intersection = max(len(ngrams1.intersection(ngrams2)),len(ngrams0.intersection(ngrams2)))
     union = len(ngrams1.union(ngrams2))

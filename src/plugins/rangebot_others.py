@@ -1,5 +1,5 @@
 from nonebot import on_command, on_regex, on_keyword, on_message
-from nonebot.params import CommandArg, EventMessage
+from nonebot.params import CommandArg
 from nonebot.adapters import Event
 from nonebot.adapters.onebot.v11 import Message, MessageSegment, exception
 from nonebot.matcher import Matcher
@@ -9,7 +9,6 @@ from src.libraries.secrets import zongqun_checker, setu_checker, dayday_checker,
 
 from PIL import Image, ImageDraw, ImageFont
 import matplotlib.pyplot as plt
-from collections import deque
 import os,re,random,json,time,math,pymysql,wget,base64,io,requests
 import numpy as np
 

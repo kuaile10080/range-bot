@@ -1,5 +1,5 @@
 import requests,json,os,wget,aiohttp
-from typing import Optional, Dict, List, Tuple
+from typing import Optional, Dict, Tuple
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 from src.libraries.maimaidx_music import MusicList,Music,Chart
 

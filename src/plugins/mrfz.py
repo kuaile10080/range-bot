@@ -1,11 +1,10 @@
 from nonebot import on_command, on_regex, on_keyword, on_message
 from nonebot.params import CommandArg, EventMessage
 from nonebot.adapters import Event
-from nonebot.adapters.onebot.v11 import Message, MessageSegment, exception
-from nonebot.matcher import Matcher
+from nonebot.adapters.onebot.v11 import Message, MessageSegment
 
 from src.libraries.image import *
-import os,glob,random,base64
+import glob,random,base64
 
 mrfz_dir = 'src/static/mrfz/'
 lihui = on_command('zlh', aliases={'舟立绘'}, priority=40, block=True)

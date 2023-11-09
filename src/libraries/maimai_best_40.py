@@ -1,21 +1,14 @@
 # Author: xyb, Diving_Fish
-import asyncio
-import os
-import math
 from typing import Optional, Dict, List, Tuple
 
-import aiohttp
+import os, wget, aiohttp
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 from src.libraries.maimaidx_music import total_list
 from src.libraries.image import get_music_cover
 
-import wget
-
-
 scoreRank = 'D C B BB BBB A AA AAA S S+ SS SS+ SSS SSS+'.split(' ')
 combo = ' FC FC+ AP AP+'.split(' ')
 diffs = 'Basic Advanced Expert Master Re:Master'.split(' ')
-
 
 class ChartInfo(object):
     def __init__(self, idNum:str, diff:int, tp:str, achievement:float, ra:int, comboId:int, scoreId:int,

@@ -3,8 +3,6 @@ from io import BytesIO
 
 from PIL import ImageFont, ImageDraw, Image
 
-
-path = 'src/static/high_eq_image.png'
 fontpath = "src/static/msyh.ttc"
 cover_dir = 'src/static/mai/cover/'
 
@@ -32,9 +30,13 @@ def text_to_image(text:str)->Image:
     margin = 4
     text_list = text.split('\n')
     max_width = 0
+    max_height = 0
     for text in text_list:
-        w, h = font.getsize(text)
+        text_bbox = font.getbbox(text)
+        w, h = text_bbox[2], text_bbox[3]
         max_width = max(max_width, w)
+        max_height = max(max_height, h)
+    h = max_height
     wa = max_width + padding * 2
     ha = h * len(text_list) + margin * (len(text_list) - 1) + padding * 2
     i = Image.new('RGB', (wa, ha), color=(255, 255, 255))

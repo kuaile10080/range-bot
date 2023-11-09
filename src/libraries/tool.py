@@ -1,4 +1,4 @@
-import time, json, aiohttp
+import time, json, aiohttp, pickle
 
 def hash(qq: int):
     days = int(time.strftime("%d", time.localtime(time.time()))) + 31 * int(
@@ -55,3 +55,12 @@ async def offlineinit():
             s += "chunithm_music.json下载失败\n"
             k=0
     return k,s
+
+with open("src/static/kanjic2j_xcj.dat","rb")as fp:
+    kanjic2j = pickle.load(fp)
+
+def convert_cn2jp(text:str) -> str:
+    for char in text:
+        if char in kanjic2j:
+            text = text.replace(char, kanjic2j[char][0])
+    return text

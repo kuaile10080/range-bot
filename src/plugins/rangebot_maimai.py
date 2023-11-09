@@ -1,11 +1,9 @@
-from collections import defaultdict
-
 from nonebot import on_command, on_regex
-from nonebot.params import CommandArg, EventMessage
+from nonebot.params import CommandArg
 from nonebot.adapters import Event
 from nonebot.adapters.onebot.v11 import Message, MessageSegment
 
-from src.libraries.tool import offlineinit
+from src.libraries.tool import offlineinit, convert_cn2jp
 from src.libraries.maimaidx_music import *
 from src.libraries.image import *
 from src.libraries.maimai_best_40 import generate
@@ -14,7 +12,7 @@ from src.libraries.maimai_plate_query import *
 from src.libraries.secrets import range_checker,dajiang_checker
 from src.libraries.maimai_info import draw_new_info
 
-from PIL import Image,ImageDraw,ImageFont
+from PIL import Image
 import re,base64,random
 
 cover_dir = 'src/static/mai/cover/'
@@ -59,16 +57,12 @@ charter_search = on_command('谱师查歌', priority = 10, block = True)
 async def _(event: Event, message: Message = CommandArg()):
     charter = str(message).strip()
     k=0
-    s = """ 结果如下
-
- """
+    s = s = "\n结果如下：\n"
     for i in range(0,len(music_data)):
         for j in range(3,len(music_data[i]['charts'])):
-            if charter.lower() in music_data[i]['charts'][j]['charter'].lower():
+            if charter.lower() in music_data[i]['charts'][j]['charter'].lower() or convert_cn2jp(charter.lower()) in music_data[i]['charts'][j]['charter'].lower():
                 k += 1
-                s += ('No.' + str(k) + ' ' + music_data[i]['charts'][j]['charter'] + ' ' + '[' + music_data[i]['id'] + ']' + '. '  +'【'+ music_data[i]['type'] +'】'+ hardlist[j] + ' ' + music_data[i]['title'])
-                s += """
- """
+                s += f"No.{k:03d} {music_data[i]['charts'][j]['charter']} [{music_data[i]['id']}] {music_data[i]['title']}\n"
     if k > 350 :
         await charter_search.finish(f"结果过多（{k} 条），请缩小搜索范围。")
     elif k == 0 :
@@ -81,16 +75,12 @@ artist_search = on_command('曲师查歌', priority = 10, block = True)
 async def _(event: Event, message: Message = CommandArg()):
     artist = str(message).strip()
     k=0
-    s = """ 结果如下
-
- """
+    s = "\n结果如下：\n"
     for i in range(0,len(music_data)):
-        if artist.lower() in music_data[i]['basic_info']['artist'].lower():
+        if artist.lower() in music_data[i]['basic_info']['artist'].lower() or convert_cn2jp(artist.lower()) in music_data[i]['basic_info']['artist'].lower():
             k += 1
-            s += ('No.' + str(k) + ' ' + music_data[i]['basic_info']['artist'] + ' ' + '[' + music_data[i]['id'] + ']' + '. ' + music_data[i]['title'])
-            s += """
- """
-    if k > 300:
+            s += f"No.{k:02d} {music_data[i]['basic_info']['artist']} [{music_data[i]['id']}] {music_data[i]['title']}\n"
+    if k > 99:
         await artist_search.finish(f"结果过多（{k} 条），请缩小搜索范围。")
     elif k == 0 :
         await artist_search.finish(f"没有找到结果，请检查搜索条件。")
@@ -100,15 +90,11 @@ new_search = on_command('新歌查歌', priority = 10, block = True)
 @new_search.handle()
 async def _(event: Event, message: Message = CommandArg()):
     k=0
-    s = """ 结果如下
-
- """
+    s = "\n结果如下：\n"
     for i in range(0,len(music_data)):
         if (music_data[i]['basic_info']['is_new'] == True):
             k += 1
-            s += ('No.' + str(k) + ' ' + '[' + music_data[i]['id'] + ']' + '. '+'【'+ music_data[i]['type'] +'】'+ music_data[i]['title'])
-            s += """
- """
+            s += f"No.{k:03d} [{music_data[i]['id']}] {music_data[i]['title']}\n"
     if k > 300:
         await new_search.finish(f"结果过多（{k} 条），请缩小搜索范围。")
     elif k == 0 :
@@ -119,33 +105,25 @@ bpm_search = on_command('bpm查歌' , aliases={"BPM查歌","Bpm查歌"}, priorit
 @bpm_search.handle()
 async def _(event: Event, message: Message = CommandArg()):
     argv = str(message).strip().split(" ")
+    res = []
     if len(argv) == 2:
-        k=0
-        s = """ 结果如下
-
- """
         for i in range(0,len(music_data)):
             if(float(argv[0]) <= music_data[i]['basic_info']['bpm'] <= float(argv[1])):
-                k += 1
-                s += ('No.' + str(k) + ' BPM:' + str(music_data[i]['basic_info']['bpm']) + ' ' + '[' + music_data[i]['id'] + ']' + '. ' + music_data[i]['title'])
-                s += """
- """
+                res.append(music_data[i])
     elif len(argv) == 1:
-        k=0
-        s = """ 结果如下
- """
         for i in range(0,len(music_data)):
             if(float(argv[0]) == music_data[i]['basic_info']['bpm']):
-                k += 1
-                s += ('No.' + str(k) + ' BPM:' + str(music_data[i]['basic_info']['bpm']) + ' ' + '[' + music_data[i]['id'] + ']' + '. ' + music_data[i]['title'])
-                s += """
- """
+                res.append(music_data[i])
     else:
         await bpm_search.finish("命令格式为\nbpm查歌 <bpm>\nbpm查歌 <bpm下限> <bpm上限>")
-    if k > 300:
-        await bpm_search.finish(f"结果过多（{k} 条），请缩小搜索范围。")
-    elif k == 0 :
+    if len(res) > 99:
+        await bpm_search.finish(f"结果过多（{len(res)} 条），请缩小搜索范围。")
+    elif len(res) == 0 :
         await bpm_search.finish(f"没有找到结果，请检查搜索条件。")
+    s = "\n结果如下：\n"
+    res.sort(key = lambda x:float(x['basic_info']['bpm']))
+    for i,music_dict in enumerate(res):
+        s += f"No.{i+1:02d} BPM:{int(music_dict['basic_info']['bpm']):>3d} [{music_dict['id']}] {music_dict['title']}\n"
     await bpm_search.finish(MessageSegment.image(f"base64://{str(image_to_base64(text_to_image(s)), encoding='utf-8')}"))
 
 

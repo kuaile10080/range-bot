@@ -3,7 +3,7 @@ from io import BytesIO
 from PIL import Image,ImageDraw,ImageFont
 
 from nonebot import on_command
-from nonebot.params import CommandArg, EventMessage
+from nonebot.params import CommandArg
 from nonebot.adapters import Event
 from nonebot.adapters.onebot.v11 import Message, MessageSegment
 from src.libraries.image import *
