@@ -33,10 +33,28 @@ async def _(event: Event, message: Message = CommandArg()):
 cover_dir = 'src/static/chunithm/cover/'
 
 def song_txt(music: Music):
-    img = get_chuni_cover(music.id)
     return MessageSegment.text(f"{music.id}. {music.title}\n") + \
-        MessageSegment.image(f"base64://{str(image_to_base64(img), encoding='utf-8')}") + \
-        MessageSegment.text(f"\n{'/'.join(str(ds) for ds in music['ds'])}")
+        MessageSegment.image(f"base64://{str(image_to_base64(get_chuni_cover(music.id)), encoding='utf-8')}") + \
+        MessageSegment.text(f"\n定数:{'/'.join(str(ds) for ds in music['ds'])}\n") + \
+        MessageSegment.text(f"艺术家: {music['basic_info']['artist']}\n") + \
+        MessageSegment.text(f"分类: {music['basic_info']['genre']}\n") + \
+        MessageSegment.text(f"BPM: {music['basic_info']['bpm']}\n") + \
+        MessageSegment.text(f"版本: {music['basic_info']['from']}\n")
+
+def song_txt_r(music: dict):
+    lev_list = []
+    lev_keys = ["lev_bas", "lev_adv", "lev_exp", "lev_mas", "lev_ult"]
+    for key in lev_keys:
+        if music[key] != "":
+            lev_list.append(music[key])
+        else:
+            lev_list.append("-")
+    return MessageSegment.text(f"{music['id']}. {music['title']}\n") + \
+        MessageSegment.image(f"base64://{str(image_to_base64(get_chuni_cover(music['id'])), encoding='utf-8')}") + \
+        MessageSegment.text(f"\n等级:{'/'.join(lev_list)}\n") + \
+        MessageSegment.text(f"艺术家: {music['artist']}\n") + \
+        MessageSegment.text(f"分类: {music['catname']}\n") + \
+        MessageSegment.text(f"注音: {music['reading']}\n")
 
 def inner_level_q(ds1, ds2=None):
     result_set = []
@@ -115,11 +133,7 @@ async def _(event: Event):
     if len(res) == 0:
         await search_music.finish("没有找到这样的乐曲。")
     elif len(res) == 1:
-        music = res[0]
-        img = get_chuni_cover(music['id'])
-        await search_music.finish(MessageSegment.text(f"{music['id']}. {music['title']}\n") +
-                                  MessageSegment.image(f"base64://{str(image_to_base64(img), encoding='utf-8')}") +
-                                  MessageSegment.text(f"艺术家: {music['basic_info']['artist']}\n分类: {music['basic_info']['genre']}\nBPM: {music['basic_info']['bpm']}\n版本: {music['basic_info']['from']}\n定数: {'/'.join(str(ds) for ds in music['ds'])}"))
+        await search_music.finish(song_txt(res[0]))
     elif len(res) < 30:
         search_result = ""
         for music in sorted(res, key=lambda i: int(i['id'])):
@@ -142,18 +156,7 @@ async def _(event: Event):
     if len(res) == 0:
         await crsearch_music.finish("没有找到这样的乐曲。")
     elif len(res) == 1:
-        music = res[0]
-        img = get_chuni_cover(music['id'])
-        level = []
-        for key in music:
-            if key[:3] == "lev":
-                if music[key] != "":
-                    level.append(music[key])
-                else:
-                    level.append("-")
-        await crsearch_music.finish(MessageSegment.text(f"{music['id']}. {music['title']}\n") +
-                                  MessageSegment.image(f"base64://{str(image_to_base64(img), encoding='utf-8')}") +
-                                  MessageSegment.text(f"艺术家: {music['artist']}\n分类: {music['catname']}\n读音: {music['reading']}\n定数: {'/'.join(level)}"))
+        await crsearch_music.finish(song_txt_r(res[0]))
     elif len(res) < 50:
         search_result = ""
         for music in sorted(res, key=lambda i: int(i['id'])):
@@ -169,16 +172,7 @@ async def _(event: Event):
     id = re.match(regex, str(event.get_message())).groups()[0].strip()
     for music in chuni_music_jp:
         if music['id'] == id:
-            level = []
-            for key in music:
-                if key[:3] == "lev":
-                    if music[key] != "":
-                        level.append(music[key])
-                    else:
-                        level.append("-")
-            await crid.finish(MessageSegment.text(f"{music['id']}. {music['title']}\n") +
-                            MessageSegment.image(f"base64://{str(image_to_base64(get_chuni_cover(music['id'])), encoding='utf-8')}") +
-                            MessageSegment.text(f"艺术家: {music['artist']}\n分类: {music['catname']}\n读音: {music['reading']}\n定数: {'/'.join(level)}"))
+            await crid.finish(song_txt_r(music))
     await crid.finish("没有找到这样的乐曲。")
 
 
@@ -219,10 +213,7 @@ Combo: {chart['combo']}'''
         name = groups[1].strip()
         music = total_list.by_id(int(name))
         try:
-            img = get_chuni_cover(music['id'])
-            await query_chart.finish(MessageSegment.text(f"{music['id']}. {music['title']}\n") +
-                                     MessageSegment.image(f"base64://{str(image_to_base64(img), encoding='utf-8')}") +
-                                     MessageSegment.text(f"艺术家: {music['basic_info']['artist']}\n分类: {music['basic_info']['genre']}\nBPM: {music['basic_info']['bpm']}\n版本: {music['basic_info']['from']}\n定数: {'/'.join(str(ds) for ds in music['ds'])}"))
+            await query_chart.finish(song_txt(music))
         except FinishedException:
             pass
         except Exception as e:

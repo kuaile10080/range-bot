@@ -1,5 +1,6 @@
 from PIL import Image, ImageDraw, ImageFont
-from src.libraries.maimaidx_music import get_cover_len5_id,Music
+from src.libraries.maimaidx_music import Music
+from src.libraries.image import get_music_cover
 
 assets_path = "src/static/mai/newinfo/"
 cover_path = "src/static/mai/cover/"
@@ -102,8 +103,9 @@ async def draw_new_info(record:dict,music:Music)->Image.Image:
     img.paste(temp_img,(6,6),temp_img)
 
     # 封面
-    temp_img = Image.open(cover_path + f"{get_cover_len5_id(music_id)}.png").convert("RGBA").resize((316,316))
-    img.paste(temp_img,(40,94),temp_img)
+    temp_img = get_music_cover(music_id)
+    temp_img = temp_img.resize((316,316),resample=Image.Resampling.BILINEAR)
+    img.paste(temp_img,(40,94))
 
     # LV
     temp_img = Image.open(assets_path + f"UI_TST_MBase_LV_{diff}.png").convert("RGBA")

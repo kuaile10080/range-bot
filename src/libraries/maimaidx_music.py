@@ -1,5 +1,7 @@
 import json, random, requests, nltk
 from typing import Dict, List, Optional, Union, Tuple, Any
+from nonebot.adapters.onebot.v11 import MessageSegment
+from src.libraries.image import image_to_base64, get_music_cover
 from copy import deepcopy
 from zhconv import convert
 
@@ -9,9 +11,6 @@ def get_cover_len4_id(mid) -> str:
     if 10001 <= mid:
         mid -= 10000
     return f'{mid:04d}'
-
-def get_cover_len5_id(mid) -> str:
-    return f'{int(mid):05d}'
 
 def cross(checker: List[Any], elem: Optional[Union[Any, List[Any]]], diff):
     ret = False
@@ -249,3 +248,12 @@ def calculate_ngram_similarity(text1, text2, n):
         return 0
     else:
         return intersection / union
+    
+def song_MessageSegment(music: Music):
+    return  MessageSegment.text(f"{music['id']}. {music['title']}\n") + \
+            MessageSegment.image(f"base64://{str(image_to_base64(get_music_cover(music['id'])), encoding='utf-8')}") + \
+            MessageSegment.text(f"\n艺术家: {music['basic_info']['artist']}\n") + \
+            MessageSegment.text(f"分类: {music['basic_info']['genre']}\n") + \
+            MessageSegment.text(f"BPM: {music['basic_info']['bpm']}\n") + \
+            MessageSegment.text(f"版本: {music['basic_info']['from']}\n") + \
+            MessageSegment.text(f"定数: {'/'.join(str(ds) for ds in music['ds'])}")

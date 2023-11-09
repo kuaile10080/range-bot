@@ -2,12 +2,14 @@ import base64, os, requests
 from io import BytesIO
 
 from PIL import ImageFont, ImageDraw, Image
-from src.libraries.maimaidx_music import get_cover_len5_id
 
 
 path = 'src/static/high_eq_image.png'
 fontpath = "src/static/msyh.ttc"
 cover_dir = 'src/static/mai/cover/'
+
+def get_cover_len5_id(mid) -> str:
+    return f'{int(mid):05d}'
 
 def draw_text(img_pil, text, offset_x):
     draw = ImageDraw.Draw(img_pil)

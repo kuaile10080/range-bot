@@ -1,7 +1,6 @@
 from PIL import Image
 import math,wget,os,aiohttp,json,time
 
-from src.libraries.maimaidx_music import get_cover_len5_id
 from src.libraries.secrets import DF_Dev_Token
 from src.libraries.image import get_music_cover
 

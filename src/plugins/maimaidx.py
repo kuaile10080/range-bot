@@ -13,16 +13,7 @@ from src.libraries.maimai_best_50 import generate50
 from PIL import Image
 import re
 
-#OFFLINE
 cover_dir = 'src/static/mai/cover/'
-
-def song_txt(music: Music):
-    #OFFLINE
-    img = get_music_cover(music.id)
-    return  MessageSegment.text(f"{music.id}. {music.title}\n") + \
-            MessageSegment.image(f"base64://{str(image_to_base64(img), encoding='utf-8')}") + \
-            MessageSegment.text(f"\n{'/'.join(str(ds) for ds in music['ds'])}")
-
 
 def inner_level_q(ds1, ds2=None):
     result_set = []
@@ -78,9 +69,9 @@ async def _(event: Event):
         else:
             music_data = total_list.filter(level=level, diff=['绿黄红紫白'.index(res.groups()[1])], type=tp)
         if len(music_data) == 0:
-            rand_result = "没有这样的乐曲哦。"
+            rand_result = MessageSegment.text("没有这样的乐曲哦。\n")
         else:
-            rand_result = song_txt(music_data.random())
+            rand_result = song_MessageSegment(music_data.random())
         await spec_rand.finish(rand_result)
     except FinishedException:
         pass
@@ -92,7 +83,7 @@ async def _(event: Event):
 mr = on_regex(r".*maimai.*什么", priority = 10, block = True)
 @mr.handle()
 async def _():
-    await mr.finish(song_txt(total_list.random()))
+    await mr.finish(song_MessageSegment(total_list.random()))
 
 
 search_music = on_regex(r"^查歌.+", priority = 10, block = True)
@@ -106,12 +97,7 @@ async def _(event: Event):
     if len(res) == 0:
         await search_music.finish("没有找到这样的乐曲。")
     elif len(res) == 1:
-        music = res[0]
-        ##OFFLINE file = f"https://www.diving-fish.com/covers/{get_cover_len5_id(music['id'])}.png"
-        img = get_music_cover(music['id'])
-        await search_music.finish(  MessageSegment.text(f"{music['id']}. {music['title']}\n") + \
-                                    MessageSegment.image(f"base64://{str(image_to_base64(img), encoding='utf-8')}") + \
-                                    MessageSegment.text(f"艺术家: {music['basic_info']['artist']}\n分类: {music['basic_info']['genre']}\nBPM: {music['basic_info']['bpm']}\n版本: {music['basic_info']['from']}\n定数: {'/'.join(str(ds) for ds in music['ds'])}"))
+        await search_music.finish(song_MessageSegment(res[0]))
     elif len(res) < 30:
         search_result = ""
         for music in sorted(res, key = lambda i: int(i['id'])):
@@ -141,9 +127,6 @@ async def _(event: Event):
 # BPM: {music['basic_info']['bpm']}'''
             ds = music['ds'][level_index]
             level = music['level'][level_index]
-            #OFFLINE file = f"https://www.diving-fish.com/covers/{get_cover_len5_id(music['id'])}.png"
-            img = get_music_cover(music.id)
-
 #-------平均完成率与拟合定数-----------------
             try:
                 avg = f"{music['stats'][level_index]['avg']:.4f}%"
@@ -174,7 +157,7 @@ TOUCH: {chart['notes'][3]}
 BREAK: {chart['notes'][4]}
 谱师: {chart['charter']}'''
             await query_chart.finish(   MessageSegment.text(f"{music['id']}. {music['title']}\n") + \
-                                        MessageSegment.image(f"base64://{str(image_to_base64(img), encoding='utf-8')}") + \
+                                        MessageSegment.image(f"base64://{str(image_to_base64(get_music_cover(music.id)), encoding='utf-8')}") + \
                                         MessageSegment.text(msg + diffcalc))
         except FinishedException:
             pass
@@ -184,11 +167,7 @@ BREAK: {chart['notes'][4]}
         name = groups[1].strip()
         music = total_list.by_id(name)
         try:
-            ##OFFLINE file = f"https://www.diving-fish.com/covers/{get_cover_len5_id(music['id'])}.png"
-            img = get_music_cover(music['id'])
-            await query_chart.finish(   MessageSegment.text(f"{music['id']}. {music['title']}\n") + \
-                                        MessageSegment.image(f"base64://{str(image_to_base64(img), encoding='utf-8')}") + \
-                                        MessageSegment.text(f"艺术家: {music['basic_info']['artist']}\n分类: {music['basic_info']['genre']}\nBPM: {music['basic_info']['bpm']}\n版本: {music['basic_info']['from']}\n定数: {'/'.join(str(ds) for ds in music['ds'])}"))
+            await query_chart.finish(song_MessageSegment(music))
         except FinishedException:
             pass
         except Exception as e:
@@ -217,7 +196,7 @@ async def _(event: Event, message: Message = CommandArg()):
             s += f'忌 {wm_list[i]}\n'
     s += "然哥提醒您：打几把舞萌快去学习\n新机需要共同维护，谁拆机，我拆谁\n"
     music = total_list[h % len(total_list)]
-    await jrwm.finish(MessageSegment.text(s) + song_txt(music))
+    await jrwm.finish(MessageSegment.text(s) + song_MessageSegment(music))
 
 
 query_score = on_command('分数线', priority = 10, block = True)

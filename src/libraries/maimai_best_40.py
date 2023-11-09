@@ -6,7 +6,7 @@ from typing import Optional, Dict, List, Tuple
 
 import aiohttp
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
-from src.libraries.maimaidx_music import get_cover_len5_id, total_list
+from src.libraries.maimaidx_music import total_list
 from src.libraries.image import get_music_cover
 
 import wget

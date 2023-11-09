@@ -17,44 +17,38 @@ from src.libraries.maimai_info import draw_new_info
 from PIL import Image,ImageDraw,ImageFont
 import re,base64,random
 
-#OFFLINE
 cover_dir = 'src/static/mai/cover/'
 long_dir_ = 'src/static/long/'
 
-def song_txt(music: Music):
-    #OFFLINE
-    img = get_music_cover(music.id)
-    return  MessageSegment.text(f"{music.id}. {music.title}\n") + \
-            MessageSegment.image(f"base64://{str(image_to_base64(img), encoding='utf-8')}") + \
-            MessageSegment.text(f"\n{'/'.join(str(ds) for ds in music['ds'])}")
-
 """-----------(maibot删除功能：是什么歌)-----------"""
-music_aliases = defaultdict(list)
-f = open('src/static/aliases.csv', 'r', encoding='utf-8')
-tmp = f.readlines()
-f.close()
-for t in tmp:
-    arr = t.strip().split('\t')
-    for i in range(len(arr)):
-        if arr[i] != "":
-            music_aliases[arr[i].lower()].append(arr[0])
+# music_aliases = defaultdict(list)
+# f = open('src/static/aliases.csv', 'r', encoding='utf-8')
+# tmp = f.readlines()
+# f.close()
+# for t in tmp:
+#     arr = t.strip().split('\t')
+#     for i in range(len(arr)):
+#         if arr[i] != "":
+#             music_aliases[arr[i].lower()].append(arr[0])
 
 find_song = on_regex(r".+是什么歌", rule = dajiang_checker, priority = 10, block = True)
 
 @find_song.handle()
 async def _(event: Event):
     regex = "(.+)是什么歌"
-    name = re.match(regex, str(event.get_message())).groups()[0].strip().lower()
-    if name not in music_aliases:
-        #await find_song.finish("未找到此歌曲\n添加曲名别名请联系CDRange")
-        return
-    result_set = music_aliases[name]
-    if len(result_set) == 1:
-        music = total_list.by_title(result_set[0])
-        await find_song.finish(MessageSegment.text("您要找的是不是") + song_txt(music))
+    name = re.match(regex, str(event.get_message())).groups()[0].strip()
+    result_list = total_list.filt_by_name(name)
+    if len(result_list) == 0:
+        await find_song.finish("未找到此歌曲\n添加曲名别名请联系CDRange(50835696)")
+    elif len(result_list) == 1:
+        await find_song.finish(MessageSegment.text("您要找的是不是：\n") + song_MessageSegment(result_list[0]))
+    elif len(result_list) < 30:
+        search_result = ""
+        for music in sorted(result_list, key = lambda i: int(i['id'])):
+            search_result += f"{music['id']}. {music['title']}\n"
+        await find_song.finish(search_result.strip())
     else:
-        s = '\n'.join(result_set)
-        await find_song.finish(f"您要找的可能是以下歌曲中的其中一首：\n{ s }")
+        await find_song.finish(f"结果过多（{len(result_list)} 条），请缩小查询范围。")
 
 
 """-----------谱师查歌&曲师查歌&新歌查歌&BPM查歌&版本查歌-----------"""
