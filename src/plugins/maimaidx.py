@@ -102,7 +102,7 @@ async def _(event: Event):
     name = re.match(regex, str(event.get_message())).groups()[0].strip()
     if name == "":
         return
-    res = total_list.filter(title_search=name)
+    res = total_list.filt_by_name(title_search=name)
     if len(res) == 0:
         await search_music.finish("没有找到这样的乐曲。")
     elif len(res) == 1:

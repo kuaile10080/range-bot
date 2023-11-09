@@ -195,8 +195,8 @@ async def _update_music_data(event: Event, message: Message = CommandArg()):
     status,strr = await offlineinit()
     print(status,"\n",strr)
     if status == 1:
-        global total_list, music_data 
-        total_list, music_data = refresh_music_list()
+        global total_list, music_data, alias_data
+        total_list, music_data, alias_data = refresh_music_list()
         await update_music_data.finish(strr)
         # already = 0
         # downloaded = 0
@@ -516,9 +516,8 @@ async def _singlequery(event: Event, message: Message = CommandArg()):
             await singlequery.finish("请输入正确的查询命令，格式：info+id或info+部分歌名。")
         else:
             name = msg
-            res = total_list.filter(title_search=name)
+            res = total_list.filt_by_name(title_search=name)
             if len(res) == 0:
-                return
                 await singlequery.finish("没有找到这样的乐曲。")
             elif len(res) == 1:
                 music = res[0]
@@ -542,7 +541,7 @@ async def _singlequery(event: Event, message: Message = CommandArg()):
         if rec['song_id'] == id:
             records[4-rec['level_index']] = rec
     if records == [{},{},{},{},{}]:
-        await singlequery.finish("您还没有打过这首歌")
+        await singlequery.finish(f"您查询的是{music.title}\n您还没有打过这首歌")
     else:
         imgs = []
         for rec in records:
@@ -564,7 +563,7 @@ async def _singlequery(event: Event, message: Message = CommandArg()):
 
 
 
-    
+"""-----------old info-----------"""
     # img = Image.open("src/static/platequery/bginfo.png").convert('RGBA')
     # cover = get_music_cover(id)
     # cover = cover.resize((200,200))

@@ -26,6 +26,15 @@ async def offlineinit():
         else:
             s += "chart_stats.json下载失败\n"
             k=0
+    async with aiohttp.request('GET', 'https://api.yuzuai.xyz/maimaidx/maimaidxalias') as resp:
+        if resp.status == 200:
+            s += "all_alias.json下载成功\n"
+            with open("src/static/all_alias.json", "w", encoding= "utf-8") as f:
+                j = await resp.json()
+                json.dump(j, f, ensure_ascii=False)
+        else:
+            s += "all_alias.json下载失败\n"
+            k=0
     async with aiohttp.request('GET', 'https://www.diving-fish.com/api/chunithmprober/music_data') as resp:
         if resp.status == 200:
             s += "chunithm_music_data.json下载成功\n"

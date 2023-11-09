@@ -1,9 +1,7 @@
-import json
-import random
+import json, random, requests, nltk
 from typing import Dict, List, Optional, Union, Tuple, Any
 from copy import deepcopy
-
-import requests
+from zhconv import convert
 
 def get_cover_len4_id(mid) -> str:
     return mid
@@ -117,6 +115,7 @@ class Music(Dict):
     stats: Optional[List[Stats]] = None
     release_date: Optional[str] = None
     artist: Optional[str] = None
+    alias: Optional[List[str]] = None
 
     diff: List[int] = []
 
@@ -147,15 +146,15 @@ class MusicList(List[Music]):
         return random.choice(self)
 
     def filter(self,
-               *,
-               level: Optional[Union[str, List[str]]] = ...,
-               ds: Optional[Union[float, List[float], Tuple[float, float]]] = ...,
-               title_search: Optional[str] = ...,
-               genre: Optional[Union[str, List[str]]] = ...,
-               bpm: Optional[Union[float, List[float], Tuple[float, float]]] = ...,
-               type: Optional[Union[str, List[str]]] = ...,
-               diff: List[int] = ...,
-               ):
+            *,
+            level: Optional[Union[str, List[str]]] = ...,
+            ds: Optional[Union[float, List[float], Tuple[float, float]]] = ...,
+            title_search: Optional[str] = ...,
+            genre: Optional[Union[str, List[str]]] = ...,
+            bpm: Optional[Union[float, List[float], Tuple[float, float]]] = ...,
+            type: Optional[Union[str, List[str]]] = ...,
+            diff: List[int] = ...,
+            ):
         new_list = MusicList()
         for music in self:
             diff2 = diff
@@ -177,6 +176,32 @@ class MusicList(List[Music]):
             music.diff = diff2
             new_list.append(music)
         return new_list
+    
+    def filt_by_name(self,title_search:str):
+        title_search = title_search.lower()
+        new_list = MusicList()
+        title_temp = MusicList()
+        alias_temp = MusicList()
+        ngram_temp = None
+        ngrams = 0
+        for music in self:
+            if title_search in music.title.lower():
+                title_temp.append(music)
+            elif title_search in music.alias:
+                alias_temp.append(music)
+            else:
+                for alias in music.alias:
+                    ngram_similarity = calculate_ngram_similarity(title_search, alias.lower(), 2)
+                    if ngram_similarity > ngrams:
+                        ngrams = ngram_similarity
+                        ngram_temp = music
+        if len(title_temp) != 0:
+            return title_temp
+        elif len(alias_temp) != 0:
+            return alias_temp
+        elif ngram_temp is not None:
+            new_list.append(ngram_temp)
+        return new_list
 
 #OFFLINE
 #obj_data = requests.get('https://www.diving-fish.com/api/maimaidxprober/music_data').json()
@@ -185,18 +210,24 @@ def refresh_music_list():
     try:
         mdatafile = open("src/static/music_data.json", encoding="utf-8")
         cstatsfile = open("src/static/chart_stats.json", encoding="utf-8")
+        aliasfile = open("src/static/all_alias.json", encoding="utf-8")
         obj_data = json.load(mdatafile)
         obj_stats = json.load(cstatsfile)
+        obj_alias = json.load(aliasfile)
         mdatafile.close()
         cstatsfile.close()
     except:
         obj_data = requests.get('https://www.diving-fish.com/api/maimaidxprober/music_data').json()
         obj_stats = requests.get('https://www.diving-fish.com/api/maimaidxprober/chart_stats').json()
+        obj_alias = requests.get('https://api.yuzuai.xyz/maimaidx/maimaidxalias').json()
     obj_stats = obj_stats["charts"]
     _music_data = obj_data
     _total_list: MusicList = MusicList(obj_data)
+    _alias_data = obj_alias
     for __i in range(len(_total_list)):
         _total_list[__i] = Music(_total_list[__i])
+        _total_list[__i]['Alias'] = _alias_data[_total_list[__i]['id']]["Alias"]
+        _total_list[__i].alias = _total_list[__i]['Alias']
         try:
             _total_list[__i]['stats'] = obj_stats[_total_list[__i].id]
         except:
@@ -204,6 +235,17 @@ def refresh_music_list():
         for __j in range(len(_total_list[__i].charts)):
             _total_list[__i].charts[__j] = Chart(_total_list[__i].charts[__j])
             _total_list[__i].stats[__j] = Stats(_total_list[__i].stats[__j])
-    return _total_list, _music_data
+    return _total_list, _music_data, _alias_data
 
-total_list, music_data = refresh_music_list()
+total_list, music_data, alias_data = refresh_music_list()
+
+def calculate_ngram_similarity(text1, text2, n):
+    ngrams0 = set(nltk.ngrams(convert(text1, 'zh-hant'), n))
+    ngrams1 = set(nltk.ngrams(text1, n))
+    ngrams2 = set(nltk.ngrams(text2, n))
+    intersection = max(len(ngrams1.intersection(ngrams2)),len(ngrams0.intersection(ngrams2)))
+    union = len(ngrams1.union(ngrams2))
+    if union == 0:
+        return 0
+    else:
+        return intersection / union
