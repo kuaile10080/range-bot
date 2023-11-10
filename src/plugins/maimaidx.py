@@ -95,7 +95,7 @@ async def _(event: Event):
         return
     res = total_list.filter(title_search=name)
     if len(res) == 0:
-        await search_music.finish("没有找到这样的乐曲。曲名不确准确以使用xxx是什么歌。")
+        await search_music.finish("没有找到这样的乐曲。曲名不准确请使用xxx是什么歌。")
     elif len(res) == 1:
         await search_music.finish(song_MessageSegment(res[0]))
     elif len(res) < 50:

@@ -170,7 +170,7 @@ class MusicList(List[Music]):
                 continue
             if not in_or_equal(music.bpm, bpm):
                 continue
-            if title_search is not Ellipsis and title_search.lower() not in music.title.lower():
+            if title_search is not Ellipsis and title_search.lower() not in music.title.lower() and convert_cn2jp(title_search.lower()) not in music.title.lower():
                 continue
             music.diff = diff2
             new_list.append(music)
@@ -182,7 +182,6 @@ class MusicList(List[Music]):
             alias_data = json.load(fp)
 
         title_search = title_search.lower()
-        title_search_jp = convert_cn2jp(title_search)
         new_list = MusicList()
         title_temp = MusicList()
         alias_temp_1 = MusicList()
@@ -195,13 +194,13 @@ class MusicList(List[Music]):
                 title_temp.append(music)
             else:
                 for alias in alias_list:
-                    if title_search == alias.lower():
+                    if title_search == alias.lower() and music not in alias_temp_1:
                         alias_temp_1.append(music)
-                        continue
+                        break
                     if title_search in alias.lower():
                         alias_temp_2.append(music)
-                        continue
-                    ngram_similarity = calculate_ngram_similarity(title_search, title_search_jp, alias.lower(), 2)
+                        break
+                    ngram_similarity = calculate_ngram_similarity(title_search, alias.lower(), 2)
                     if ngram_similarity > ngrams_max:
                         ngrams_max = ngram_similarity
                         ngram_temp = music
@@ -215,12 +214,11 @@ class MusicList(List[Music]):
             new_list.append(ngram_temp)
         return new_list
 
-def calculate_ngram_similarity(text1_cn, text1_jp, text2, n):
+def calculate_ngram_similarity(text1_cn, text2, n):
     ngrams0 = set(nltk.ngrams(text1_cn, n))
-    ngrams1 = set(nltk.ngrams(text1_jp, n))
-    ngrams2 = set(nltk.ngrams(text2, n))
-    intersection = max(len(ngrams1.intersection(ngrams2)),len(ngrams0.intersection(ngrams2)))
-    union = len(ngrams1.union(ngrams2))
+    ngrams1 = set(nltk.ngrams(text2, n))
+    intersection = len(ngrams0.intersection(ngrams1))
+    union = len(ngrams0.union(ngrams1))
     if union == 0:
         return 0
     else:
