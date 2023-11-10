@@ -185,25 +185,32 @@ class MusicList(List[Music]):
         title_search_jp = convert_cn2jp(title_search)
         new_list = MusicList()
         title_temp = MusicList()
-        alias_temp = MusicList()
+        alias_temp_1 = MusicList()
+        alias_temp_2 = MusicList()
         ngram_temp = None
         ngrams_max = 0
         for music in self:
             alias_list = alias_data[music.id]["Alias"]
             if title_search in music.title.lower():
                 title_temp.append(music)
-            elif title_search in "@".join(alias_list):
-                alias_temp.append(music)
             else:
                 for alias in alias_list:
+                    if title_search == alias.lower():
+                        alias_temp_1.append(music)
+                        continue
+                    if title_search in alias.lower():
+                        alias_temp_2.append(music)
+                        continue
                     ngram_similarity = calculate_ngram_similarity(title_search, title_search_jp, alias.lower(), 2)
                     if ngram_similarity > ngrams_max:
                         ngrams_max = ngram_similarity
                         ngram_temp = music
         if len(title_temp) != 0:
             return title_temp
-        elif len(alias_temp) != 0:
-            return alias_temp
+        elif len(alias_temp_1) != 0:
+            return alias_temp_1
+        elif len(alias_temp_2) != 0:
+            return alias_temp_2
         elif ngram_temp is not None:
             new_list.append(ngram_temp)
         return new_list

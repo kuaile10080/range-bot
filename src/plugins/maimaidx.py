@@ -93,12 +93,12 @@ async def _(event: Event):
     name = re.match(regex, str(event.get_message())).groups()[0].strip()
     if name == "":
         return
-    res = total_list.filt_by_name(title_search=name)
+    res = total_list.filter(title_search=name)
     if len(res) == 0:
-        await search_music.finish("没有找到这样的乐曲。")
+        await search_music.finish("没有找到这样的乐曲。曲名不确准确以使用xxx是什么歌。")
     elif len(res) == 1:
         await search_music.finish(song_MessageSegment(res[0]))
-    elif len(res) < 30:
+    elif len(res) < 50:
         search_result = ""
         for music in sorted(res, key = lambda i: int(i['id'])):
             search_result += f"{music['id']}. {music['title']}\n"
