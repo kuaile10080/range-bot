@@ -9,7 +9,7 @@ from src.libraries.image import *
 from src.libraries.maimai_best_40 import generate
 from src.libraries.maimai_best_50 import generate50
 from src.libraries.maimai_plate_query import *
-from src.libraries.secrets import range_checker,dajiang_checker
+from src.libraries.secrets import range_checker,dajiang_checker, maiqun_checker
 from src.libraries.maimai_info import draw_new_info
 
 from PIL import Image
@@ -764,3 +764,67 @@ async def _fslb(event: Event):
     s += f"""
 第{page}页，共{maxpage}页"""
     await fslb.finish(MessageSegment.image(f"base64://{str(image_to_base64(text_to_image(s)), encoding='utf-8')}"))
+
+"""-----------------别名增删查----------------"""
+select_alias = on_command("别名", priority = 10, block = True, rule = maiqun_checker)
+@select_alias.handle()
+async def _select_alias(event: Event, message: Message = CommandArg()):
+    msg = str(message).strip().split(" ")
+    if len(msg) == 1 and msg[0] != "":
+        id = msg[0]
+        with open("src/static/all_alias_temp.json","r",encoding='utf-8')as fp:
+            alias_data = json.load(fp)
+        if id not in alias_data:
+            await select_alias.finish("未找到该乐曲，请直接输入乐曲id。")
+        else:
+            s = f"{id}.{alias_data[id]['Name']}的别名有：\n"
+            for i in range(1,len(alias_data[id]['Alias'])):
+                s += f"{alias_data[id]['Alias'][i]}\n"
+            await select_alias.finish(s)
+    elif len(msg) == 3:
+        qq = str(event.get_user_id())
+        id = msg[1]
+        with open("src/static/all_alias_temp.json","r",encoding='utf-8')as fp:
+            alias_data = json.load(fp)
+        if id not in alias_data:
+            await select_alias.finish("未找到该乐曲，请直接输入乐曲id。")
+        else:
+            if ("增" in msg[0]) or ("加" in msg[0]):
+                if msg[2] in alias_data[id]["Alias"]:
+                    await select_alias.finish("该别名已存在。")
+                else:
+                    with open("src/static/alias_pre_process_add.json","r",encoding='utf-8')as fp:
+                        alias_pre_process_add = json.load(fp)
+                    if id in alias_pre_process_add:
+                        alias_pre_process_add[id].append(msg[2])
+                    else:
+                        alias_pre_process_add[id] = [msg[2]]
+                    with open("src/static/alias_pre_process_add.json","w",encoding='utf-8')as fp:
+                        json.dump(alias_pre_process_add,fp,ensure_ascii=False,indent=4)
+                    with open("src/static/alias_log.csv","a",encoding='utf-8')as fp:
+                        fp.write(f"{qq},{','.join(msg)}\n")
+                    if refresh_alias_temp():
+                        await select_alias.finish(f"添加成功。\n已为 {id}.{alias_data[id]['Name']} 添加别名：\n{msg[2]}")
+            elif ("删" in msg[0]) or ("减" in msg[0]):
+                if msg[2] not in alias_data[id]["Alias"]:
+                    await select_alias.finish("该别名不存在。")
+                else:
+                    with open("src/static/alias_pre_process_remove.json","r",encoding='utf-8')as fp:
+                        alias_pre_process_remove = json.load(fp)
+                    if id in alias_pre_process_remove:
+                        alias_pre_process_remove[id].append(msg[2])
+                    else:
+                        alias_pre_process_remove[id] = [msg[2]]
+                    with open("src/static/alias_pre_process_remove.json","w",encoding='utf-8')as fp:
+                        json.dump(alias_pre_process_remove,fp,ensure_ascii=False,indent=4)
+                    with open("src/static/alias_log.csv","a",encoding='utf-8')as fp:
+                        fp.write(f"{qq},{','.join(msg)}\n")
+                    if refresh_alias_temp():
+                        await select_alias.finish("删除成功")
+            else:
+                await select_alias.finish('输入格式错误。\n查别名请输入“别名 id”\n增加别名请输入“别名 增 id 别名”\n删除别名请输入“别名 删 id 别名”')
+
+    else:
+        await select_alias.finish('输入格式错误。\n查别名请输入“别名 id”\n增加别名请输入“别名 增 id 别名”\n删除别名请输入“别名 删 id 别名”\n')
+
+    

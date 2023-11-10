@@ -4,7 +4,6 @@ from nonebot.adapters.onebot.v11 import MessageSegment
 from src.libraries.image import image_to_base64, get_music_cover
 from src.libraries.tool import convert_cn2jp
 from copy import deepcopy
-from src.libraries.secrets import alias_pre_process_add, alias_pre_process_remove
 
 def get_cover_len4_id(mid) -> str:
     return mid
@@ -178,23 +177,28 @@ class MusicList(List[Music]):
         return new_list
     
     def filt_by_name(self,title_search:str):
+
+        with open("src/static/all_alias_temp.json", "r", encoding="utf-8") as fp:
+            alias_data = json.load(fp)
+
         title_search = title_search.lower()
         title_search_jp = convert_cn2jp(title_search)
         new_list = MusicList()
         title_temp = MusicList()
         alias_temp = MusicList()
         ngram_temp = None
-        ngrams = 0
+        ngrams_max = 0
         for music in self:
+            alias_list = alias_data[music.id]["Alias"]
             if title_search in music.title.lower():
                 title_temp.append(music)
-            elif title_search in music.alias:
+            elif title_search in "@".join(alias_list):
                 alias_temp.append(music)
             else:
-                for alias in music.alias:
+                for alias in alias_list:
                     ngram_similarity = calculate_ngram_similarity(title_search, title_search_jp, alias.lower(), 2)
-                    if ngram_similarity > ngrams:
-                        ngrams = ngram_similarity
+                    if ngram_similarity > ngrams_max:
+                        ngrams_max = ngram_similarity
                         ngram_temp = music
         if len(title_temp) != 0:
             return title_temp
@@ -203,53 +207,6 @@ class MusicList(List[Music]):
         elif ngram_temp is not None:
             new_list.append(ngram_temp)
         return new_list
-
-#OFFLINE
-#obj_data = requests.get('https://www.diving-fish.com/api/maimaidxprober/music_data').json()
-#obj_stats = requests.get('https://www.diving-fish.com/api/maimaidxprober/chart_stats').json()
-def refresh_music_list():
-    try:
-        mdatafile = open("src/static/music_data.json", encoding="utf-8")
-        cstatsfile = open("src/static/chart_stats.json", encoding="utf-8")
-        aliasfile = open("src/static/all_alias.json", encoding="utf-8")
-        obj_data = json.load(mdatafile)
-        obj_stats = json.load(cstatsfile)
-        obj_alias = json.load(aliasfile)
-        mdatafile.close()
-        cstatsfile.close()
-    except:
-        obj_data = requests.get('https://www.diving-fish.com/api/maimaidxprober/music_data').json()
-        obj_stats = requests.get('https://www.diving-fish.com/api/maimaidxprober/chart_stats').json()
-        obj_alias = requests.get('https://api.yuzuai.xyz/maimaidx/maimaidxalias').json()
-    obj_stats = obj_stats["charts"]
-    _music_data = obj_data
-    _total_list: MusicList = MusicList(obj_data)
-    _alias_data = obj_alias
-
-    for key in alias_pre_process_add:
-        for item in alias_pre_process_add[key]:
-            if item not in _alias_data[key]["Alias"]:
-                _alias_data[key]["Alias"].append(item)
-
-    for key in alias_pre_process_remove:
-        for item in alias_pre_process_remove[key]:
-            if item in _alias_data[key]["Alias"]:
-                _alias_data[key]["Alias"].remove(item)
-            
-    for __i in range(len(_total_list)):
-        _total_list[__i] = Music(_total_list[__i])
-        _total_list[__i]['Alias'] = _alias_data[_total_list[__i]['id']]["Alias"]
-        _total_list[__i].alias = _total_list[__i]['Alias']
-        try:
-            _total_list[__i]['stats'] = obj_stats[_total_list[__i].id]
-        except:
-            _total_list[__i]['stats'] = [{},{},{},{},{}]
-        for __j in range(len(_total_list[__i].charts)):
-            _total_list[__i].charts[__j] = Chart(_total_list[__i].charts[__j])
-            _total_list[__i].stats[__j] = Stats(_total_list[__i].stats[__j])
-    return _total_list, _music_data, _alias_data
-
-total_list, music_data, alias_data = refresh_music_list()
 
 def calculate_ngram_similarity(text1_cn, text1_jp, text2, n):
     ngrams0 = set(nltk.ngrams(text1_cn, n))
@@ -270,3 +227,63 @@ def song_MessageSegment(music: Music):
             MessageSegment.text(f"BPM: {music['basic_info']['bpm']}\n") + \
             MessageSegment.text(f"版本: {music['basic_info']['from']}\n") + \
             MessageSegment.text(f"定数: {'/'.join(str(ds) for ds in music['ds'])}")
+
+def refresh_alias_temp():
+    with open("src/static/all_alias.json", "r", encoding="utf-8") as aliasfile:
+            alias_data = json.load(aliasfile)
+
+    with open("src/static/alias_pre_process_add.json", "r", encoding="utf-8") as addfile, \
+            open("src/static/alias_pre_process_remove.json", "r", encoding="utf-8") as removefile:
+            alias_pre_process_add = json.load(addfile)
+            alias_pre_process_remove = json.load(removefile)
+
+    for key in alias_pre_process_add:
+        for item in alias_pre_process_add[key]:
+            if item not in alias_data[key]["Alias"]:
+                alias_data[key]["Alias"].append(item)
+
+    for key in alias_pre_process_remove:
+        for item in alias_pre_process_remove[key]:
+            if item in alias_data[key]["Alias"]:
+                alias_data[key]["Alias"].remove(item)
+    
+    with open("src/static/all_alias_temp.json","w",encoding="utf-8") as fp:
+        json.dump(alias_data,fp,ensure_ascii=False,indent=4)
+    return True
+
+
+#OFFLINE
+#obj_data = requests.get('https://www.diving-fish.com/api/maimaidxprober/music_data').json()
+#obj_stats = requests.get('https://www.diving-fish.com/api/maimaidxprober/chart_stats').json()
+def refresh_music_list():
+    try:
+        with open("src/static/music_data.json", "r", encoding="utf-8") as mdatafile, \
+             open("src/static/chart_stats.json", "r", encoding="utf-8") as cstatsfile, \
+             open("src/static/all_alias.json", "r", encoding="utf-8") as aliasfile:
+                obj_data = json.load(mdatafile)
+                obj_stats = json.load(cstatsfile)
+                obj_alias = json.load(aliasfile)
+    except:
+        obj_data = requests.get('https://www.diving-fish.com/api/maimaidxprober/music_data').json()
+        obj_stats = requests.get('https://www.diving-fish.com/api/maimaidxprober/chart_stats').json()
+        obj_alias = requests.get('https://api.yuzuai.xyz/maimaidx/maimaidxalias').json()
+    obj_stats = obj_stats["charts"]
+    _music_data = obj_data
+    _total_list: MusicList = MusicList(obj_data)
+    _alias_data = obj_alias
+            
+    for __i in range(len(_total_list)):
+        _total_list[__i] = Music(_total_list[__i])
+        _total_list[__i]['Alias'] = _alias_data[_total_list[__i]['id']]["Alias"]
+        _total_list[__i].alias = _total_list[__i]['Alias']
+        try:
+            _total_list[__i]['stats'] = obj_stats[_total_list[__i].id]
+        except:
+            _total_list[__i]['stats'] = [{},{},{},{},{}]
+        for __j in range(len(_total_list[__i].charts)):
+            _total_list[__i].charts[__j] = Chart(_total_list[__i].charts[__j])
+            _total_list[__i].stats[__j] = Stats(_total_list[__i].stats[__j])
+    return _total_list, _music_data, _alias_data
+
+refresh_alias_temp()
+total_list, music_data, alias_data = refresh_music_list()

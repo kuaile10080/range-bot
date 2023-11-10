@@ -592,5 +592,4 @@ async def _mirror_img(event: Event, message: Message = CommandArg()):
         await mirror_img.finish(MessageSegment.image(url))
 
 
-#branch test
 
