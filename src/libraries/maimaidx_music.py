@@ -183,33 +183,33 @@ class MusicList(List[Music]):
 
         title_search = title_search.lower()
         new_list = MusicList()
-        title_temp = MusicList()
-        alias_temp_1 = MusicList()
-        alias_temp_2 = MusicList()
+        title_temp_equal = MusicList()
+        alias_temp_equal = MusicList()
+        alias_temp_in = MusicList()
         ngram_temp = None
         ngrams_max = 0
         for music in self:
             alias_list = alias_data[music.id]["Alias"]
-            if title_search in music.title.lower():
-                title_temp.append(music)
+            if title_search == music.title.lower():
+                title_temp_equal.append(music)
             else:
                 for alias in alias_list:
-                    if title_search == alias.lower() and music not in alias_temp_1:
-                        alias_temp_1.append(music)
+                    if title_search == alias.lower():
+                        alias_temp_equal.append(music)
                         break
                     if title_search in alias.lower():
-                        alias_temp_2.append(music)
+                        alias_temp_in.append(music)
                         break
                     ngram_similarity = calculate_ngram_similarity(title_search, alias.lower(), 2)
                     if ngram_similarity > ngrams_max:
                         ngrams_max = ngram_similarity
                         ngram_temp = music
-        if len(title_temp) != 0:
-            return title_temp
-        elif len(alias_temp_1) != 0:
-            return alias_temp_1
-        elif len(alias_temp_2) != 0:
-            return alias_temp_2
+        if len(title_temp_equal) != 0:
+            return title_temp_equal
+        elif len(alias_temp_equal) != 0:
+            return alias_temp_equal
+        elif len(alias_temp_in) != 0:
+            return alias_temp_in
         elif ngram_temp is not None:
             new_list.append(ngram_temp)
         return new_list
@@ -236,6 +236,10 @@ def song_MessageSegment(music: Music):
 def refresh_alias_temp():
     with open("src/static/all_alias.json", "r", encoding="utf-8") as aliasfile:
             alias_data = json.load(aliasfile)
+
+    # for id in alias_data:
+    #     if alias_data[id]['Name'] not in alias_data[id]['Alias']:
+    #         alias_data[id]['Alias'].append(alias_data[id]['Name'])
 
     with open("src/static/alias_pre_process_add.json", "r", encoding="utf-8") as addfile, \
             open("src/static/alias_pre_process_remove.json", "r", encoding="utf-8") as removefile:

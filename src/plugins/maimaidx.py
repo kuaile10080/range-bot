@@ -80,7 +80,7 @@ async def _(event: Event):
         await spec_rand.finish("随机命令错误，请检查语法")
 
 
-mr = on_regex(r".*maimai.*什么", priority = 10, block = True)
+mr = on_regex(r".*maimai.*什么", priority = 100, block = True)
 @mr.handle()
 async def _():
     await mr.finish(song_MessageSegment(total_list.random()))
