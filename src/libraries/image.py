@@ -55,32 +55,33 @@ def image_to_base64(img, format='PNG'):
     return base64_str
 
 def get_music_cover(mid) -> Image.Image:
-    cover_path = cover_dir + f'{get_cover_len5_id(mid)}.png'
+    cover_path = f'{cover_dir}{get_cover_len5_id(mid)}.png'
     if os.path.exists(cover_path):
-        try:
-            return Image.open(cover_path).convert('RGB')
-        except:
-            pass
-    try:
-        download_music_cover(mid)
         return Image.open(cover_path).convert('RGB')
-    except:
-        return Image.open(cover_dir + '00000.png').convert('RGB')
-
-def download_music_cover(mid) -> int:
-    cover_path = cover_dir + f'{get_cover_len5_id(mid)}.png'
-    if os.path.exists(cover_path):
-        return 0
     else:
-        try:
-            id = (5-len(mid))*'0' + mid
-            url = f"https://www.diving-fish.com/covers/{id}.png"
-            r = requests.get(url)
-            if r.status_code == 200:
-                with open(cover_path, "wb") as f:
-                    f.write(r.content)
-                return 1
-            else:
-                return id
-        except:
-            return id
+        mid = int(mid)
+        if 1000<mid<2000:
+            mid += 10000
+        elif 10000<mid<11000:
+            mid -= 10000
+        new_cover_path = f'{cover_dir}{get_cover_len5_id(mid)}.png'
+        if os.path.exists(new_cover_path):
+            with open(new_cover_path, 'rb') as fp:
+                content = fp.read()
+                with open(cover_path, 'wb') as fp2:
+                    fp2.write(content)
+            return Image.open(BytesIO(content)).convert('RGB')
+        else:
+            try:
+                url = f"https://www.diving-fish.com/covers/{get_cover_len5_id(mid)}.png"
+                r = requests.get(url)
+                if r.status_code == 200:
+                    with open(new_cover_path, 'wb') as fp:
+                        fp.write(r.content)
+                    if cover_path != new_cover_path:
+                        with open(cover_path, 'wb') as fp:
+                            fp.write(r.content)
+                    return Image.open(BytesIO(r.content)).convert('RGB')
+            except:
+                return Image.open('src/static/mai/cover/00000.png').convert('RGB')
+

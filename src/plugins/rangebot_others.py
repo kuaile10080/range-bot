@@ -164,7 +164,6 @@ async def _jtadd(event: Event):
                     db.ping()
                     cursor = db.cursor()
                     SQL = f"INSERT INTO {msg[0]} (time,num,operator,operate,operate_parameter) VALUES (now(),{num},{user},'{oper}',{int(msg[2])});"
-                    print(SQL)
                     cursor.execute(SQL)
                     db.commit()
                     cursor.close()
@@ -217,7 +216,6 @@ async def sjst_handle(event: Event):
         with open(setupath,"rb")as fp:
             encoded = base64.b64encode(fp.read())
         url = "base64://" + encoded.decode('utf-8')
-        print(a)
         try:
             await sjst.finish(MessageSegment.image(url))
         except exception.ActionFailed:
@@ -237,11 +235,6 @@ fudu = on_message(priority = 20000, block = True)
 @fudu.handle()
 async def fudu_handle(event: Event):
     global fuducount, fudumessage
-    '''
-    print(fuducount)
-    print(fudumessage)
-    print(len(str(message)))
-    '''
     if type(re.match("group_(.+)_(.+)",event.get_session_id())) == re.Match:
         group = str(re.match("group_(.+)_(.+)",event.get_session_id()).groups()[0])
         if len(str(event.get_message())) > 50:
@@ -389,13 +382,11 @@ async def gre_handle(event: Event,matcher: Matcher):
         gre_status = 1
         wordHead = word["wordHead"]
         replace_list = random.sample([i for i in range(1,len(wordHead))], len(wordHead)//2)
-        print(wordHead)
         wordHead = list(wordHead)
         for i in replace_list:
             wordHead[i] = '_'
         wordHead = ''.join(wordHead)
         ans_pattern = wordHead.replace("_","[a-z\-]*")
-        print(ans_pattern)
         synos = word["content"]["syno"]["synos"]
         msg = f"{wordHead}\n"
         pt = r"（[^()]*）"

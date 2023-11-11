@@ -130,7 +130,6 @@ def get_chuni_cover(jid:str) -> Image.Image:
                     break
             url = "https://new.chunithm-net.com/chuni-mobile/html/mobile/img/" + image_url
             path = chuni_path + f"cover/{jid}.jpg"
-            print(url, path)
             wget.download(url, path)
             return Image.open(chuni_path + f"cover/{jid}.jpg").convert("RGB")
         except:

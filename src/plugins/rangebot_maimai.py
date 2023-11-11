@@ -55,14 +55,19 @@ hardlist = ['Basic','Advance','Expert','Master','Re:Master']
 charter_search = on_command('谱师查歌', priority = 10, block = True)
 @charter_search.handle()
 async def _(event: Event, message: Message = CommandArg()):
+    temp_dict = {
+        2:"红",
+        3:"紫",
+        4:"白"
+    }
     charter = str(message).strip()
     k=0
     s = s = "\n结果如下：\n"
     for i in range(0,len(music_data)):
-        for j in range(3,len(music_data[i]['charts'])):
+        for j in range(2,len(music_data[i]['charts'])):
             if charter.lower() in music_data[i]['charts'][j]['charter'].lower() or convert_cn2jp(charter.lower()) in music_data[i]['charts'][j]['charter'].lower():
                 k += 1
-                s += f"No.{k:03d} {music_data[i]['charts'][j]['charter']} [{music_data[i]['id']}] {music_data[i]['title']}\n"
+                s += f"No.{k:03d} {music_data[i]['charts'][j]['charter']} [{music_data[i]['id']}][{temp_dict[j]}]{music_data[i]['title']}\n"
     if k > 350 :
         await charter_search.finish(f"结果过多（{k} 条），请缩小搜索范围。")
     elif k == 0 :
@@ -165,31 +170,10 @@ update_music_data = on_command("更新歌曲列表", priority = 5, block = True,
 @update_music_data.handle()
 async def _update_music_data(event: Event, message: Message = CommandArg()):
     status,strr = await offlineinit()
-    print(status,"\n",strr)
     if status == 1:
         global total_list, music_data, alias_data
         total_list, music_data, alias_data = refresh_music_list()
         await update_music_data.finish(strr)
-        # already = 0
-        # downloaded = 0
-        # faild = 0
-        # fail = []
-        # for song in music_data:
-        #     status = download_music_cover(song['id'])
-        #     if status == 0:
-        #         already += 1
-        #     elif status == 1:
-        #         print(status)
-        #         downloaded += 1
-        #     else:
-        #         print(status)
-        #         fail.append(song)
-        #         faild += 1
-        # if faild != 0:
-        #     with open("src/static/fail.json", "w", encoding= "utf-8") as fp:
-        #         json.dump(fail, fp, ensure_ascii=False,indent=4)
-        # await update_music_data.finish(f"更新完成，共{already}首歌曲已存在，{downloaded}首歌曲下载成功，{faild}首歌曲下载失败。")
-
     else:
         await update_music_data.finish(strr)
     
@@ -334,7 +318,6 @@ async def _plate(event: Event):
     elif success == 403:
         await plate.finish("该用户禁止了其他人获取数据。")
     else:
-        print(flag)
         song_played = {}
         for song in player_data['verlist']:
             song_played[str(song["id"])+'l'+str(song["level_index"])] = {

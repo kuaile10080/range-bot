@@ -46,8 +46,6 @@ async def _(event: Event, message: Message = CommandArg()):
                     icon = Image.open(temp)
                 except:
                     icon = Image.open(path + 'icon/' + 'none_icon.png').convert('RGBA')
-                    print(freeHeroListId[i*10+j])
-                    print(HeroList[freeHeroListId[i*10+j]]['alias'])
             Hero_BG.paste(icon, (10+140*j, 20+180*i))
             name = HeroList[freeHeroListId[i*10+j]]['name']
             w ,h = tempDraw.textsize(name, font = font)
@@ -87,8 +85,6 @@ async def _(event: Event, message: Message = CommandArg()):
                 icon = Image.open(path + 'icon/' + HeroList[fightHeroId[i*10+j]]['alias'] + '.png').convert('RGBA')
             except:
                 icon = Image.open(path + 'icon/' + 'none_icon.png').convert('RGBA')
-                print(fightHeroId[i*10+j])
-                print(HeroList[fightHeroId[i*10+j]]['alias'])
             ARAM_BG.paste(icon, (10+140*j, 20+180*i))
             name = HeroList[fightHeroId[i*10+j]]['name']
             w ,h = tempDraw.textsize(name, font = font)
@@ -102,8 +98,6 @@ async def _(event: Event, message: Message = CommandArg()):
             icon = Image.open(path + 'icon/' + HeroList[fightHeroId[i*10+j]]['alias'] + '.png').convert('RGBA')
         except:
             icon = Image.open(path + 'icon/' + 'none_icon.png').convert('RGBA')
-            print(fightHeroId[i*10+j])
-            print(HeroList[fightHeroId[i*10+j]]['alias'])
         ARAM_BG.paste(icon, (10+140*j, 20+180*i))
         name = HeroList[fightHeroId[i*10+j]]['name']
         w ,h = tempDraw.textsize(name, font = font)
