@@ -115,6 +115,7 @@ class Music(Dict):
     release_date: Optional[str] = None
     artist: Optional[str] = None
     alias: Optional[List[str]] = None
+    cn_version: Optional[str] = None
 
     diff: List[int] = []
 
@@ -225,13 +226,13 @@ def calculate_ngram_similarity(text1_cn, text2, n):
         return intersection / union
     
 def song_MessageSegment(music: Music):
-    return  MessageSegment.text(f"{music['id']}. {music['title']}\n") + \
-            MessageSegment.image(f"base64://{str(image_to_base64(get_music_cover(music['id'])), encoding='utf-8')}") + \
-            MessageSegment.text(f"\n艺术家: {music['basic_info']['artist']}\n") + \
-            MessageSegment.text(f"分类: {music['basic_info']['genre']}\n") + \
-            MessageSegment.text(f"BPM: {music['basic_info']['bpm']}\n") + \
-            MessageSegment.text(f"版本: {music['basic_info']['from']}\n") + \
-            MessageSegment.text(f"定数: {'/'.join(str(ds) for ds in music['ds'])}")
+    return  MessageSegment.text(f"{music.id}. {music.title}\n") + \
+            MessageSegment.image(f"base64://{str(image_to_base64(get_music_cover(music.id)), encoding='utf-8')}") + \
+            MessageSegment.text(f"\n艺术家: {music.artist}\n") + \
+            MessageSegment.text(f"分类: {music.genre}\n") + \
+            MessageSegment.text(f"BPM: {music.bpm}\n") + \
+            MessageSegment.text(f"版本: {music.cn_version}\n") + \
+            MessageSegment.text(f"定数: {'/'.join(str(ds) for ds in music.ds)}")
 
 def refresh_alias_temp():
     with open("src/static/all_alias.json", "r", encoding="utf-8") as aliasfile:
@@ -261,21 +262,31 @@ def refresh_alias_temp():
     return True
 
 
+with open("src/static/version_list.json", "r", encoding="utf-8") as fp:
+    version_list = json.load(fp)
+
+def get_cn_version(music: Music)->str:
+    if int(music.id) > 1000:
+        for version_name in version_list:
+            if "舞萌DX" in version_name and music.title in version_list[version_name]:
+                return version_name
+    else:
+        for version_name in version_list:
+            if "舞萌DX" not in version_name and music.title in version_list[version_name]:
+                return version_name
+    return ""
+            
+
 #OFFLINE
 #obj_data = requests.get('https://www.diving-fish.com/api/maimaidxprober/music_data').json()
 #obj_stats = requests.get('https://www.diving-fish.com/api/maimaidxprober/chart_stats').json()
 def refresh_music_list():
-    try:
-        with open("src/static/music_data.json", "r", encoding="utf-8") as mdatafile, \
-             open("src/static/chart_stats.json", "r", encoding="utf-8") as cstatsfile, \
-             open("src/static/all_alias.json", "r", encoding="utf-8") as aliasfile:
-                obj_data = json.load(mdatafile)
-                obj_stats = json.load(cstatsfile)
-                obj_alias = json.load(aliasfile)
-    except:
-        obj_data = requests.get('https://www.diving-fish.com/api/maimaidxprober/music_data').json()
-        obj_stats = requests.get('https://www.diving-fish.com/api/maimaidxprober/chart_stats').json()
-        obj_alias = requests.get('https://api.yuzuai.xyz/maimaidx/maimaidxalias').json()
+    with open("src/static/music_data.json", "r", encoding="utf-8") as mdatafile, \
+        open("src/static/chart_stats.json", "r", encoding="utf-8") as cstatsfile, \
+        open("src/static/all_alias.json", "r", encoding="utf-8") as aliasfile:
+        obj_data = json.load(mdatafile)
+        obj_stats = json.load(cstatsfile)
+        obj_alias = json.load(aliasfile)
     obj_stats = obj_stats["charts"]
     _music_data = obj_data
     _total_list: MusicList = MusicList(obj_data)
@@ -285,6 +296,8 @@ def refresh_music_list():
         _total_list[__i] = Music(_total_list[__i])
         _total_list[__i]['Alias'] = _alias_data[_total_list[__i]['id']]["Alias"]
         _total_list[__i].alias = _total_list[__i]['Alias']
+        _total_list[__i]['cn_version'] = get_cn_version(_total_list[__i])
+        _total_list[__i].cn_version = _total_list[__i]['cn_version']
         try:
             _total_list[__i]['stats'] = obj_stats[_total_list[__i].id]
         except:
@@ -296,3 +309,7 @@ def refresh_music_list():
 
 refresh_alias_temp()
 total_list, music_data, alias_data = refresh_music_list()
+
+for music in total_list:
+    if music.cn_version == "":
+        print(music)
