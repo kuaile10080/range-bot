@@ -231,7 +231,8 @@ def song_MessageSegment(music: Music):
             MessageSegment.text(f"\n艺术家: {music.artist}\n") + \
             MessageSegment.text(f"分类: {music.genre}\n") + \
             MessageSegment.text(f"BPM: {music.bpm}\n") + \
-            MessageSegment.text(f"版本: {music.cn_version}\n") + \
+            MessageSegment.text(f"水鱼版本: {music.version}\n") + \
+            MessageSegment.text(f"国服版本: {music.cn_version}\n") + \
             MessageSegment.text(f"定数: {'/'.join(str(ds) for ds in music.ds)}")
 
 def refresh_alias_temp():
@@ -274,7 +275,7 @@ def get_cn_version(music: Music)->str:
         for version_name in version_list:
             if "舞萌DX" not in version_name and music.title in version_list[version_name]:
                 return version_name
-    return ""
+    return "舞萌DX 2023"
             
 
 #OFFLINE
@@ -309,7 +310,3 @@ def refresh_music_list():
 
 refresh_alias_temp()
 total_list, music_data, alias_data = refresh_music_list()
-
-for music in total_list:
-    if music.cn_version == "":
-        print(music)
