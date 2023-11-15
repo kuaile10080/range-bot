@@ -9,6 +9,7 @@ from src.libraries.maimaidx_music import *
 from src.libraries.image import *
 from src.libraries.maimai_best_40 import generate
 from src.libraries.maimai_best_50 import generate50
+from src.libraries.message_segment import *
 
 from PIL import Image
 import re
@@ -71,7 +72,7 @@ async def _(event: Event):
         if len(music_data) == 0:
             rand_result = MessageSegment.text("没有这样的乐曲哦。\n")
         else:
-            rand_result = song_MessageSegment(music_data.random())
+            rand_result = song_MessageSegment2(music_data.random())
         await spec_rand.finish(rand_result)
     except FinishedException:
         pass
@@ -83,7 +84,7 @@ async def _(event: Event):
 mr = on_regex(r".*maimai.*什么", priority = 100, block = True)
 @mr.handle()
 async def _():
-    await mr.finish(song_MessageSegment(total_list.random()))
+    await mr.finish(song_MessageSegment2(total_list.random()))
 
 
 search_music = on_regex(r"^查歌.+", priority = 10, block = True)
@@ -97,7 +98,7 @@ async def _(event: Event):
     if len(res) == 0:
         await search_music.finish("没有找到这样的乐曲。曲名不准确请使用xxx是什么歌。")
     elif len(res) == 1:
-        await search_music.finish(song_MessageSegment(res[0]))
+        await search_music.finish(song_MessageSegment2(res[0]))
     elif len(res) < 50:
         search_result = ""
         for music in sorted(res, key = lambda i: int(i['id'])):
@@ -167,7 +168,7 @@ BREAK: {chart['notes'][4]}
         name = groups[1].strip()
         music = total_list.by_id(name)
         try:
-            await query_chart.finish(song_MessageSegment(music))
+            await query_chart.finish(song_MessageSegment2(music))
         except FinishedException:
             pass
         except Exception as e:

@@ -11,6 +11,7 @@ from src.libraries.maimai_best_50 import generate50
 from src.libraries.maimai_plate_query import *
 from src.libraries.secrets import range_checker,dajiang_checker, maiqun_checker
 from src.libraries.maimai_info import draw_new_info
+from src.libraries.message_segment import *
 
 from PIL import Image, ImageDraw, ImageFont
 import re,base64,random
@@ -39,7 +40,7 @@ async def _(event: Event):
     if len(result_list) == 0:
         await find_song.finish("未找到此歌曲\n添加曲名别名请联系CDRange(50835696)")
     elif len(result_list) == 1:
-        await find_song.finish(MessageSegment.text("您要找的是不是：\n") + song_MessageSegment(result_list[0]))
+        await find_song.finish(MessageSegment.text("您要找的是不是：\n") + song_MessageSegment2(result_list[0]))
     elif len(result_list) < 30:
         search_result = ""
         for music in sorted(result_list, key = lambda i: int(i['id'])):

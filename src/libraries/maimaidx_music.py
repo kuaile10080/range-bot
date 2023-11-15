@@ -1,7 +1,5 @@
-import json, random, requests, nltk
+import json, random, nltk
 from typing import Dict, List, Optional, Union, Tuple, Any
-from nonebot.adapters.onebot.v11 import MessageSegment
-from src.libraries.image import image_to_base64, get_music_cover
 from src.libraries.tool import convert_cn2jp
 from copy import deepcopy
 
@@ -254,16 +252,6 @@ def calculate_ngram_similarity(text1_cn, text2, n):
         return 0
     else:
         return intersection / union
-    
-def song_MessageSegment(music: Music):
-    return  MessageSegment.text(f"{music.id}. {music.title}\n") + \
-            MessageSegment.image(f"base64://{str(image_to_base64(get_music_cover(music.id)), encoding='utf-8')}") + \
-            MessageSegment.text(f"\n艺术家: {music.artist}\n") + \
-            MessageSegment.text(f"分类: {music.genre}\n") + \
-            MessageSegment.text(f"BPM: {music.bpm}\n") + \
-            MessageSegment.text(f"水鱼版本: {music.version}\n") + \
-            MessageSegment.text(f"国服版本: {music.cn_version}\n") + \
-            MessageSegment.text(f"定数: {'/'.join(str(ds) for ds in music.ds)}")
 
 def refresh_alias_temp():
     with open("src/static/all_alias.json", "r", encoding="utf-8") as aliasfile:
