@@ -4,7 +4,7 @@ from typing import Optional, Dict, List, Tuple
 import os, wget, aiohttp
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 from src.libraries.maimaidx_music import total_list
-from src.libraries.image import get_music_cover
+from src.libraries.image import get_music_cover, get_qq_logo
 
 scoreRank = 'D C B BB BBB A AA AAA S S+ SS SS+ SSS SSS+'.split(' ')
 combo = ' FC FC+ AP AP+'.split(' ')
@@ -320,22 +320,12 @@ class DrawBest(object):
                 pass
         
         if self.qq != '0':
-            if os.path.exists(self.icon_dir + self.qq + '.png'):
-                splashLogo = Image.open(self.icon_dir + self.qq + '.png').convert('RGBA')
-            else:
-                try:
-                    ProfImg = wget.download('https://q.qlogo.cn/g?b=qq&nk=' + self.qq + '&s=640' , self.temp_dir + self.qq)
-                    splashLogo = Image.open(ProfImg).convert('RGBA')
-                except:
-                    try:
-                        splashLogo = Image.open(self.temp_dir + self.qq).convert('RGBA')
-                    except:
-                        splashLogo = Image.open(self.icon_dir + 'default.png').convert('RGBA')       
+            iconLogo = get_qq_logo(self.qq)
         else:
-            splashLogo = Image.open(self.icon_dir + 'default.png').convert('RGBA')
+            iconLogo = get_qq_logo(self.qq,mode=0)
 
-        splashLogo = splashLogo.resize((98,98))
-        self.img.paste(splashLogo, (14, 12), mask=splashLogo.split()[3])
+        iconLogo = iconLogo.resize((98,98))
+        self.img.paste(iconLogo, (14, 12), mask=iconLogo.split()[3])
 
         ratingBaseImg = Image.open(self.pic_dir + self._findRaPic()).convert('RGBA')
         ratingBaseImg = self._drawRating(ratingBaseImg)

@@ -436,9 +436,7 @@ async def gre_rank_handle(event: Event):
     plt.xticks([])
     w, h = fig.get_size_inches()
     for i,qq in enumerate(labels):
-        if not os.path.exists('src/static/mai/temp/' + qq):
-            wget.download('https://q.qlogo.cn/g?b=qq&nk=' + qq + '&s=640' , 'src/static/mai/temp/' + qq)
-        icon = Image.open('src/static/mai/temp/' + qq).convert('RGBA')
+        icon = get_qq_logo(qq)
         fig.figimage(icon.resize((int(3*width*fig.dpi),int(3*width*fig.dpi))), 65 + (w*fig.dpi-65)/(len(labels)-1)*i*0.87, 0, zorder=3)
 
     plt.savefig("src/static/gre/rank.png")

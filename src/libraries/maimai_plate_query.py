@@ -2,7 +2,7 @@ from PIL import Image
 import math,wget,os,aiohttp,json,time
 
 from src.libraries.secrets import DF_Dev_Token
-from src.libraries.image import get_music_cover
+from src.libraries.image import get_music_cover, get_qq_logo
 
 cover_dir = 'src/static/mai/cover/'
 icon_dir = 'src/static/mai/icon/'
@@ -18,20 +18,14 @@ async def get_player_plate(payload: dict):
         return plate_data, 0
         
 async def refresh_player_full_data(qq: str):
-    payload = {'qq': qq } 
-    async with aiohttp.request("POST", "https://www.diving-fish.com/api/maimaidxprober/query/player", json=payload) as resp:
+    async with aiohttp.request("GET","https://www.diving-fish.com/api/maimaidxprober/dev/player/records",params={"qq":qq},headers={"developer-token":DF_Dev_Token}) as resp:
         if resp.status == 400:
             return None, 400
-        query_player = await resp.json()
-        username = query_player["username"]
-        async with aiohttp.request("GET","https://www.diving-fish.com/api/maimaidxprober/dev/player/records",params={"username":username},headers={"developer-token":DF_Dev_Token}) as resp:
-            if resp.status == 400:
-                return None, 400
-            full_data = await resp.json()      
-            file = open( temp_dir + qq + time.strftime("_%y%m%d") + ".json", "w", encoding= "utf-8")
-            json.dump(full_data,file)
-            file.close()
-            return full_data, 0
+        full_data = await resp.json()      
+        file = open( temp_dir + qq + time.strftime("_%y%m%d") + ".json", "w", encoding= "utf-8")
+        json.dump(full_data,file)
+        file.close()
+        return full_data, 0
 
 async def read_full_data(qq:str):
     try:
@@ -229,33 +223,13 @@ async def querydraw(song_played:dict,searchlist:list,diffcount:dict,platename:st
             hoffset += math.ceil(diffcount[diff]/9)*iconsizepro+40
 
     if qq != '':
-        if os.path.exists(icon_dir + qq + '.png'):
-            logo = Image.open(icon_dir + qq + '.png').convert('RGBA')
-        else:
-            try:
-                ProfImg = wget.download('https://q.qlogo.cn/g?b=qq&nk=' + qq + '&s=640' , temp_dir + qq)
-                logo = Image.open(ProfImg).convert('RGBA')
-            except:
-                try:
-                    logo = Image.open(temp_dir + qq).convert('RGBA')
-                except:
-                    logo = Image.open(icon_dir + 'default.png').convert('RGBA')       
+        iconLogo = get_qq_logo(qq)
     else:
-        logo = Image.open(icon_dir + 'default.png').convert('RGBA')
-    # if qq == '':
-    #     logo = Image.open(icon_dir + 'default.png').convert('RGBA')
-    # else:
-    #     try:
-    #         logo = Image.open(icon_dir + qq + '.png').convert('RGBA')
-    #     except:
-    #         if os.path.exists(temp_dir + qq):
-    #             os.remove(temp_dir + qq)
-    #         ProfImg = wget.download('https://q.qlogo.cn/g?b=qq&nk=' + qq + '&s=640' , temp_dir + qq)
-    #         logo = Image.open(ProfImg).convert('RGBA')
+        iconLogo = get_qq_logo(qq,mode=0)
     iconmask = Image.open(icon_dir + 'iconmask.png').convert('RGBA')
-    logo = logo.resize((200,200))
+    iconLogo = iconLogo.resize((200,200))
     temp = Image.new("RGBA",(200,200))
-    temp.paste(logo, (0,0), mask=iconmask.split()[3])
+    temp.paste(iconLogo, (0,0), mask=iconmask.split()[3])
     img.paste(temp, (296, 115), mask=temp.split()[3])
     if flag == 2:
         img = img.resize((int(img.size[0]*0.5),int(img.size[1]*0.5)))

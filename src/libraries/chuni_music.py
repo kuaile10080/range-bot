@@ -2,6 +2,7 @@ import requests,json,os,wget,aiohttp
 from typing import Optional, Dict, Tuple
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 from src.libraries.maimaidx_music import MusicList,Music,Chart
+from src.libraries.image import get_qq_logo
 
 # chuni_music = [
 #     {
@@ -394,19 +395,9 @@ class DrawChuni(object):
         self.img.paste(PlateImg, (5, 3), mask=PlateImg.split()[3])
         
         if self.qq != '0':
-            if os.path.exists(self.icon_dir + self.qq + '.png'):
-                iconLogo = Image.open(self.icon_dir + self.qq + '.png').convert('RGBA')
-            else:
-                try:
-                    ProfImg = wget.download('https://q.qlogo.cn/g?b=qq&nk=' + self.qq + '&s=640' , self.temp_dir + self.qq)
-                    iconLogo = Image.open(ProfImg).convert('RGBA')
-                except:
-                    try:
-                        iconLogo = Image.open(self.temp_dir + self.qq).convert('RGBA')
-                    except:
-                        iconLogo = Image.open(self.icon_dir + 'default.png').convert('RGBA')       
+            iconLogo = get_qq_logo(self.qq)
         else:
-            iconLogo = Image.open(self.icon_dir + 'default.png').convert('RGBA')
+            iconLogo = get_qq_logo(self.qq,mode=0)
 
         iconLogo = iconLogo.resize((98,98))
         self.img.paste(iconLogo, (14, 12), mask=iconLogo.split()[3])
