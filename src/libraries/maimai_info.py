@@ -339,7 +339,7 @@ def draw_music_info(music:dict)->Image.Image:
         hold = notes[1]
         slide = notes[2]
         breaks = notes[-1]
-        if chats_sum==5:
+        if music["type"]=="DX":
             touch = notes[3]
         else:
             touch = "-"
