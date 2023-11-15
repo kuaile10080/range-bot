@@ -25,17 +25,22 @@ SCORE_COEFFICIENT_TABLE = [
     [98, 20.3, 'sp'],
     [99, 20.8, 'ss'],
     [99.5, 21.1, 'ssp'],
-    [99.9999, 21.4, 'ssp'],
+    #[99.9999, 21.4, 'ssp'],
     [100, 21.6, 'sss'],
-    [100.4999, 22.2, 'sss'],
+    #[100.4999, 22.2, 'sss'],
     [100.5, 22.4, 'sssp']
 ]
 
 def compute_ra(achievement:float,ds:float)->int:
-    for i in range(len(SCORE_COEFFICIENT_TABLE)):
-        if achievement <= SCORE_COEFFICIENT_TABLE[i][0]:
-            return int(SCORE_COEFFICIENT_TABLE[i-1][1]*ds)
-    return 0
+    if achievement == 99.9999:
+        return int(SCORE_COEFFICIENT_TABLE[-2][1]*ds*achievement/100)-1
+    elif achievement == 100.4999:
+        return int(SCORE_COEFFICIENT_TABLE[-1][1]*ds*achievement/100)-1
+    else:
+        for i in range(len(SCORE_COEFFICIENT_TABLE)-1):
+            if SCORE_COEFFICIENT_TABLE[i][0] <= achievement < SCORE_COEFFICIENT_TABLE[i+1][0]:
+                return int(SCORE_COEFFICIENT_TABLE[i][1]*ds*achievement/100)
+        return int(SCORE_COEFFICIENT_TABLE[-1][1]*ds*100.5/100)
 
 def cross(checker: List[Any], elem: Optional[Union[Any, List[Any]]], diff):
     ret = False
