@@ -108,10 +108,10 @@ async def _(event: Event):
         await search_music.finish(f"结果过多（{len(res)} 条），请缩小查询范围。")
 
 
-query_chart = on_regex(r"^([绿黄红紫白]?) ?id([0-9]+)" , priority = 10, block = True)
+query_chart = on_regex(r"^([绿黄红紫白]?) ?id ?([0-9]+)" , priority = 10, block = True)
 @query_chart.handle()
 async def _(event: Event):
-    regex = "([绿黄红紫白]?) ?id([0-9]+)"
+    regex = "([绿黄红紫白]?) ?id ?([0-9]+)"
     groups = re.match(regex, str(event.get_message())).groups()
     level_labels = ['绿', '黄', '红', '紫', '白']
     if groups[0] != "":

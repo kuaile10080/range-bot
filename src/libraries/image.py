@@ -86,13 +86,15 @@ def get_music_cover(mid) -> Image.Image:
                 return Image.open('src/static/mai/cover/00000.png').convert('RGB')
 
 def get_qq_logo(qq:any,mode=1) -> Image.Image:
-    if os.path.exists(f'src/static/mai/icon/{qq}.png') and mode==1:
+    if mode == 0:
+        return Image.open('src/static/mai/cover/0000.png').convert('RGBA')
+    elif os.path.exists(f'src/static/mai/icon/{qq}.png'):
         return Image.open(f'src/static/mai/icon/{qq}.png').convert('RGBA')
-    elif mode ==2:
+    else:
         r = requests.get(f"https://q.qlogo.cn/g?b=qq&nk={qq}&s=640")
         if r.status_code == 200:
-            return Image.open(BytesIO(r.content)).convert('RGBA')
+            logo = Image.open(BytesIO(r.content))
+            logo = logo.convert('RGBA')
+            return logo
         else:
             return Image.open('src/static/mai/icon/default.png').convert('RGBA')
-    else:
-        return Image.open('src/static/mai/icon/default.png').convert('RGBA')
