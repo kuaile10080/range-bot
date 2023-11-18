@@ -177,7 +177,7 @@ async def _update_music_data(event: Event, message: Message = CommandArg()):
         await update_music_data.finish(strr)
     else:
         await update_music_data.finish(strr)
-    
+
 
 
 ptv = {
@@ -273,7 +273,7 @@ pnconvert = {
     '星': '星',
     '祭': '祭',
     '祝': '祝',
-}       
+}
 
 
 plate = on_regex(r'^([真超檄橙暁晓桃櫻樱紫菫堇白雪輝辉熊華华爽煌舞霸宙星祭祝])([極极将舞神者]舞?)(?:进度|完成表|完成度)\s?(.+)?', priority = 10, block = True)
@@ -287,7 +287,7 @@ async def _plate(event: Event):
     #diffs = 'Basic Advanced Expert Master Re:Master'.split(' ')
     #combo_rank = 'fc fcp ap app'.split(' ')
     #sync_rank = 'fs fsp fsd fsdp'.split(' ')
-    flag = 1    
+    flag = 1
     qq = str(event.get_user_id())
     payload = {'qq': qq}
     if f'{platename[0]}{platename[1]}' == '真将':
@@ -326,7 +326,7 @@ async def _plate(event: Event):
                 "fc": song["fc"],
                 "fs": song["fs"],
                 "level": song["level"]
-            }         
+            }
         searchlist = []
         diffcount = {
             "15":0,
@@ -485,7 +485,7 @@ async def _singlequery(event: Event, message: Message = CommandArg()):
                 if music == None:
                     music = random.choice(res)
     id = int(music.id)
-    
+
     qq = str(event.get_user_id())
     if not_exist_data(qq):
         await singlequery.send("每天第一次查询自动刷新成绩，可能需要较长时间。若需手动刷新成绩请发送“刷新成绩”")
@@ -524,98 +524,98 @@ async def _singlequery(event: Event, message: Message = CommandArg()):
 
 
 """-----------old info-----------"""
-    # img = Image.open("src/static/platequery/bginfo.png").convert('RGBA')
-    # cover = get_music_cover(id)
-    # cover = cover.resize((200,200))
-    # img.paste(cover,(60,90))
-    # if musictype == "DX":
-    #     icon = Image.open("src/static/platequery/DX.png").convert('RGBA')
-    # else:
-    #     icon = Image.open("src/static/platequery/SD.png").convert('RGBA')
-    # img.paste(icon,(50,50),mask=icon.split()[3])
-    # draw = ImageDraw.Draw(img)
-    # font = ImageFont.truetype("src/static/msyh.ttc", 37, encoding='utf-8')
-    # y = 40
-    # info_to_file_dict = {
-    #     "sssp": "SSSp",
-    #     "sss": "SSS",
-    #     "ssp": "SSp",
-    #     "ss": "SS",
-    #     "sp": "Sp",
-    #     "s": "S",
-    #     "aaa": "AAA",
-    #     "aa": "AA",
-    #     "a": "A",
-    #     "bbb": "BBB",
-    #     "bb": "BB",
-    #     "b": "B",
-    #     "c": "C",
-    #     "d": "D",
-    #     "fc": "FC",
-    #     "fcp": "FCp",
-    #     "ap": "AP",
-    #     "app": "APp",
-    #     "fs": "FS",
-    #     "fsp": "FSp",
-    #     "fsd": "FSD",
-    #     "fsdp": "FSDp"
-    # }
-    # for rec in records:
-    #     if rec != {}:
-    #         #draw dxstars
-    #         x = 330
-    #         dx_max = sum(music['charts'][rec['level_index']]['notes'])*3
-    #         if rec['dxScore']/dx_max > 0.99:
-    #             stars = 6
-    #         elif rec['dxScore']/dx_max > 0.97:
-    #             stars = 5
-    #         elif rec['dxScore']/dx_max > 0.95:
-    #             stars = 4
-    #         elif rec['dxScore']/dx_max > 0.93:
-    #             stars = 3
-    #         elif rec['dxScore']/dx_max > 0.90:
-    #             stars = 2
-    #         elif rec['dxScore']/dx_max > 0.85:
-    #             stars = 1
-    #         else:
-    #             stars = 0
-    #         for i in range(stars):
-    #             star = Image.open(f"src/static/platequery/stars_{stars}.png").convert('RGBA')
-    #             img.paste(star,(x+40*i,y+16),mask=star.split()[3])
-    #         #draw achievement
-    #         x = 335
-    #         offset=22
-    #         if rec['achievements']<10:
-    #             x=x+offset*2
-    #         elif rec['achievements']<100:
-    #             x=x+offset
-    #         achi = "%.4f" % rec['achievements'] + "%"
-    #         y=y+4
-    #         draw.text((x-1,y+4),achi,(0,0,0),font)
-    #         draw.text((x-1,y+6),achi,(0,0,0),font)
-    #         draw.text((x+1,y+4),achi,(0,0,0),font)
-    #         draw.text((x+1,y+6),achi,(0,0,0),font)
-    #         draw.text((x,y+5),achi,(255,255,255),font)
-    #         #draw others
-    #         y=y-4
-    #         x=345
+# img = Image.open("src/static/platequery/bginfo.png").convert('RGBA')
+# cover = get_music_cover(id)
+# cover = cover.resize((200,200))
+# img.paste(cover,(60,90))
+# if musictype == "DX":
+#     icon = Image.open("src/static/platequery/DX.png").convert('RGBA')
+# else:
+#     icon = Image.open("src/static/platequery/SD.png").convert('RGBA')
+# img.paste(icon,(50,50),mask=icon.split()[3])
+# draw = ImageDraw.Draw(img)
+# font = ImageFont.truetype("src/static/msyh.ttc", 37, encoding='utf-8')
+# y = 40
+# info_to_file_dict = {
+#     "sssp": "SSSp",
+#     "sss": "SSS",
+#     "ssp": "SSp",
+#     "ss": "SS",
+#     "sp": "Sp",
+#     "s": "S",
+#     "aaa": "AAA",
+#     "aa": "AA",
+#     "a": "A",
+#     "bbb": "BBB",
+#     "bb": "BB",
+#     "b": "B",
+#     "c": "C",
+#     "d": "D",
+#     "fc": "FC",
+#     "fcp": "FCp",
+#     "ap": "AP",
+#     "app": "APp",
+#     "fs": "FS",
+#     "fsp": "FSp",
+#     "fsd": "FSD",
+#     "fsdp": "FSDp"
+# }
+# for rec in records:
+#     if rec != {}:
+#         #draw dxstars
+#         x = 330
+#         dx_max = sum(music['charts'][rec['level_index']]['notes'])*3
+#         if rec['dxScore']/dx_max > 0.99:
+#             stars = 6
+#         elif rec['dxScore']/dx_max > 0.97:
+#             stars = 5
+#         elif rec['dxScore']/dx_max > 0.95:
+#             stars = 4
+#         elif rec['dxScore']/dx_max > 0.93:
+#             stars = 3
+#         elif rec['dxScore']/dx_max > 0.90:
+#             stars = 2
+#         elif rec['dxScore']/dx_max > 0.85:
+#             stars = 1
+#         else:
+#             stars = 0
+#         for i in range(stars):
+#             star = Image.open(f"src/static/platequery/stars_{stars}.png").convert('RGBA')
+#             img.paste(star,(x+40*i,y+16),mask=star.split()[3])
+#         #draw achievement
+#         x = 335
+#         offset=22
+#         if rec['achievements']<10:
+#             x=x+offset*2
+#         elif rec['achievements']<100:
+#             x=x+offset
+#         achi = "%.4f" % rec['achievements'] + "%"
+#         y=y+4
+#         draw.text((x-1,y+4),achi,(0,0,0),font)
+#         draw.text((x-1,y+6),achi,(0,0,0),font)
+#         draw.text((x+1,y+4),achi,(0,0,0),font)
+#         draw.text((x+1,y+6),achi,(0,0,0),font)
+#         draw.text((x,y+5),achi,(255,255,255),font)
+#         #draw others
+#         y=y-4
+#         x=345
 
-    #         rate = Image.open("src/static/mai/pic/UI_GAM_Rank_" + info_to_file_dict[rec["rate"]] + ".png").convert('RGBA')
-    #         img.paste(rate,(x+185,y+12),mask=rate.split()[3])
-    #         if rec["fs"] != "":
-    #             fs = Image.open("src/static/mai/pic/UI_MSS_MBase_Icon_" + info_to_file_dict[rec["fs"]] + ".png").convert('RGBA')
-    #             img.paste(fs,(x+283,y+12),mask=fs.split()[3])
-    #         if rec["fc"] != "":
-    #             fc = Image.open("src/static/mai/pic/UI_MSS_MBase_Icon_" + info_to_file_dict[rec["fc"]] + ".png").convert('RGBA')
-    #             img.paste(fc,(x+328,y+12),mask=fc.split()[3])
-    #     y = y + 60
-    # font = ImageFont.truetype("src/static/msyh.ttc", 20, encoding='utf-8')
-    # w ,h = draw.textsize(musictitle, font = font)
-    # draw.text((160-w/2,310),musictitle,(0,0,0),font)
-    # await singlequery.finish(MessageSegment.at(qq)+MessageSegment.image(f"base64://{str(image_to_base64(img), encoding='utf-8')}"))
+#         rate = Image.open("src/static/mai/pic/UI_GAM_Rank_" + info_to_file_dict[rec["rate"]] + ".png").convert('RGBA')
+#         img.paste(rate,(x+185,y+12),mask=rate.split()[3])
+#         if rec["fs"] != "":
+#             fs = Image.open("src/static/mai/pic/UI_MSS_MBase_Icon_" + info_to_file_dict[rec["fs"]] + ".png").convert('RGBA')
+#             img.paste(fs,(x+283,y+12),mask=fs.split()[3])
+#         if rec["fc"] != "":
+#             fc = Image.open("src/static/mai/pic/UI_MSS_MBase_Icon_" + info_to_file_dict[rec["fc"]] + ".png").convert('RGBA')
+#             img.paste(fc,(x+328,y+12),mask=fc.split()[3])
+#     y = y + 60
+# font = ImageFont.truetype("src/static/msyh.ttc", 20, encoding='utf-8')
+# w ,h = draw.textsize(musictitle, font = font)
+# draw.text((160-w/2,310),musictitle,(0,0,0),font)
+# await singlequery.finish(MessageSegment.at(qq)+MessageSegment.image(f"base64://{str(image_to_base64(img), encoding='utf-8')}"))
 
 
-    
+
 
 with open("src/static/music_data_bkp.json", encoding="utf-8")as fp:
     music_data_bkp = json.load(fp)
@@ -760,19 +760,19 @@ async def _select_alias(event: Event, message: Message = CommandArg()):
     msg = str(message).strip().split(" ")
     if len(msg) == 1 and msg[0] != "":
         id = msg[0]
-        with open("src/static/all_alias_temp.json","r",encoding='utf-8')as fp:
+        with open("src/static/all_alias_temp.json", "r", encoding='utf-8') as fp:
             alias_data = json.load(fp)
         if id not in alias_data:
             await select_alias.finish("未找到该乐曲，请直接输入乐曲id。")
         else:
-            s = f"{id}.{alias_data[id]['Name']}的别名有：\n"
-            for i in range(1,len(alias_data[id]['Alias'])):
+            s = f"{id}. {alias_data[id]['Name']}的别名有：\n"
+            for i in range(1, len(alias_data[id]['Alias'])):
                 s += f"{alias_data[id]['Alias'][i]}\n"
             await select_alias.finish(s)
     elif len(msg) == 3:
         qq = str(event.get_user_id())
         id = msg[1]
-        with open("src/static/all_alias_temp.json","r",encoding='utf-8')as fp:
+        with open("src/static/all_alias_temp.json", "r", encoding='utf-8') as fp:
             alias_data = json.load(fp)
         if id not in alias_data:
             await select_alias.finish("未找到该乐曲，请直接输入乐曲id。")
@@ -781,15 +781,22 @@ async def _select_alias(event: Event, message: Message = CommandArg()):
                 if msg[2] in alias_data[id]["Alias"]:
                     await select_alias.finish("该别名已存在。")
                 else:
-                    with open("src/static/alias_pre_process_add.json","r",encoding='utf-8')as fp:
+                    with open("src/static/alias_pre_process_add.json", "r", encoding='utf-8') as fp:
                         alias_pre_process_add = json.load(fp)
                     if id in alias_pre_process_add:
                         alias_pre_process_add[id].append(msg[2])
                     else:
                         alias_pre_process_add[id] = [msg[2]]
-                    with open("src/static/alias_pre_process_add.json","w",encoding='utf-8')as fp:
-                        json.dump(alias_pre_process_add,fp,ensure_ascii=False,indent=4)
-                    with open("src/static/alias_log.csv","a",encoding='utf-8')as fp:
+                    with open("src/static/alias_pre_process_add.json", "w", encoding='utf-8') as fp:
+                        json.dump(alias_pre_process_add, fp, ensure_ascii=False, indent=4)
+                    with open("src/static/alias_pre_process_remove.json", "r", encoding='utf-8') as fp:
+                        alias_pre_process_remove = json.load(fp)
+                    if id in alias_pre_process_remove:
+                        if msg[2] in alias_pre_process_remove[id]:
+                            alias_pre_process_remove[id].remove(msg[2])
+                    with open("src/static/alias_pre_process_remove.json", "w", encoding='utf-8') as fp:
+                        json.dump(alias_pre_process_remove, fp, ensure_ascii=False, indent=4)
+                    with open("src/static/alias_log.csv", "a", encoding='utf-8') as fp:
                         fp.write(f"{qq},{','.join(msg)}\n")
                     if refresh_alias_temp():
                         await select_alias.finish(f"添加成功。\n已为 {id}.{alias_data[id]['Name']} 添加别名：\n{msg[2]}")
@@ -797,15 +804,22 @@ async def _select_alias(event: Event, message: Message = CommandArg()):
                 if msg[2] not in alias_data[id]["Alias"]:
                     await select_alias.finish("该别名不存在。")
                 else:
-                    with open("src/static/alias_pre_process_remove.json","r",encoding='utf-8')as fp:
+                    with open("src/static/alias_pre_process_remove.json", "r", encoding='utf-8') as fp:
                         alias_pre_process_remove = json.load(fp)
                     if id in alias_pre_process_remove:
                         alias_pre_process_remove[id].append(msg[2])
                     else:
                         alias_pre_process_remove[id] = [msg[2]]
-                    with open("src/static/alias_pre_process_remove.json","w",encoding='utf-8')as fp:
-                        json.dump(alias_pre_process_remove,fp,ensure_ascii=False,indent=4)
-                    with open("src/static/alias_log.csv","a",encoding='utf-8')as fp:
+                    with open("src/static/alias_pre_process_remove.json", "w", encoding='utf-8') as fp:
+                        json.dump(alias_pre_process_remove, fp, ensure_ascii=False, indent=4)
+                    with open("src/static/alias_pre_process_add.json", "r", encoding='utf-8') as fp:
+                        alias_pre_process_add = json.load(fp)
+                    if id in alias_pre_process_add:
+                        if msg[2] in alias_pre_process_add[id]:
+                            alias_pre_process_add[id].remove(msg[2])
+                    with open("src/static/alias_pre_process_add.json", "w", encoding='utf-8') as fp:
+                        json.dump(alias_pre_process_add, fp, ensure_ascii=False, indent=4)
+                    with open("src/static/alias_log.csv", "a", encoding='utf-8') as fp:
                         fp.write(f"{qq},{','.join(msg)}\n")
                     if refresh_alias_temp():
                         await select_alias.finish("删除成功")
@@ -814,5 +828,3 @@ async def _select_alias(event: Event, message: Message = CommandArg()):
 
     else:
         await select_alias.finish('输入格式错误。\n查别名请输入“别名 id”\n增加别名请输入“别名 增 id 别名”\n删除别名请输入“别名 删 id 别名”\n')
-
-    
