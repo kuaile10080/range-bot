@@ -222,17 +222,17 @@ class MusicList(List[Music]):
             if title_search == music.title.lower():
                 title_temp_equal.append(music)
             else:
-                for alias in alias_list:
-                    if title_search == alias.lower():
-                        alias_temp_equal.append(music)
-                        break
-                    if title_search in alias.lower():
-                        alias_temp_in.append(music)
-                        break
-                    ngram_similarity = calculate_ngram_similarity(title_search, alias.lower(), 2)
-                    if ngram_similarity > ngrams_max:
-                        ngrams_max = ngram_similarity
-                        ngram_temp = music
+                if title_search in alias_list:
+                    alias_temp_equal.append(music)
+                else:
+                    for alias in alias_list:
+                        if title_search in alias.lower():
+                            alias_temp_in.append(music)
+                            break
+                        ngram_similarity = calculate_ngram_similarity(title_search, alias.lower(), 2)
+                        if ngram_similarity > ngrams_max:
+                            ngrams_max = ngram_similarity
+                            ngram_temp = music
         if len(title_temp_equal) != 0:
             return title_temp_equal
         elif len(alias_temp_equal) != 0:
