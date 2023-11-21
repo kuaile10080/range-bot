@@ -285,15 +285,10 @@ with open("src/static/version_list.json", "r", encoding="utf-8") as fp:
     version_list = json.load(fp)
 
 def get_cn_version(music: Music)->str:
-    if int(music.id) > 1000:
-        for version_name in version_list:
-            if "舞萌DX" in version_name and music.title in version_list[version_name]:
-                return version_name
+    if music.id in version_list:
+        return version_list[music.id]
     else:
-        for version_name in version_list:
-            if "舞萌DX" not in version_name and music.title in version_list[version_name]:
-                return version_name
-    return "舞萌DX 2023"
+        return "FESTiVAL"
             
 
 #OFFLINE

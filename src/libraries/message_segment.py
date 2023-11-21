@@ -9,8 +9,7 @@ def song_MessageSegment(music: Music):
             MessageSegment.text(f"\n艺术家: {music.artist}\n".replace(".","·")) + \
             MessageSegment.text(f"分类: {music.genre}\n") + \
             MessageSegment.text(f"BPM: {music.bpm}\n") + \
-            MessageSegment.text(f"水鱼版本: {music.version}\n") + \
-            MessageSegment.text(f"国服版本: {music.cn_version}\n") + \
+            MessageSegment.text(f"版本: {music.version}\n") + \
             MessageSegment.text(f"定数: {'/'.join(str(ds) for ds in music.ds)}")
 
 def song_MessageSegment2(music: Music):

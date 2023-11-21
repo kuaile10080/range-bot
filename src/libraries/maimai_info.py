@@ -225,22 +225,22 @@ diff_list = ["BSC", "ADV", "EXP", "MST", "MST_Re"]
 
 version_icon_path = {
     "maimai": "UI_CMN_TabTitle_MaimaiTitle_Ver100.png",
-    "maimai PLUS": "UI_CMN_TabTitle_MaimaiTitle_Ver110.png",
+    "maimaiPLUS": "UI_CMN_TabTitle_MaimaiTitle_Ver110.png",
     "GreeN": "UI_CMN_TabTitle_MaimaiTitle_Ver120.png",
-    "GreeN PLUS": "UI_CMN_TabTitle_MaimaiTitle_Ver130.png",
+    "GreeNPLUS": "UI_CMN_TabTitle_MaimaiTitle_Ver130.png",
     "ORANGE": "UI_CMN_TabTitle_MaimaiTitle_Ver140.png",
-    "ORANGE PLUS": "UI_CMN_TabTitle_MaimaiTitle_Ver150.png",
+    "ORANGEPLUS": "UI_CMN_TabTitle_MaimaiTitle_Ver150.png",
     "PiNK": "UI_CMN_TabTitle_MaimaiTitle_Ver160.png",
-    "PiNK PLUS": "UI_CMN_TabTitle_MaimaiTitle_Ver170.png",
+    "PiNKPLUS": "UI_CMN_TabTitle_MaimaiTitle_Ver170.png",
     "MURASAKi": "UI_CMN_TabTitle_MaimaiTitle_Ver180.png",
-    "MURASAKi PLUS": "UI_CMN_TabTitle_MaimaiTitle_Ver185.png",
+    "MURASAKiPLUS": "UI_CMN_TabTitle_MaimaiTitle_Ver185.png",
     "MiLK": "UI_CMN_TabTitle_MaimaiTitle_Ver190.png",
-    "MiLK PLUS": "UI_CMN_TabTitle_MaimaiTitle_Ver195.png",
+    "MiLKPLUS": "UI_CMN_TabTitle_MaimaiTitle_Ver195.png",
     "FiNALE": "UI_CMN_TabTitle_MaimaiTitle_Ver199.png",
-    "舞萌DX": "UI_CMN_TabTitle_MaimaiTitle_Ver200.png",
-    "舞萌DX 2021": "UI_CMN_TabTitle_MaimaiTitle_Ver214.png",
-    "舞萌DX 2022": "UI_CMN_TabTitle_MaimaiTitle_Ver220.png",
-    "舞萌DX 2023": "UI_CMN_TabTitle_MaimaiTitle_Ver230.png"
+    "maimaDX": "UI_CMN_TabTitle_MaimaiTitle_Ver200.png",
+    "Splash": "UI_CMN_TabTitle_MaimaiTitle_Ver214.png",
+    "UNiVERSE": "UI_CMN_TabTitle_MaimaiTitle_Ver220.png",
+    "FESTiVAL": "UI_CMN_TabTitle_MaimaiTitle_Ver230.png"
 }
 
 genre_icon_path = {
