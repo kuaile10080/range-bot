@@ -1,6 +1,7 @@
 import json, random, nltk
 from typing import Dict, List, Optional, Union, Tuple, Any
 from src.libraries.tool import convert_cn2jp
+from src.libraries.static_lists_and_dicts import SCORE_COEFFICIENT_TABLE
 from copy import deepcopy
 
 def get_cover_len4_id(mid) -> str:
@@ -9,25 +10,6 @@ def get_cover_len4_id(mid) -> str:
     if 10001 <= mid:
         mid -= 10000
     return f'{mid:04d}'
-
-SCORE_COEFFICIENT_TABLE = [
-    [0, 0, 'd'],
-    [50, 8, 'c'],
-    [60, 9.6, 'b'],
-    [70, 11.2, 'bb'],
-    [75, 12.0, 'bbb'],
-    [80, 13.6, 'a'],
-    [90, 15.2, 'aa'],
-    [94, 16.8, 'aaa'],
-    [97, 20, 's'],
-    [98, 20.3, 'sp'],
-    [99, 20.8, 'ss'],
-    [99.5, 21.1, 'ssp'],
-    #[99.9999, 21.4, 'ssp'],
-    [100, 21.6, 'sss'],
-    #[100.4999, 22.2, 'sss'],
-    [100.5, 22.4, 'sssp']
-]
 
 def compute_ra(achievement:float,ds:float)->int:
     if achievement == 99.9999:
@@ -157,21 +139,12 @@ class Music(Dict):
         return super().__getattribute__(item)
 
 
+
 class MusicList(List[Music]):
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.music_dict = {}
-        for music in self:
-            self.music_dict[music.id] = music
-
     def by_id(self, music_id: int) -> Optional[Music]:
-        if music_id in self.music_dict:
-            return self.music_dict[music_id]
-        else:
-            for music in self:
-                if music.id == music_id:
-                    return music
+        for music in self:
+            if music.id == music_id:
+                return music
         return None
 
     def by_title(self, music_title: str) -> Optional[Music]:
@@ -296,9 +269,9 @@ with open("src/static/version_list.json", "r", encoding="utf-8") as fp:
 
 version_replace = {
     "maimaDX": "舞萌DX",
-    "Splash": "舞萌DX 2021",
-    "UNiVERSE": "舞萌DX 2022",
-    "FESTiVAL": "舞萌DX 2023"
+    "Splash": "舞萌DX2021",
+    "UNiVERSE": "舞萌DX2022",
+    "FESTiVAL": "舞萌DX2023"
 }
 
 def get_cn_version(music: Music)->str:

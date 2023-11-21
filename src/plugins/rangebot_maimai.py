@@ -4,20 +4,25 @@ from nonebot.adapters import Event
 from nonebot.adapters.onebot.v11 import Message, MessageSegment
 
 from src.libraries.tool import offlineinit, convert_cn2jp
-from src.libraries.maimaidx_music import *
-from src.libraries.image import *
+from src.libraries.maimaidx_music import total_list, music_data, refresh_music_list, refresh_alias_temp
+from src.libraries.image import text_to_image, image_to_base64
 from src.libraries.maimai_best_40 import generate
 from src.libraries.maimai_best_50 import generate50
-from src.libraries.maimai_plate_query import *
+from src.libraries.maimai_plate_query import draw_final_rank_list,not_exist_data,read_full_data,refresh_player_full_data
 from src.libraries.secrets import range_checker,dajiang_checker, maiqun_checker
 from src.libraries.maimai_info import draw_new_info
-from src.libraries.message_segment import *
+from src.libraries.message_segment import song_MessageSegment2
+from src.libraries.static_lists_and_dicts import pnconvert, platename_to_file, level_index_to_file, ptv, versionlist
 
 from PIL import Image, ImageDraw, ImageFont
-import re,base64,random
+import re,base64,random,os,json
 
 cover_dir = 'src/static/mai/cover/'
 long_dir_ = 'src/static/long/'
+plate_path = "src/static/mai/plate/"
+
+with open("src/static/musicGroup.json","r",encoding="utf-8") as f:
+    musicGroup = json.load(f)
 
 """-----------(maibot删除功能：是什么歌)-----------"""
 # music_aliases = defaultdict(list)
@@ -179,208 +184,224 @@ async def _update_music_data(event: Event, message: Message = CommandArg()):
         await update_music_data.finish(strr)
 
 
-
-ptv = {
-        '真1': 'maimai',
-        '真2': 'maimai PLUS',
-        '超': 'maimai GreeN',
-        '檄': 'maimai GreeN PLUS',
-        '橙': 'maimai ORANGE',
-        '暁': 'maimai ORANGE PLUS',
-        '晓': 'maimai ORANGE PLUS',
-        '桃': 'maimai PiNK',
-        '櫻': 'maimai PiNK PLUS',
-        '樱': 'maimai PiNK PLUS',
-        '紫': 'maimai MURASAKi',
-        '菫': 'maimai MURASAKi PLUS',
-        '堇': 'maimai MURASAKi PLUS',
-        '白': 'maimai MiLK',
-        '雪': 'MiLK PLUS',
-        '輝': 'maimai FiNALE',
-        '辉': 'maimai FiNALE',
-        '熊': 'maimai でらっくす',
-        '華': 'maimai でらっくす PLUS',
-        '华': 'maimai でらっくす PLUS',
-        '爽': 'maimai でらっくす Splash',
-        '煌': 'maimai でらっくす Splash PLUS',
-        '宙': 'maimai でらっくす UNiVERSE',
-        '星': 'maimai でらっくす UNiVERSE PLUS',
-        '祭': 'maimai でらっくす FESTiVAL',
-        '祝': 'maimai でらっくす FESTiVAL PLUS',
-}
-
-versionlist = ['maimai','maimai PLUS','maimai GreeN','maimai GreeN PLUS','maimai ORANGE','maimai ORANGE PLUS','maimai PiNK','maimai PiNK PLUS','maimai MURASAKi','maimai MURASAKi PLUS','maimai MiLK','MiLK PLUS','maimai FiNALE','maimai でらっくす','maimai でらっくす PLUS','maimai でらっくす Splash','maimai でらっくす Splash PLUS','maimai でらっくす UNiVERSE','maimai でらっくす UNiVERSE PLUS','maimai でらっくす FESTiVAL','maimai でらっくす FESTiVAL PLUS']
-
 version_search = on_command('版本查歌', priority = 10, block = True)
 @version_search.handle()
 async def _(event: Event, message: Message = CommandArg()):
-    input = str(message).strip()
-    input2 = ''
-    if input in ptv:
-        input = ptv[input]
-    elif input in versionlist:
-        pass
-    elif input == '真':
-        input = 'maimai'
-        input2 = 'maimai PLUS'
+    msg = str(message).strip()
+    if msg == "":
+        await version_search.finish("请在版本查歌后输入版本缩写，如“版本查歌 真超檄”")
     else:
-        await version_search.finish("未找到该版本，请检查输入")
-    k=0
-    s = """ 结果如下
+        search_list = []
+        for char in msg:
+            if char == "真":
+                search_list.append(ptv["真1"])
+                search_list.append(ptv["真2"])
+            elif char in ptv:
+                search_list.append(ptv[char])
+            else:
+                await version_search.finish("版本缩写输入错误")
+        res = []
+        for music in total_list:
+            if music.cn_version in search_list:
+                res.append(music)
+        if len(res) > 200:
+            await version_search.finish(f"结果过多（{len(res)} 条），请缩小搜索范围。")
+        else:
+            res.sort(key = lambda x:int(x.id))
+            s = "\n结果如下：\n"
+            for i,music_dict in enumerate(res):
+                s += f"ID.{music.id:>5} {music.title} {music.type} {'/'.join(str(ds) for ds in music['ds'])}\n"    
 
- """
-    for i in range(0,len(music_data)):
-        if (input == music_data[i]['basic_info']['from']) or (input2 == music_data[i]['basic_info']['from']):
-            k += 1
-            s += ('No.' + str(k) + ' ' + '[' + music_data[i]['id'] + ']' + '. ' + music_data[i]['title'] + "【紫谱定数：" + str(music_data[i]['ds'][3]) + "】")
-            s += """
- """
     await version_search.finish(MessageSegment.image(f"base64://{str(image_to_base64(text_to_image(s)), encoding='utf-8')}"))
 
-pnconvert = {
-    '真': '真',
-    '超': '超',
-    '檄': '檄',
-    '橙': '橙',
-    '暁': '暁',
-    '晓': '暁',
-    '桃': '桃',
-    '櫻': '櫻',
-    '樱': '櫻',
-    '紫': '紫',
-    '菫': '堇',
-    '堇': '堇',
-    '白': '白',
-    '雪': '雪',
-    '輝': '輝',
-    '辉': '輝',
-    '熊': '熊',
-    '華': '華',
-    '华': '華',
-    '爽': '爽',
-    '煌': '煌',
-    '舞': '舞',
-    '霸': '霸',
-    '覇': '霸',
-    '極': '極',
-    '极': '極',
-    '将': '将',
-    '舞': '舞',
-    '舞舞': '舞舞',
-    '神': '神',
-    '者': '者',
-    '宙': '宙',
-    '星': '星',
-    '祭': '祭',
-    '祝': '祝',
-}
 
 
-plate = on_regex(r'^([真超檄橙暁晓桃櫻樱紫菫堇白雪輝辉熊華华爽煌舞霸宙星祭祝])([極极将舞神者]舞?)(?:进度|完成表|完成度)\s?(.+)?', priority = 10, block = True)
+
+
+plate = on_regex(r'^([真超檄橙暁晓桃櫻樱紫菫堇白雪輝辉熊華华爽煌舞霸宙星祭])([極极将舞神者])(舞?)(?:进度|完成表|完成度)\s?(全?)$', priority = 10, block = True)
 @plate.handle()
 async def _plate(event: Event):
-    regex = "([真超檄橙暁晓桃櫻樱紫菫堇白雪輝辉熊華华爽煌舞霸宙星祭祝])([極极将舞神者]舞?)(?:进度|完成表|完成度)\s?(.+)?"
-    res = re.match(regex, str(event.get_message()).lower())
-    platename = list(res.groups()[:2])
-    platename[0] = pnconvert[platename[0]]
-    platename[1] = pnconvert[platename[1]]
-    #diffs = 'Basic Advanced Expert Master Re:Master'.split(' ')
-    #combo_rank = 'fc fcp ap app'.split(' ')
-    #sync_rank = 'fs fsp fsd fsdp'.split(' ')
-    flag = 1
-    qq = str(event.get_user_id())
-    payload = {'qq': qq}
-    if f'{platename[0]}{platename[1]}' == '真将':
-        await plate.send(f"真代没有真将，但是我可以帮你查")
-    elif (platename[0] == '霸') ^ (platename[1] == '者'):
+    regex = r'^([真超檄橙暁晓桃櫻樱紫菫堇白雪輝辉熊華华爽煌舞霸宙星祭])([極极将舞神者])(舞?)(?:进度|完成表|完成度)\s?(全?)$'
+    res = re.match(regex, str(event.get_message())).groups()
+    if ((res[0]=="霸") ^ (res[1]=="者")) or ((res[1]=="舞") ^ (res[2]=="舞")):
         await plate.finish("¿")
-    elif  f'{platename[0]}{platename[1]}' == '舞神':
-        await plate.send(f"你也要参加合成大舞神？")
-    if platename[0] in ['舞', '霸']:
-        payload['version'] = [ptv['真1'], ptv['真2'], ptv['超'], ptv['檄'], ptv['橙'], ptv['暁'], ptv['桃'], ptv['櫻'], ptv['紫'], ptv['菫'], ptv['白'], ptv['雪'], ptv['輝']]
-        if res.groups()[2] != "全":
-            flag = 0
-            await plate.send("舞系查询默认只展示14难度及以上。若需查看全部进度请在查询命令后加上“全”，如“舞将进度全”")
-        else:
-            flag = 2
-    elif platename[0] in ['真']:
-        payload['version'] = [ptv['真1'], ptv['真2']]
-    elif platename[0] in ['熊','華']:
-        await plate.send("请注意，国服熊代与華代成就需一同清谱获得")
-        payload['version'] = [ptv['熊'], ptv['華']]
-    elif platename[0] in ['爽','煌']:
-        await plate.send("请注意，国服爽代与煌代成就需一同清谱获得")
-        payload['version'] = [ptv['爽'], ptv['煌']]
+    version = pnconvert[res[0]]
+    if version == "霸":
+        version = "舞"
+    ids = musicGroup[version]
+    if version == "舞":
+        remids = musicGroup["舞ReMASTER"]
     else:
-        payload['version'] = [ptv[platename[0]]]
-    player_data, success = await get_player_plate(payload)
+        remids = []
+    
+    status = {
+        "MST_Re": {
+            "V":0,
+            "X":0,
+            "-":len(remids)
+        },
+        "MST":{
+            "V":0,
+            "X":0,
+            "-":len(ids)
+        },
+        "EXP":{
+            "V":0,
+            "X":0,
+            "-":len(ids)
+        },
+        "ADV":{
+            "V":0,
+            "X":0,
+            "-":len(ids)
+        },
+        "BSC":{
+            "V":0,
+            "X":0,
+            "-":len(ids)
+        }
+    }
+
+    qq = str(event.get_user_id())
+    if not_exist_data(qq):
+        await plate.send("每天第一次查询自动刷新成绩，可能需要较长时间。若需手动刷新成绩请发送“刷新成绩”")
+    player_data,success = await read_full_data(qq)
     if success == 400:
         await plate.finish("未找到此玩家，请确登陆https://www.diving-fish.com/maimaidx/prober/ 录入分数，并正确填写用户名与QQ号。")
-    elif success == 403:
-        await plate.finish("该用户禁止了其他人获取数据。")
-    else:
-        song_played = {}
-        for song in player_data['verlist']:
-            song_played[str(song["id"])+'l'+str(song["level_index"])] = {
-                "achievements": song["achievements"],
-                "fc": song["fc"],
-                "fs": song["fs"],
-                "level": song["level"]
-            }
-        searchlist = []
-        diffcount = {
-            "15":0,
-            "14+":0,
-            "14":0,
-            "13+":0,
-            "13":0,
-            "12+":0,
-            "12":0,
-            "11+":0,
-            "11":0,
-            "10+":0,
-            "10":0,
-            "9+":0,
-            "9":0,
-            "8+":0
-            }
-        if platename[0] in ['舞', '霸']:
-            if flag:
-                for song in music_data:
-                    if song["basic_info"]["from"] in payload['version']:
-                        chartinfo = [song["id"],song["level"][3],3]
-                        searchlist.append(chartinfo)
-                        diffcount[song["level"][3]]+=1
-                        if len(song["level"]) == 5:
-                            chartinfo = [song["id"],song["level"][4],4]
-                            searchlist.append(chartinfo)
-                            diffcount[song["level"][4]]+=1
-            else:
-                for song in music_data:
-                    if song["basic_info"]["from"] in payload['version']:
-                        chartinfo = [song["id"],song["level"][3],3]
-                        if song["level"][3] in ["15","14+","14"]:
-                            searchlist.append(chartinfo)
-                            diffcount[song["level"][3]]+=1
-                        if len(song["level"]) == 5:
-                            chartinfo = [song["id"],song["level"][4],4]
-                            if song["level"][4] in ["15","14+","14"]:
-                                searchlist.append(chartinfo)
-                                diffcount[song["level"][4]]+=1
+    
+    record_selected = {}
+    for rec in player_data['records']:
+        if ((str(rec['song_id']) in ids) and (rec['level_index'] != 4)) or ((str(rec['song_id']) in remids) and (rec['level_index'] == 4)):
+            tmp = {
+                "id":rec['song_id'],
+                "level_index": rec['level_index']
+                }
+            status[level_index_to_file[rec['level_index']]]["-"] -= 1
+            if res[1] in "極极":
+                tmp["cover"] = rec['fc']
+                if rec['fc'] != "":
+                    tmp["finished"] = True
+                    status[level_index_to_file[rec['level_index']]]["V"] += 1
+                else:
+                    tmp["finished"] = False
+                    status[level_index_to_file[rec['level_index']]]["X"] += 1
+ 
+            if res[1] == "将":
+                tmp["cover"] = rec['rate']
+                if rec['achievements'] >= 100:
+                    tmp["finished"] = True
+                    status[level_index_to_file[rec['level_index']]]["V"] += 1
+                else:
+                    tmp["finished"] = False
+                    status[level_index_to_file[rec['level_index']]]["X"] += 1
+
+            if res[1] == "神":
+                tmp["cover"] = rec['fc']
+                if rec['fc'][:2] == 'ap':
+                    tmp["finished"] = True
+                    status[level_index_to_file[rec['level_index']]]["V"] += 1
+                else:
+                    tmp["finished"] = False
+                    status[level_index_to_file[rec['level_index']]]["X"] += 1
+
+            if res[1] == "舞":
+                tmp["cover"] = rec['fs']
+                if rec['fs'][:3] == 'fsd':
+                    tmp["finished"] = True
+                    status[level_index_to_file[rec['level_index']]]["V"] += 1
+                else:
+                    tmp["finished"] = False
+                    status[level_index_to_file[rec['level_index']]]["X"] += 1
+
+            if res[1] == "者":
+                tmp["cover"] = rec['rate']
+                if rec['achievements'] >= 80:
+                    tmp["finished"] = True
+                    status[level_index_to_file[rec['level_index']]]["V"] += 1
+                else:
+                    tmp["finished"] = False
+                    status[level_index_to_file[rec['level_index']]]["X"] += 1
+
+            record_selected[f"{rec['song_id']}_{rec['level_index']}"] = tmp
+
+    if version != "舞":
+        status.pop("MST_Re")
+
+    records = {}
+    for id in ids:
+        music = total_list.by_id(id)
+        lev = music["level"][3]
+        if lev not in records:
+            records[lev] = []
+        if f"{id}_3" in record_selected:
+            records[lev].append(record_selected[f"{id}_3"])
         else:
-            for song in music_data:
-                if song["basic_info"]["from"] in payload['version']:
-                    chartinfo = [song["id"],song["level"][3],3]
-                    searchlist.append(chartinfo)
-                    diffcount[song["level"][3]]+=1
-        searchlist.sort(key = lambda x:x[1],reverse=True)
-        platename = platename[0] + platename[1]
-        print(platename)
-        img = await querydraw(song_played,searchlist,diffcount,platename,qq,flag)
-        await plate.finish(
-            MessageSegment("at", {"qq": qq}) + \
-            MessageSegment("text",{"text":"您的" + str(event.get_message()) + "为："}) + \
-            MessageSegment("image",{"file": f"base64://{str(image_to_base64(img), encoding='utf-8')}"}))
+            records[lev].append({
+                "id":id,
+                "level_index":3,
+                "cover":"",
+                "finished":False
+            })
+    for id in remids:
+        music = total_list.by_id(id)
+        lev = music["level"][4]
+        if lev not in records:
+            records[lev] = []
+        if f"{id}_4" in record_selected:
+            records[lev].append(record_selected[f"{id}_4"])
+        else:
+            records[lev].append({
+                "id":id,
+                "level_index":4,
+                "cover":"",
+                "finished":False
+            })
+    
+    if version == "舞" and res[3] != "全":
+        keys = list(records.keys())
+        for key in keys:
+            if key not in ["15","14+","14"]:
+                records.pop(key)
+    
+    if res[1] in "極极":
+        plate_file = "main_plate/" + platename_to_file[pnconvert[res[0]] + "极"]
+    elif res[1] == "将":
+        plate_file = "main_plate/" + platename_to_file[pnconvert[res[0]] + "将"]
+    elif res[1] == "神":
+        plate_file = "main_plate/" + platename_to_file[pnconvert[res[0]] + "神"]
+    elif res[1] == "舞":
+        plate_file = "main_plate/" + platename_to_file[pnconvert[res[0]] + "舞舞"]
+    else:
+        plate_file = "main_plate/" + platename_to_file["霸者"]
+
+    info = {
+        "qq": qq,
+        "plate": plate_file,
+        "status": status
+    }
+    img = await draw_final_rank_list(info = info,records = records)
+    if res[3] == "全":
+        # 压缩img
+        img = img.resize((int(img.size[0]*0.5),int(img.size[1]*0.5)))
+
+    if version == "舞" and res[3] != "全":
+        s = "舞系默认只展示14难度及以上。若需查看全部进度请在查询命令后加上“全”，如“舞将进度全”\n"
+    elif version in "熊華":
+        s = "请注意，国服熊代与華代成就需一同清谱舞萌DX版本获得\n"
+    elif version in "爽煌":
+        s = "请注意，国服爽代与煌代成就需一同清谱舞萌DX2021版本获得\n"
+    elif version in "宙星":
+        s = "请注意，国服宙代与星代成就需一同清谱舞萌DX2022版本获得\n"
+    elif version in "祭":
+        s = "舞萌DX2023目前尚未更新完成，以下仅展示当前曲目\n"
+    else:
+        s = ""
+
+    s += "您的" + str(event.get_message()) + "为：" + "\n"
+    await plate.finish(
+        MessageSegment("at", {"qq": qq}) + \
+        MessageSegment("text",{"text":s}) + \
+        MessageSegment("image",{"file": f"base64://{str(image_to_base64(img), encoding='utf-8')}"}))
 
 
 refresh_data = on_command("刷新成绩", priority = 10, block = True)
@@ -395,67 +416,75 @@ async def _refresh_data(event: Event, message: Message = CommandArg()):
 
 
 
-levelquery = on_regex(r"^([0-9]+)([＋\+]?)进度$",priority = 10, block = True)
+levelquery = on_regex(r"^([0-9]+)([＋\+]?)(?:进度|完成表|完成度)$",priority = 10, block = True)
 @levelquery.handle()
 async def _levelquery(event: Event):
-    regex = r"^([0-9]+)([＋\+]?)进度$"
+    regex = r"^([0-9]+)([＋\+]?)(?:进度|完成表|完成度)$"
     res = re.match(regex, str(event.get_message()))
-    level = res.group(1)
-    if (int(level) > 15) | (int(level) < 1) :
-        return
-        await levelquery.finish("别搞了，我最近忙得很没空改bot，有问题跟我说一下就行，别像有人一天天在群里测来测去的测你*呢，想测不会自己开个去玩吗，再测ban了")
-    plus = res.group(2)
-    if plus != "":
-        plus = "+"
-    if level + plus == "15+":
-        return
-        await levelquery.finish("别搞了，我最近忙得很没空改bot，有问题跟我说一下就行，别像有人一天天在群里测来测去的测你*呢，想测不会自己开个去玩吗，再测ban了")
+    level = int(res.group(1))
+    if (level >= 15) or (level <= 0):
+        await levelquery.finish("蓝的盆")
+    
     qq = str(event.get_user_id())
     if not_exist_data(qq):
         await levelquery.send("每天第一次查询自动刷新成绩，可能需要较长时间。若需手动刷新成绩请发送“刷新成绩”")
     player_data,success = await read_full_data(qq)
     if success == 400:
         await levelquery.finish("未找到此玩家，请确登陆https://www.diving-fish.com/maimaidx/prober/ 录入分数，并正确填写用户名与QQ号。")
-    song_played = {}
-    for song in player_data['records']:
-        song_played[str(song["song_id"])+'l'+str(song["level_index"])] = {
-            "achievements": song["achievements"],
-            "fc": song["fc"],
-            "fs": song["fs"],
-            "ds": song["ds"]
-        }
-    searchlist = []
-    diffcount = {}
-    if int(level) >=7:
-        if plus == "":
-            pythonsb = [".6",".5",".4",".3",".2",".1",".0"]
-            for sb in pythonsb:
-                diffcount[level+sb] = 0
-        else:
-            plus =="+"
-            pythonsb = [".9",".8",".7"]
-            for sb in pythonsb:
-                diffcount[level+sb] = 0
+    
+    plus = res.group(2)
+    records = {}
+    if plus != "":
+        for suffix in [".7",".8",".9"]:
+            records[str(level)+suffix] = []
     else:
-        if plus != "":
-            await levelquery.send("7以下没有+")
-        pythonsb = [".9",".8",".7",".6",".5",".4",".3",".2",".1",".0"]
-        for sb in pythonsb:
-            diffcount[level+sb] = 0
-    for song in music_data:
-        for i in range(len(song["ds"])):
-            if song["level"][i] == level+plus:
-                chartinfo = [song["id"],song["ds"][i],i]
-                searchlist.append(chartinfo)
-                diffcount[str(song["ds"][i])]+=1
-    searchlist.sort(key = lambda x:x[1],reverse=True)
-    img = await querydraw(song_played,searchlist,diffcount,"霸者",qq)#level+plus)
+        for suffix in [".0",".1",".2",".3",".4",".5",".6"]:
+            records[str(level)+suffix] = []
+    
+    record_selected = {}
+    for rec in player_data['records']:
+        if str(rec['ds']) in records:
+            tmp = {
+                "id":rec['song_id'],
+                "level_index": rec['level_index']
+                }
+            if rec['fc'][:2] == 'ap':
+                tmp['cover'] = rec['fc']
+            else:
+                tmp['cover'] = rec['rate']
+            if rec['achievements']>=100:
+                tmp['finished'] = True
+            else:
+                tmp['finished'] = False
+            record_selected[f"{rec['song_id']}_{rec['level_index']}"] = tmp
+            
+    for music in music_data:
+        for i,ds in enumerate(music['ds']):
+            if str(ds) in records:
+                if f"{music['id']}_{i}" in record_selected:
+                    records[str(ds)].append(record_selected[f"{music['id']}_{i}"])
+                else:
+                    records[str(ds)].append({
+                    "id": music['id'],
+                    "level_index": i,
+                    "cover": "",
+                    "finished": False
+                    })
+
+    plate_file_path = "other_plate/" + random.choice(os.listdir(plate_path + "other_plate"))
+
+    info = {
+        "qq": qq,
+        "plate": plate_file_path,
+        "status":{}
+    }
+
+    img = await draw_final_rank_list(info = info,records = records)
     await levelquery.finish(
         MessageSegment("at", {"qq": qq}) + \
-        #MessageSegment("text",{"text":"您的" + str(event.get_message()) + "为："}) + \
+        MessageSegment("text",{"text":"您的" + str(event.get_message()) + "为："}) + \
         MessageSegment("image",{"file": f"base64://{str(image_to_base64(img), encoding='utf-8')}"}))
-
-
+    
 
 singlequery = on_command("info",priority = 10, block = True)
 @singlequery.handle()
@@ -522,104 +551,6 @@ async def _singlequery(event: Event, message: Message = CommandArg()):
         await singlequery.finish(MessageSegment.at(qq)+MessageSegment.image(f"base64://{str(image_to_base64(final_img), encoding='utf-8')}"))
 
 
-
-"""-----------old info-----------"""
-# img = Image.open("src/static/platequery/bginfo.png").convert('RGBA')
-# cover = get_music_cover(id)
-# cover = cover.resize((200,200))
-# img.paste(cover,(60,90))
-# if musictype == "DX":
-#     icon = Image.open("src/static/platequery/DX.png").convert('RGBA')
-# else:
-#     icon = Image.open("src/static/platequery/SD.png").convert('RGBA')
-# img.paste(icon,(50,50),mask=icon.split()[3])
-# draw = ImageDraw.Draw(img)
-# font = ImageFont.truetype("src/static/msyh.ttc", 37, encoding='utf-8')
-# y = 40
-# info_to_file_dict = {
-#     "sssp": "SSSp",
-#     "sss": "SSS",
-#     "ssp": "SSp",
-#     "ss": "SS",
-#     "sp": "Sp",
-#     "s": "S",
-#     "aaa": "AAA",
-#     "aa": "AA",
-#     "a": "A",
-#     "bbb": "BBB",
-#     "bb": "BB",
-#     "b": "B",
-#     "c": "C",
-#     "d": "D",
-#     "fc": "FC",
-#     "fcp": "FCp",
-#     "ap": "AP",
-#     "app": "APp",
-#     "fs": "FS",
-#     "fsp": "FSp",
-#     "fsd": "FSD",
-#     "fsdp": "FSDp"
-# }
-# for rec in records:
-#     if rec != {}:
-#         #draw dxstars
-#         x = 330
-#         dx_max = sum(music['charts'][rec['level_index']]['notes'])*3
-#         if rec['dxScore']/dx_max > 0.99:
-#             stars = 6
-#         elif rec['dxScore']/dx_max > 0.97:
-#             stars = 5
-#         elif rec['dxScore']/dx_max > 0.95:
-#             stars = 4
-#         elif rec['dxScore']/dx_max > 0.93:
-#             stars = 3
-#         elif rec['dxScore']/dx_max > 0.90:
-#             stars = 2
-#         elif rec['dxScore']/dx_max > 0.85:
-#             stars = 1
-#         else:
-#             stars = 0
-#         for i in range(stars):
-#             star = Image.open(f"src/static/platequery/stars_{stars}.png").convert('RGBA')
-#             img.paste(star,(x+40*i,y+16),mask=star.split()[3])
-#         #draw achievement
-#         x = 335
-#         offset=22
-#         if rec['achievements']<10:
-#             x=x+offset*2
-#         elif rec['achievements']<100:
-#             x=x+offset
-#         achi = "%.4f" % rec['achievements'] + "%"
-#         y=y+4
-#         draw.text((x-1,y+4),achi,(0,0,0),font)
-#         draw.text((x-1,y+6),achi,(0,0,0),font)
-#         draw.text((x+1,y+4),achi,(0,0,0),font)
-#         draw.text((x+1,y+6),achi,(0,0,0),font)
-#         draw.text((x,y+5),achi,(255,255,255),font)
-#         #draw others
-#         y=y-4
-#         x=345
-
-#         rate = Image.open("src/static/mai/pic/UI_GAM_Rank_" + info_to_file_dict[rec["rate"]] + ".png").convert('RGBA')
-#         img.paste(rate,(x+185,y+12),mask=rate.split()[3])
-#         if rec["fs"] != "":
-#             fs = Image.open("src/static/mai/pic/UI_MSS_MBase_Icon_" + info_to_file_dict[rec["fs"]] + ".png").convert('RGBA')
-#             img.paste(fs,(x+283,y+12),mask=fs.split()[3])
-#         if rec["fc"] != "":
-#             fc = Image.open("src/static/mai/pic/UI_MSS_MBase_Icon_" + info_to_file_dict[rec["fc"]] + ".png").convert('RGBA')
-#             img.paste(fc,(x+328,y+12),mask=fc.split()[3])
-#     y = y + 60
-# font = ImageFont.truetype("src/static/msyh.ttc", 20, encoding='utf-8')
-# w ,h = draw.textsize(musictitle, font = font)
-# draw.text((160-w/2,310),musictitle,(0,0,0),font)
-# await singlequery.finish(MessageSegment.at(qq)+MessageSegment.image(f"base64://{str(image_to_base64(img), encoding='utf-8')}"))
-
-
-
-
-with open("src/static/music_data_bkp.json", encoding="utf-8")as fp:
-    music_data_bkp = json.load(fp)
-
 """-----------------随n个x-----------------"""
 rand_n = on_regex(r"^随[0-9]+[个|首][绿黄红紫白]?[0-9]+[＋\+]?", rule = dajiang_checker, priority = 10, block = True)
 @rand_n.handle()
@@ -680,9 +611,9 @@ async def _rand_n(event: Event):
                 else:
                     paichu_list = []
                     break
-        for music in music_data_bkp:
+        for music in music_data:
             for i,lv in enumerate(music["level"]):
-                if (lv == str(level)+plus)and((diff=='')or(diff==i))and(music["basic_info"]["from"] not in paichu_list):
+                if (lv == str(level)+plus)and((diff=='')or(diff==i))and(music['cn_version'] not in paichu_list):
                     l.append(f"{re_temp_list[i]}【{music['id']}】{music['title']}")
         if len(l) == 0:
             dirlist = os.listdir(long_dir_)

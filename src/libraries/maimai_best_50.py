@@ -1,10 +1,11 @@
 # Author: xyb, Diving_Fish
 from typing import Optional, Dict, List, Tuple
 
-import os, wget, aiohttp, math
+import os, aiohttp, math, random
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 from src.libraries.maimaidx_music import total_list
 from src.libraries.image import get_music_cover, get_qq_logo
+from src.libraries.static_lists_and_dicts import platename_to_file
 
 scoreRank = 'D C B BB BBB A AA AAA S S+ SS SS+ SSS SSS+'.split(' ')
 combo = ' FC FC+ AP AP+'.split(' ')
@@ -315,23 +316,15 @@ class DrawBest(object):
             img.paste(temp, (self.COLOUMS_IMG[j + 8] + 4, self.ROWS_IMG[i + 1] + 4))
 
     def draw(self):
-        if self.plate != '' :
+        if self.plate in platename_to_file:
+            PlateImg = Image.open(self.plate_dir + 'main_plate/' + platename_to_file[self.plate]).convert('RGBA')
+        else:
             try:
-                PlateImg = Image.open(self.plate_dir + self.plate + '.png').convert('RGBA')
-                #PlateImg = self._resizePic(PlateImg, 1.7875)
-                PlateImg = PlateImg.resize((720,116))
-                self.img.paste(PlateImg, (5, 3), mask=PlateImg.split()[3])
+                PlateImg = Image.open(self.plate_dir + 'private_plate/' + self.qq + '.png').convert('RGBA')
             except:
-                pass
-        else :
-            try:
-                PlateImg = Image.open(self.plate_dir + self.qq + '.png').convert('RGBA')
-                #PlateImg = self._resizePic(PlateImg, 1.7875)
-                PlateImg = PlateImg.resize((720,116))
-                self.img.paste(PlateImg, (5, 3), mask=PlateImg.split()[3])
-            except:
-                pass
-
+                plates = os.listdir(self.plate_dir + 'other_plate/')
+                PlateImg = Image.open(self.plate_dir + 'other_plate/' + random.choice(plates)).convert('RGBA')
+        self.img.paste(PlateImg, (5, 3), mask=PlateImg.split()[3])
         
         if self.qq != '0':
             iconLogo = get_qq_logo(self.qq)

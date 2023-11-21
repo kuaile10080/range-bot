@@ -4,107 +4,8 @@ from PIL import Image, ImageDraw, ImageFont, ImageFilter
 from src.libraries.maimaidx_music import MusicList,Music,Chart
 from src.libraries.image import get_qq_logo
 
-# chuni_music = [
-#     {
-#         "id": "2359",
-#         "catname": "POPS & ANIME",
-#         "newflag": "1",
-#         "title": "五等分のカタチ",
-#         "reading": "コトウフンノカタチ",
-#         "artist": "中野家の五つ子（花澤香菜・竹達彩奈・伊藤美来・佐倉綾音・水瀬いのり）「五等分の花嫁∬」",
-#         "lev_bas": "2",
-#         "lev_adv": "6",
-#         "lev_exp": "9",
-#         "lev_mas": "11",
-#         "lev_ult": "",
-#         "we_kanji": "",
-#         "we_star": "",
-#         "image": "399b7af05dcd04ed.jpg"
-#     },...]
-#———————————————————————————————————————————————————————————————————————————————————————————————————————
-# b40_resp = {
-#     "nickname": "CDRange",
-#     "rating": 1.5749999999999997,
-#     "records": {
-#         "b30": [
-#             {
-#                 "cid": 1815,
-#                 "ds": 9.5,
-#                 "fc": "",
-#                 "level": "9+",
-#                 "level_index": 1,
-#                 "level_label": "Advanced",
-#                 "mid": 712,
-#                 "ra": 10.27,
-#                 "score": 994373,
-#                 "title": "Climax"
-#             },
-#             ...
-#         ],
-#         "r10": [...]
-#     },
-#     "username": "kuaile10080"
-# }
-#———————————————————————————————————————————————————————————————————————————————————————————————————————
-# music_data = [
-#     {
-#         "id": 3,
-#         "title": "B.B.K.K.B.K.K.",
-#         "ds": [
-#             3.0,
-#             5.0,
-#             10.0,
-#             12.4,
-#             13.7
-#         ],
-#         "level": [
-#             "3",
-#             "5",
-#             "10",
-#             "12",
-#             "13+"
-#         ],
-#         "cids": [
-#             1,
-#             2,
-#             3,
-#             4,
-#             5
-#         ],
-#         "charts": [
-#             {
-#                 "combo": 333,
-#                 "charter": "ロシェ＠ペンギン"
-#             },
-#             {
-#                 "combo": 541,
-#                 "charter": "Jack"
-#             },
-#             {
-#                 "combo": 1051,
-#                 "charter": "Techno Kitchen"
-#             },
-#             {
-#                 "combo": 960,
-#                 "charter": "ロシェ＠ペンギン"
-#             },
-#             {
-#                 "combo": 1626,
-#                 "charter": "Redarrow"
-#             }
-#         ],
-#         "basic_info": {
-#             "title": "B.B.K.K.B.K.K.",
-#             "artist": "nora2r",
-#             "genre": "VARIETY",
-#             "bpm": 170,
-#             "from": "CHUNITHM"
-#         }
-#     },
-#     ...
-# ]
-
 chuni_path = "src/static/chunithm/"
+
 with open(chuni_path + "chuni_music.json","r",encoding="utf-8") as fp:
     chuni_music = json.load(fp)
 
@@ -153,14 +54,7 @@ def get_chuni_music_list():
 
 total_list, music_data = get_chuni_music_list()
 
-
-
 #开抄————————————————————————————————————————————————————————————————————————————
-#开抄————————————————————————————————————————————————————————————————————————————
-#开抄————————————————————————————————————————————————————————————————————————————
-#开抄————————————————————————————————————————————————————————————————————————————
-
-
 
 class DrawChuni(object):
     def __init__(self, b30:list, r10:list, userName:str, playerRating:float, qq:str) -> None:

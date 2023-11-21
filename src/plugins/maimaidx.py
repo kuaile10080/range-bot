@@ -128,23 +128,17 @@ async def _(event: Event):
     if groups[0] == "":
         name = groups[1].strip()
         music = total_list.by_id(name)
-        try:
-            await query_chart.finish(song_MessageSegment2(music))
-        except FinishedException:
-            pass
-        except Exception as e:
-            print(e)
+        if music is None:
             await query_chart.finish("未找到该谱面")
+        else:
+            await query_chart.finish(song_MessageSegment2(music))
     elif groups[0] == "老":
         name = groups[1].strip()
         music = total_list.by_id(name)
-        try:
-            await query_chart.finish(song_MessageSegment(music))
-        except FinishedException:
-            pass
-        except Exception as e:
-            print(e)
+        if music is None:
             await query_chart.finish("未找到该谱面")
+        else:
+            await query_chart.finish(song_MessageSegment2(music))
     else:
         try:
             level_index = level_labels.index(groups[0])

@@ -2,6 +2,7 @@ from PIL import Image, ImageDraw, ImageFont
 from src.libraries.maimaidx_music import Music
 from src.libraries.image import get_music_cover
 from src.libraries.maimaidx_music import compute_ra
+from src.libraries.static_lists_and_dicts import version_icon_path, genre_icon_path, level_index_to_file
 
 assets_path = "src/static/mai/newinfo/"
 cover_path = "src/static/mai/cover/"
@@ -221,37 +222,6 @@ def draw_Lv(lv:str,diff)->Image.Image:
 
     return img
 
-diff_list = ["BSC", "ADV", "EXP", "MST", "MST_Re"]
-
-version_icon_path = {
-    "maimai": "UI_CMN_TabTitle_MaimaiTitle_Ver100.png",
-    "maimaiPLUS": "UI_CMN_TabTitle_MaimaiTitle_Ver110.png",
-    "GreeN": "UI_CMN_TabTitle_MaimaiTitle_Ver120.png",
-    "GreeNPLUS": "UI_CMN_TabTitle_MaimaiTitle_Ver130.png",
-    "ORANGE": "UI_CMN_TabTitle_MaimaiTitle_Ver140.png",
-    "ORANGEPLUS": "UI_CMN_TabTitle_MaimaiTitle_Ver150.png",
-    "PiNK": "UI_CMN_TabTitle_MaimaiTitle_Ver160.png",
-    "PiNKPLUS": "UI_CMN_TabTitle_MaimaiTitle_Ver170.png",
-    "MURASAKi": "UI_CMN_TabTitle_MaimaiTitle_Ver180.png",
-    "MURASAKiPLUS": "UI_CMN_TabTitle_MaimaiTitle_Ver185.png",
-    "MiLK": "UI_CMN_TabTitle_MaimaiTitle_Ver190.png",
-    "MiLKPLUS": "UI_CMN_TabTitle_MaimaiTitle_Ver195.png",
-    "FiNALE": "UI_CMN_TabTitle_MaimaiTitle_Ver199.png",
-    "舞萌DX": "UI_CMN_TabTitle_MaimaiTitle_Ver200.png",
-    "舞萌DX 2021": "UI_CMN_TabTitle_MaimaiTitle_Ver214.png",
-    "舞萌DX 2022": "UI_CMN_TabTitle_MaimaiTitle_Ver220.png",
-    "舞萌DX 2023": "UI_CMN_TabTitle_MaimaiTitle_Ver230.png"
-}
-
-genre_icon_path = {
-    "舞萌": "UI_CMN_TabTitle_Original.png",
-    "流行&动漫": "UI_CMN_TabTitle_PopsAnime.png",
-    "其他游戏": "UI_CMN_TabTitle_Variety.png",
-    "niconico & VOCALOID": "UI_CMN_TabTitle_Niconico.png",
-    "东方Project": "UI_CMN_TabTitle_Toho.png",
-    "音击&中二节奏": "UI_CMN_TabTitle_Chugeki.png"
-}
-
 def draw_music_info(music:dict)->Image.Image:
     
     if len(music['ds'])==5:
@@ -315,7 +285,7 @@ def draw_music_info(music:dict)->Image.Image:
     # 每谱面信息
     for i in range(chats_sum):
         #等级
-        lv_img = draw_Lv(music["level"][i],diff_list[i]).resize((84,40))
+        lv_img = draw_Lv(music["level"][i],level_index_to_file[i]).resize((84,40))
         bg.paste(lv_img,(917,97+i*jump),lv_img)
 
 
