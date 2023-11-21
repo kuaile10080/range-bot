@@ -90,13 +90,24 @@ async def _():
 search_music = on_regex(r"^查歌.+", priority = 10, block = True)
 @search_music.handle()
 async def _(event: Event):
-    regex = "查歌(.+)"
+    regex = "^查歌(.+)"
     name = re.match(regex, str(event.get_message())).groups()[0].strip()
     if name == "":
         return
     res = total_list.filter(title_search=name)
     if len(res) == 0:
-        await search_music.finish("没有找到这样的乐曲。曲名不准确请使用xxx是什么歌。")
+        ress = total_list.filt_by_name(name)
+        if len(ress) == 0:
+            await search_music.finish("没有找到这样的乐曲")
+        elif len(ress) == 1:
+            await search_music.finish(MessageSegment.text("您要找的是不是：\n") + song_MessageSegment2(ress[0]))
+        elif len(ress) < 30:
+            search_result = ""
+            for music in sorted(ress, key = lambda i: int(i['id'])):
+                search_result += f"{music['id']}. {music['title']}\n"
+            await search_music.finish(search_result.strip())
+        else:
+            await search_music.finish(f"结果过多（{len(ress)} 条），请缩小查询范围。")
     elif len(res) == 1:
         await search_music.finish(song_MessageSegment2(res[0]))
     elif len(res) < 50:
@@ -111,7 +122,7 @@ async def _(event: Event):
 query_chart = on_regex(r"^([绿黄红紫白老]?) ?id ?([0-9]+)" , priority = 10, block = True)
 @query_chart.handle()
 async def _(event: Event):
-    regex = "([绿黄红紫白老]?) ?id ?([0-9]+)"
+    regex = "^([绿黄红紫白老]?) ?id ?([0-9]+)"
     groups = re.match(regex, str(event.get_message())).groups()
     level_labels = ['绿', '黄', '红', '紫', '白']
     if groups[0] == "":
