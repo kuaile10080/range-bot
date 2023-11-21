@@ -158,10 +158,20 @@ class Music(Dict):
 
 
 class MusicList(List[Music]):
-    def by_id(self, music_id: int) -> Optional[Music]:
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.music_dict = {}
         for music in self:
-            if music.id == music_id:
-                return music
+            self.music_dict[music.id] = music
+
+    def by_id(self, music_id: int) -> Optional[Music]:
+        if music_id in self.music_dict:
+            return self.music_dict[music_id]
+        else:
+            for music in self:
+                if music.id == music_id:
+                    return music
         return None
 
     def by_title(self, music_title: str) -> Optional[Music]:
