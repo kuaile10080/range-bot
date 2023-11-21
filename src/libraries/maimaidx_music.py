@@ -284,11 +284,21 @@ def refresh_alias_temp():
 with open("src/static/version_list.json", "r", encoding="utf-8") as fp:
     version_list = json.load(fp)
 
+version_replace = {
+    "maimaDX": "舞萌DX",
+    "Splash": "舞萌DX 2021",
+    "UNiVERSE": "舞萌DX 2022",
+    "FESTiVAL": "舞萌DX 2023"
+}
+
 def get_cn_version(music: Music)->str:
     if music.id in version_list:
-        return version_list[music.id]
+        if version_list[music.id] in version_replace:
+            return version_replace[version_list[music.id]]
+        else:
+            return version_list[music.id]
     else:
-        return "FESTiVAL"
+        return "舞萌DX 2023"
             
 
 #OFFLINE

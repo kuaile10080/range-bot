@@ -237,10 +237,10 @@ version_icon_path = {
     "MiLK": "UI_CMN_TabTitle_MaimaiTitle_Ver190.png",
     "MiLKPLUS": "UI_CMN_TabTitle_MaimaiTitle_Ver195.png",
     "FiNALE": "UI_CMN_TabTitle_MaimaiTitle_Ver199.png",
-    "maimaDX": "UI_CMN_TabTitle_MaimaiTitle_Ver200.png",
-    "Splash": "UI_CMN_TabTitle_MaimaiTitle_Ver214.png",
-    "UNiVERSE": "UI_CMN_TabTitle_MaimaiTitle_Ver220.png",
-    "FESTiVAL": "UI_CMN_TabTitle_MaimaiTitle_Ver230.png"
+    "舞萌DX": "UI_CMN_TabTitle_MaimaiTitle_Ver200.png",
+    "舞萌DX 2021": "UI_CMN_TabTitle_MaimaiTitle_Ver214.png",
+    "舞萌DX 2022": "UI_CMN_TabTitle_MaimaiTitle_Ver220.png",
+    "舞萌DX 2023": "UI_CMN_TabTitle_MaimaiTitle_Ver230.png"
 }
 
 genre_icon_path = {
