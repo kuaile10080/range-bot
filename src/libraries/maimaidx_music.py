@@ -11,7 +11,7 @@ def get_cover_len4_id(mid) -> str:
         mid -= 10000
     return f'{mid:04d}'
 
-def compute_ra(achievement:float,ds:float)->int:
+def compute_ra(ds:float, achievement:float)->int:
     if achievement == 99.9999:
         return int(SCORE_COEFFICIENT_TABLE[-2][1]*ds*achievement/100)-1
     elif achievement == 100.4999:

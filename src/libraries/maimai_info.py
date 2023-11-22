@@ -291,7 +291,7 @@ def draw_music_info(music:dict)->Image.Image:
 
         font_info = ImageFont.truetype("src/static/SourceHanSansCN-Bold.otf", 16,encoding="utf-8")
         # 定数
-        ds_text = f"定数 {music['ds'][i]:>2.1f}         SSS+ {compute_ra(100.5,music['ds'][i]):>3d}         SSS {compute_ra(100,music['ds'][i]):>3d}"
+        ds_text = f"定数 {music['ds'][i]:>2.1f}         SSS+ {compute_ra(music['ds'][i], 100.5):>3d}         SSS {compute_ra(music['ds'][i], 100):>3d}"
         width = font_info.getbbox(ds_text)[2]
         img_draw.text((628 + int((348-width)/2), 137+i*jump), ds_text, font=font_info, fill=(255, 255, 255, 255))
         # maxcombo
