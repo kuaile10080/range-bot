@@ -423,6 +423,8 @@ async def _plate(event: Event):
         s = "请注意，国服宙代与星代成就需一同清谱舞萌DX2022版本获得\n"
     elif version in "祭":
         s = "舞萌DX2023目前尚未更新完成，以下仅展示当前曲目\n"
+    elif version in "真" and res[1] == "将":
+        s = "真代没有真将，但是我可以假装帮你查\n"
     else:
         s = ""
 
