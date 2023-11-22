@@ -459,12 +459,13 @@ async def generateap50(player_data,username,qq) -> Image.Image:
     sd_best = BestList(35)
     dx_best = BestList(15)
     for rec in player_data['records']:
-        if total_list.by_id(rec["song_id"]).cn_version == "舞萌DX2023":
-            dx_best = BestList(15)
-        else:
-            sd_best = BestList(35)
-    
-    if username == "":
+        if rec['fc'][0]=='a':
+            if total_list.by_id(rec["song_id"]).cn_version == "舞萌DX2023":
+                dx_best.push(ChartInfo.from_json(rec))
+            else:
+                sd_best.push(ChartInfo.from_json(rec))
+
+    if username != "":
         qq = '0'
     pic = DrawBest(sd_best, dx_best, player_data["nickname"], player_data["plate"], qq, player_data["additional_rating"]).getDir()
     return pic
