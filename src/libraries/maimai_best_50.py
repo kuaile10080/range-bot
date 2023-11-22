@@ -3,7 +3,7 @@ from typing import Optional, Dict, List, Tuple
 
 import os, aiohttp, math, random
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
-from src.libraries.maimaidx_music import total_list
+from src.libraries.maimaidx_music import total_list, compute_ra
 from src.libraries.image import get_music_cover, get_qq_logo
 from src.libraries.static_lists_and_dicts import platename_to_file
 
@@ -20,7 +20,7 @@ class ChartInfo(object):
         self.diff = diff
         self.tp = tp
         self.achievement = achievement
-        self.ra = computeRa(ds,achievement)
+        self.ra = compute_ra(ds,achievement)
         self.comboId = comboId
         self.fsId = fsId
         self.scoreId = scoreId
@@ -101,9 +101,9 @@ class DrawBest(object):
         self.sdRating = 0
         self.dxRating = 0
         for sd in sdBest:
-            self.sdRating += computeRa(sd.ds, sd.achievement)
+            self.sdRating += compute_ra(sd.ds, sd.achievement)
         for dx in dxBest:
-            self.dxRating += computeRa(dx.ds, dx.achievement)
+            self.dxRating += compute_ra(dx.ds, dx.achievement)
         self.playerRating = self.sdRating + self.dxRating
         self.pic_dir = 'src/static/mai/pic/'
         self.cover_dir = 'src/static/mai/cover/'
@@ -250,7 +250,7 @@ class DrawBest(object):
                 fsImg = self._resizePic(fsImg, 0.6)
                 temp.paste(fsImg, (100, 22), fsImg.split()[3])
             font = ImageFont.truetype('src/static/adobe_simhei.otf', 12, encoding='utf-8')
-            tempDraw.text((8, 44), f'Base: {chartInfo.ds} -> {computeRa(chartInfo.ds, chartInfo.achievement)}', 'white', font)
+            tempDraw.text((8, 44), f'Base: {chartInfo.ds} -> {compute_ra(chartInfo.ds, chartInfo.achievement)}', 'white', font)
             font = ImageFont.truetype('src/static/adobe_simhei.otf', 18, encoding='utf-8')
             tempDraw.text((8, 60), f'#{num + 1}', 'white', font)
 
@@ -401,36 +401,36 @@ class DrawBest(object):
         return self.img
 
 
-def computeRa(ds: float, achievement: float) -> int:
-    baseRa = 22.4 
-    if achievement < 50:
-        baseRa = 7.0
-    elif achievement < 60:
-        baseRa = 8.0 
-    elif achievement < 70:
-        baseRa = 9.6 
-    elif achievement < 75:
-        baseRa = 11.2 
-    elif achievement < 80:
-        baseRa = 12.0 
-    elif achievement < 90:
-        baseRa = 13.6 
-    elif achievement < 94:
-        baseRa = 15.2 
-    elif achievement < 97:
-        baseRa = 16.8 
-    elif achievement < 98:
-        baseRa = 20.0 
-    elif achievement < 99:
-        baseRa = 20.3
-    elif achievement < 99.5:
-        baseRa = 20.8 
-    elif achievement < 100:
-        baseRa = 21.1 
-    elif achievement < 100.5:
-        baseRa = 21.6 
+# def computeRa(ds: float, achievement: float) -> int:
+#     baseRa = 22.4 
+#     if achievement < 50:
+#         baseRa = 7.0
+#     elif achievement < 60:
+#         baseRa = 8.0 
+#     elif achievement < 70:
+#         baseRa = 9.6 
+#     elif achievement < 75:
+#         baseRa = 11.2 
+#     elif achievement < 80:
+#         baseRa = 12.0 
+#     elif achievement < 90:
+#         baseRa = 13.6 
+#     elif achievement < 94:
+#         baseRa = 15.2 
+#     elif achievement < 97:
+#         baseRa = 16.8 
+#     elif achievement < 98:
+#         baseRa = 20.0 
+#     elif achievement < 99:
+#         baseRa = 20.3
+#     elif achievement < 99.5:
+#         baseRa = 20.8 
+#     elif achievement < 100:
+#         baseRa = 21.1 
+#     elif achievement < 100.5:
+#         baseRa = 21.6 
 
-    return math.floor(ds * (min(100.5, achievement) / 100) * baseRa)
+#     return math.floor(ds * (min(100.5, achievement) / 100) * baseRa)
 
 
 async def generate50(payload: Dict) -> Tuple[Optional[Image.Image], int]:
