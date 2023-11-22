@@ -9,7 +9,7 @@ from src.libraries.image import text_to_image, image_to_base64
 from src.libraries.maimai_best_40 import generate
 from src.libraries.maimai_best_50 import generate50
 from src.libraries.maimai_plate_query import draw_final_rank_list,not_exist_data,read_full_data,refresh_player_full_data
-from src.libraries.secrets import range_checker,dajiang_checker, maiqun_checker
+from src.libraries.secrets import *
 from src.libraries.maimai_info import draw_new_info
 from src.libraries.message_segment import song_MessageSegment2
 from src.libraries.static_lists_and_dicts import pnconvert, platename_to_file, level_index_to_file, ptv, versionlist
@@ -35,8 +35,7 @@ with open("src/static/musicGroup.json","r",encoding="utf-8") as f:
 #         if arr[i] != "":
 #             music_aliases[arr[i].lower()].append(arr[0])
 
-find_song = on_regex(r".+是什么歌", rule = dajiang_checker, priority = 10, block = True)
-
+find_song = on_regex(r".+是什么歌", priority = 10, block = True)
 @find_song.handle()
 async def _(event: Event):
     regex = "(.+)是什么歌"
@@ -593,7 +592,7 @@ async def _singlequery(event: Event, message: Message = CommandArg()):
 
 
 """-----------------随n个x-----------------"""
-rand_n = on_regex(r"^随[0-9]+[个|首][绿黄红紫白]?[0-9]+[＋\+]?", rule = dajiang_checker, priority = 10, block = True)
+rand_n = on_regex(r"^随[0-9]+[个|首][绿黄红紫白]?[0-9]+[＋\+]?", priority = 10, block = True)
 @rand_n.handle()
 async def _rand_n(event: Event):
     pattern = r"^随([0-9]+)[个|首]([绿黄红紫白]?)([0-9]+)([＋\+]?)(.*)"

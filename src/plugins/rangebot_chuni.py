@@ -8,7 +8,6 @@ from src.libraries.image import *
 from src.libraries.chuni_music import *
 from src.libraries.tool import hash
 from src.libraries.image import *
-from src.libraries.secrets import dajiang_checker
 
 import re
 
@@ -70,7 +69,7 @@ def inner_level_q(ds1, ds2=None):
     return result_set
 
 
-inner_level = on_command('cinner_level ', aliases={'c定数查歌 '}, rule=dajiang_checker, priority=10, block=True)
+inner_level = on_command('cinner_level ', aliases={'c定数查歌 '}, priority=10, block=True)
 @inner_level.handle()
 async def _(event: Event, message: Message = CommandArg()):
     argv = str(message).strip().split(" ")
@@ -91,7 +90,7 @@ async def _(event: Event, message: Message = CommandArg()):
     await inner_level.finish(MessageSegment.image(f"base64://{str(image_to_base64(text_to_image(s)), encoding='utf-8')}"))
 
 
-spec_rand = on_regex(r"^c随个(?:dx|sd|标准)?[绿黄红紫白]?[0-9]+\+?", rule=dajiang_checker, priority=10, block=True)
+spec_rand = on_regex(r"^c随个(?:dx|sd|标准)?[绿黄红紫白]?[0-9]+\+?", priority=10, block=True)
 @spec_rand.handle()
 async def _(event: Event):
     # level_labels = ['绿', '黄', '红', '紫', '白']
@@ -110,13 +109,13 @@ async def _(event: Event):
     await spec_rand.finish(rand_result)
 
 
-mr = on_regex(r".*中二.*什么", rule=dajiang_checker, priority=10, block=True)
+mr = on_regex(r".*中二.*什么", priority=10, block=True)
 @mr.handle()
 async def _():
     await mr.finish(song_txt(total_list.random()))
 
 
-search_music = on_regex(r"^c查歌.+", rule=dajiang_checker,priority=10, block=True)
+search_music = on_regex(r"^c查歌.+",priority=10, block=True)
 @search_music.handle()
 async def _(event: Event):
     regex = "c查歌(.+)"
@@ -136,7 +135,7 @@ async def _(event: Event):
     else:
         await search_music.finish(f"结果过多（{len(res)} 条），请缩小查询范围。")
 
-crsearch_music = on_regex(r"^cr查歌.+", rule=dajiang_checker,priority=10, block=True)
+crsearch_music = on_regex(r"^cr查歌.+",priority=10, block=True)
 @crsearch_music.handle()
 async def _(event: Event):
     regex = "cr查歌(.+)"
@@ -159,7 +158,7 @@ async def _(event: Event):
     else:
         await crsearch_music.finish(f"结果过多（{len(res)} 条），请缩小查询范围。")
 
-crid = on_regex(r"^crid ?([0-9]+)", rule=dajiang_checker, priority=10, block=True)
+crid = on_regex(r"^crid ?([0-9]+)", priority=10, block=True)
 @crid.handle()
 async def _(event: Event):
     regex = "crid ?([0-9]+)"
@@ -171,7 +170,7 @@ async def _(event: Event):
 
 
 
-query_chart = on_regex(r"^c([绿黄红紫白]?)id ?([0-9]+)",rule=dajiang_checker, priority=10, block=True)
+query_chart = on_regex(r"^c([绿黄红紫白]?)id ?([0-9]+)", priority=10, block=True)
 @query_chart.handle()
 async def _(event: Event):
     regex = "c([绿黄红紫白]?)id ?([0-9]+)"
@@ -198,7 +197,7 @@ async def _(event: Event):
 
 
 wm_list = ['推分', '越级', '下埋', '夜勤', '练底力','练手法', '打SUN', '干饭', '抓大J', '收歌', '扭头去打mai']
-jrzhe = on_command('今日中二', aliases={'今日chuni'},rule=dajiang_checker, priority=10, block=True)
+jrzhe = on_command('今日中二', aliases={'今日chuni'}, priority=10, block=True)
 
 
 @jrzhe.handle()

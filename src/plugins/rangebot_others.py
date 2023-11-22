@@ -5,7 +5,7 @@ from nonebot.adapters.onebot.v11 import Message, MessageSegment, exception
 from nonebot.matcher import Matcher
 
 from src.libraries.image import *
-from src.libraries.secrets import zongqun_checker, setu_checker, dayday_checker, gre_checker, TEST_GROUP, RANGE, SQL_HOST, SQL_PASSWORD, SQL_PORT
+from src.libraries.secrets import *
 
 from PIL import Image, ImageDraw, ImageFont
 import matplotlib.pyplot as plt
@@ -268,7 +268,7 @@ async def dayday_handle(event: Event):
     for word in daydaykeywords:
         if word in s:
             msg = "你" + word + "你ma呢"
-            await dayday.send(msg)
+            await dayday.finish(msg)
     return
 
 """-----------gre-----------"""
@@ -498,22 +498,10 @@ async def _daimao_edit(event: Event, message: Message = CommandArg()):
     await daimao_edit.finish(MessageSegment.image(url))
 
 MIRROR_TIMING = 30
-mirror_img = on_command("mirror", priority = 10, block = True, rule=zongqun_checker)
+mirror_img = on_command("mirror", priority = 10, block = True, rule=ex_fdu_checker)
 @mirror_img.handle()
 async def _mirror_img(event: Event, message: Message = CommandArg()):
-    if type(re.match("group_(.+)_(.+)",event.get_session_id())) == re.Match:
-        groupid = str(re.match("group_(.+)_(.+)",event.get_session_id()).groups()[0])
-        timelist = readjson(static_dir + "mirrorrecord.json")
-        try:
-            a = (timelist[groupid])
-        except:
-            a = 0
-        rest = time.time() - a
-        if (rest < MIRROR_TIMING) & (groupid != TEST_GROUP) & (str(event.get_user_id()) != RANGE):
-            await mirror_img.finish("本群CD还剩" + str( MIRROR_TIMING - int(rest)) + "秒，请稍后再试") 
-        else:
-            timelist[groupid] = time.time()
-            writejson(static_dir + "mirrorrecord.json",timelist)
+
     msg_json = json.loads(event.json())["message"]
     if len(msg_json) != 2:
         return
@@ -528,57 +516,73 @@ async def _mirror_img(event: Event, message: Message = CommandArg()):
             part = 2
         else:
             await mirror_img.finish(Message("请确保格式为mirror l/r/t + 图片"))
-        img_url = msg_json[1]["data"]["url"]
-        r = requests.get(img_url, stream=True)
-        file_io = io.BytesIO(r.content)
-        img = Image.open(file_io)
 
-        if img.format == "GIF":
-            n = img.n_frames
-        else:
-            n = 1
+    if type(re.match("group_(.+)_(.+)",event.get_session_id())) == re.Match:
+        groupid = str(re.match("group_(.+)_(.+)",event.get_session_id()).groups()[0])
+        if groupid not in MAIN_GROUPS:
+            timelist = readjson(static_dir + "mirrorrecord.json")
+            try:
+                a = (timelist[groupid])
+            except:
+                a = 0
+            rest = time.time() - a
+            if (rest < MIRROR_TIMING) & (groupid != TEST_GROUP) & (str(event.get_user_id()) != RANGE):
+                await mirror_img.finish("本群CD还剩" + str( MIRROR_TIMING - int(rest)) + "秒，请稍后再试") 
+            else:
+                timelist[groupid] = time.time()
+                writejson(static_dir + "mirrorrecord.json",timelist)
 
-        frames = []
-        outframes = []
-        for i in range(n):
-            img.seek(i)
-            frames.append(img.copy())
+    img_url = msg_json[1]["data"]["file"]
+    r = requests.get(img_url, stream=True)
+    file_io = io.BytesIO(r.content)
+    img = Image.open(file_io)
 
-        if len(frames) == 0:
-            await mirror_img.finish(Message("图片解析错误"))
-        width, height = img.size
+    if img.format == "GIF":
+        n = img.n_frames
+    else:
+        n = 1
 
-        if part == 2:
-            for frame in frames:
-                outframes.append(frame.transpose(Image.FLIP_LEFT_RIGHT))
-        elif part == 0:
-            for frame in frames:
-                left_half = frame.crop((0, 0, width // 2, height))
-                mirrored_img = left_half.transpose(Image.FLIP_LEFT_RIGHT)
-                full_image = Image.new("RGBA", (width//2*2, height))
-                full_image.paste(left_half, (0, 0))
-                full_image.paste(mirrored_img, (width//2, 0))
-                outframes.append(full_image)
-                del left_half, mirrored_img, full_image
-        elif part == 1:
-            for frame in frames:
-                right_half = frame.crop((width // 2, 0, width, height))
-                mirrored_img = right_half.transpose(Image.FLIP_LEFT_RIGHT)
-                full_image = Image.new("RGBA", (width//2*2, height))
-                full_image.paste(mirrored_img, (0, 0))
-                full_image.paste(right_half, (width//2, 0))
-                outframes.append(full_image)
-                del right_half, mirrored_img, full_image
-        
+    frames = []
+    outframes = []
+    for i in range(n):
+        img.seek(i)
+        frames.append(img.copy())
 
-        output = io.BytesIO()
-        if img.format == "GIF":
-            outframes[0].save(output,format="GIF", save_all=True, append_images=outframes[1:], duration=img.info['duration'], loop=img.info['loop'], disposal=2)
-        else :
-            outframes[0].save(output,format="PNG")
-        encoded = base64.b64encode(output.getvalue())
-        url = "base64://" + encoded.decode('utf-8')
-        await mirror_img.finish(MessageSegment.image(url))
+    if len(frames) == 0:
+        await mirror_img.finish(Message("图片解析错误"))
+    width, height = img.size
+
+    if part == 2:
+        for frame in frames:
+            outframes.append(frame.transpose(Image.FLIP_LEFT_RIGHT))
+    elif part == 0:
+        for frame in frames:
+            left_half = frame.crop((0, 0, width // 2, height))
+            mirrored_img = left_half.transpose(Image.FLIP_LEFT_RIGHT)
+            full_image = Image.new("RGBA", (width//2*2, height))
+            full_image.paste(left_half, (0, 0))
+            full_image.paste(mirrored_img, (width//2, 0))
+            outframes.append(full_image)
+            del left_half, mirrored_img, full_image
+    elif part == 1:
+        for frame in frames:
+            right_half = frame.crop((width // 2, 0, width, height))
+            mirrored_img = right_half.transpose(Image.FLIP_LEFT_RIGHT)
+            full_image = Image.new("RGBA", (width//2*2, height))
+            full_image.paste(mirrored_img, (0, 0))
+            full_image.paste(right_half, (width//2, 0))
+            outframes.append(full_image)
+            del right_half, mirrored_img, full_image
+    
+
+    output = io.BytesIO()
+    if img.format == "GIF":
+        outframes[0].save(output,format="GIF", save_all=True, append_images=outframes[1:], duration=img.info['duration'], loop=img.info['loop'], disposal=2)
+    else :
+        outframes[0].save(output,format="PNG")
+    encoded = base64.b64encode(output.getvalue())
+    url = "base64://" + encoded.decode('utf-8')
+    await mirror_img.finish(MessageSegment.image(url))
 
 
 
