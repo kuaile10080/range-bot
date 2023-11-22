@@ -97,23 +97,17 @@ async def _(event: Event):
     # level_labels = ['绿', '黄', '红', '紫', '白']
     regex = "c随个((?:dx|sd|标准))?([绿黄红紫白]?)([0-9]+\+?)"
     res = re.match(regex, str(event.get_message()).lower())
-    try:
-        level = res.groups()[2]
-        if res.groups()[1] == "":
-            music_data = total_list.filter(level=level)
-        else:
-            music_data = total_list.filter(
-                level=level, diff=['绿黄红紫白'.index(res.groups()[1])])
-        if len(music_data) == 0:
-            rand_result = "没有这样的乐曲哦。"
-        else:
-            rand_result = song_txt(music_data.random())
-        await spec_rand.finish(rand_result)
-    except FinishedException:
-        pass
-    except Exception as e:
-        print(e)
-        await spec_rand.finish("随机命令错误，请检查语法")
+    level = res.groups()[2]
+    if res.groups()[1] == "":
+        music_data = total_list.filter(level=level)
+    else:
+        music_data = total_list.filter(
+            level=level, diff=['绿黄红紫白'.index(res.groups()[1])])
+    if len(music_data) == 0:
+        rand_result = "没有这样的乐曲哦。"
+    else:
+        rand_result = song_txt(music_data.random())
+    await spec_rand.finish(rand_result)
 
 
 mr = on_regex(r".*中二.*什么", rule=dajiang_checker, priority=10, block=True)
@@ -184,41 +178,23 @@ async def _(event: Event):
     groups = re.match(regex, str(event.get_message())).groups()
     level_labels = ['绿', '黄', '红', '紫', '白']
     if groups[0] != "":
-        try:
             level_index = level_labels.index(groups[0])
             level_name = ['Basic', 'Advanced',
                           'Expert', 'Master', 'Re: MASTER']
             name = groups[1].strip()
             music = total_list.by_id(int(name))
             chart = music['charts'][level_index]
-#             info = f'''
-# 曲师: {music['basic_info']['artist']}
-# 版本: {music['basic_info']['genre']}
-# 流派: {music['basic_info']['from']}
-# BPM: {music['basic_info']['bpm']}'''
             ds = music['ds'][level_index]
             level = music['level'][level_index]
             img = get_chuni_cover(music.id)
-            msg = f'''{level_name[level_index]} {level}({ds})
-谱师: {chart['charter']}
-Combo: {chart['combo']}'''
+            msg = f"{level_name[level_index]} {level}({ds})\n谱师: {chart['charter']}\nCombo: {chart['combo']}"
             await query_chart.finish(MessageSegment.text(f"{music['id']}. {music['title']}\n") +
                                      MessageSegment.image(f"base64://{str(image_to_base64(img), encoding='utf-8')}") +
                                      MessageSegment.text(msg))
-        except FinishedException:
-            pass
-        except Exception:
-            await query_chart.finish("未找到该谱面")
     else:
         name = groups[1].strip()
         music = total_list.by_id(int(name))
-        try:
-            await query_chart.finish(song_txt(music))
-        except FinishedException:
-            pass
-        except Exception as e:
-            print(e)
-            await query_chart.finish("未找到该谱面")
+        await query_chart.finish(song_txt(music))
 
 
 wm_list = ['推分', '越级', '下埋', '夜勤', '练底力','练手法', '打SUN', '干饭', '抓大J', '收歌', '扭头去打mai']
