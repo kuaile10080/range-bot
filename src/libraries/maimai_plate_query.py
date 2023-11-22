@@ -9,15 +9,6 @@ cover_dir = 'src/static/mai/cover/'
 temp_dir = 'src/static/mai/temp/'
 assets_path = "src/static/mai/platequery/"
 plate_path = "src/static/mai/plate/"
-
-async def get_player_plate(payload: dict):
-    async with aiohttp.request("POST", "https://www.diving-fish.com/api/maimaidxprober/query/plate", json=payload) as resp:
-        if resp.status == 400:
-            return None, 400
-        elif resp.status == 403:
-            return None, 403
-        plate_data = await resp.json()
-        return plate_data, 0
         
 async def refresh_player_full_data(qq: str):
     async with aiohttp.request("GET","https://www.diving-fish.com/api/maimaidxprober/dev/player/records",params={"qq":qq},headers={"developer-token":DF_Dev_Token}) as resp:
@@ -27,6 +18,13 @@ async def refresh_player_full_data(qq: str):
         file = open( temp_dir + qq + time.strftime("_%y%m%d") + ".json", "w", encoding= "utf-8")
         json.dump(full_data,file)
         file.close()
+        return full_data, 0
+
+async def get_full_data_by_username(username: str):
+    async with aiohttp.request("GET","https://www.diving-fish.com/api/maimaidxprober/dev/player/records",params={"username":username},headers={"developer-token":DF_Dev_Token}) as resp:
+        if resp.status == 400:
+            return None, 400
+        full_data = await resp.json()
         return full_data, 0
 
 async def read_full_data(qq:str):

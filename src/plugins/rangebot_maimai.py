@@ -7,8 +7,8 @@ from src.libraries.tool import offlineinit, convert_cn2jp
 from src.libraries.maimaidx_music import total_list, music_data, refresh_music_list, refresh_alias_temp
 from src.libraries.image import text_to_image, image_to_base64
 from src.libraries.maimai_best_40 import generate
-from src.libraries.maimai_best_50 import generate50
-from src.libraries.maimai_plate_query import draw_final_rank_list,not_exist_data,read_full_data,refresh_player_full_data
+from src.libraries.maimai_best_50 import generate50, generateap50
+from src.libraries.maimai_plate_query import *
 from src.libraries.secrets import *
 from src.libraries.maimai_info import draw_new_info
 from src.libraries.message_segment import song_MessageSegment2
@@ -799,3 +799,24 @@ async def _select_alias(event: Event, message: Message = CommandArg()):
 
     else:
         await select_alias.finish('输入格式错误。\n查别名请输入“别名 id”\n增加别名请输入“别名 增 id 别名”\n删除别名请输入“别名 删 id 别名”\n')
+
+"""-----------------apb50----------------"""
+apb50 = on_command("apb50", priority = 10, block = True)
+@apb50.handle()
+async def _apb50(event: Event, message: Message = CommandArg()):
+    username = str(message).strip()
+    if username == "":
+        qq = str(event.get_user_id())
+        if not_exist_data(qq):
+            await apb50.send("每天第一次查询自动刷新成绩，可能需要较长时间。若需手动刷新成绩请发送“刷新成绩”")
+        player_data,success = await read_full_data(qq)
+        if success == 400:
+            await apb50.finish("未找到此玩家，请确登陆https://www.diving-fish.com/maimaidx/prober/ 录入分数，并正确填写用户名与QQ号。")
+    else:
+        player_data,success = await get_full_data_by_username(username)
+        if success == 400:
+            await apb50.finish("未找到此玩家")
+        elif success == 403:
+            await apb50.finish("该用户禁止了其他人获取数据。")
+    img = await generateap50(player_data,username,qq)
+    await apb50.finish(MessageSegment.image(f"base64://{str(image_to_base64(img), encoding='utf-8')}"))
