@@ -385,7 +385,7 @@ async def _plate(event: Event):
 
     dacheng = True
     for diff in status:
-        if status[diff]["-"] == 0 or status[diff]["X"] == 0:
+        if status[diff]["-"] != 0 or status[diff]["X"] != 0:
             dacheng = False
             break
 
