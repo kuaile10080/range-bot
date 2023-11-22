@@ -181,7 +181,13 @@ async def _(event: Event):
             level_name = ['Basic', 'Advanced',
                           'Expert', 'Master', 'Re: MASTER']
             name = groups[1].strip()
-            music = total_list.by_id(int(name))
+            music = total_list.by_id(name)
+
+            if music is None:
+                await query_chart.finish("没有找到这样的乐曲。")
+            if len(chart = music['charts']) < level_index:
+                await query_chart.finish("没有这个难度。")
+
             chart = music['charts'][level_index]
             ds = music['ds'][level_index]
             level = music['level'][level_index]
@@ -192,7 +198,7 @@ async def _(event: Event):
                                      MessageSegment.text(msg))
     else:
         name = groups[1].strip()
-        music = total_list.by_id(int(name))
+        music = total_list.by_id(name)
         await query_chart.finish(song_txt(music))
 
 
