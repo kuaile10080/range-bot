@@ -813,10 +813,11 @@ async def _apb50(event: Event, message: Message = CommandArg()):
         if success == 400:
             await apb50.finish("未找到此玩家，请确登陆https://www.diving-fish.com/maimaidx/prober/ 录入分数，并正确填写用户名与QQ号。")
     else:
+        qq = '0'
         player_data,success = await get_full_data_by_username(username)
         if success == 400:
             await apb50.finish("未找到此玩家")
         elif success == 403:
             await apb50.finish("该用户禁止了其他人获取数据。")
-    img = await generateap50(player_data,username,qq)
+    img = await generateap50(player_data,qq)
     await apb50.finish(MessageSegment.image(f"base64://{str(image_to_base64(img), encoding='utf-8')}"))
