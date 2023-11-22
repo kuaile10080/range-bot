@@ -185,7 +185,7 @@ async def _(event: Event):
 
             if music is None:
                 await query_chart.finish("没有找到这样的乐曲。")
-            if len(chart = music['charts']) < level_index:
+            if len(music['charts']) < level_index:
                 await query_chart.finish("没有这个难度。")
 
             chart = music['charts'][level_index]
