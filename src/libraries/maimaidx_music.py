@@ -141,9 +141,9 @@ class Music(Dict):
 
 
 class MusicList(List[Music]):
-    def by_id(self, music_id: int) -> Optional[Music]:
+    def by_id(self, music_id: any) -> Optional[Music]:
         for music in self:
-            if music.id == music_id:
+            if int(music.id) == int(music_id):
                 return music
         return None
 
@@ -239,10 +239,6 @@ def calculate_ngram_similarity(text1_cn, text2, n):
 def refresh_alias_temp():
     with open("src/static/all_alias.json", "r", encoding="utf-8") as aliasfile:
             alias_data = json.load(aliasfile)
-
-    # for id in alias_data:
-    #     if alias_data[id]['Name'] not in alias_data[id]['Alias']:
-    #         alias_data[id]['Alias'].append(alias_data[id]['Name'])
 
     with open("src/static/alias_pre_process_add.json", "r", encoding="utf-8") as addfile, \
             open("src/static/alias_pre_process_remove.json", "r", encoding="utf-8") as removefile:

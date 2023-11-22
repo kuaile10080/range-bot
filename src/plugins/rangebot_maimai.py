@@ -208,7 +208,7 @@ async def _(event: Event, message: Message = CommandArg()):
         else:
             res.sort(key = lambda x:int(x.id))
             s = "\n结果如下：\n"
-            for i,music_dict in enumerate(res):
+            for i,music in enumerate(res):
                 s += f"ID.{music.id:>5} {music.title} {music.type} {'/'.join(str(ds) for ds in music['ds'])}\n"    
 
     await version_search.finish(MessageSegment.image(f"base64://{str(image_to_base64(text_to_image(s)), encoding='utf-8')}"))
