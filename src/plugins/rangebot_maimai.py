@@ -228,7 +228,13 @@ async def _plate(event: Event):
     version = pnconvert[res[0]]
     if version == "霸":
         version = "舞"
-    ids = musicGroup[version]
+    if version != "祭":
+        ids = musicGroup[version]
+    else:
+        ids = []
+        for music in total_list:
+            if music.cn_version == ptv["祭"]:
+                ids.append(music.id)
     if version == "舞":
         remids = musicGroup["舞ReMASTER"]
     else:
