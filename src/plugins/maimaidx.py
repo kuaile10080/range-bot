@@ -268,7 +268,7 @@ async def _(event: Event, message: Message = CommandArg()):
     elif success == 403:
         await best_40_pic.finish("该用户禁止了其他人获取数据。")
     else:
-        await best_40_pic.finish(MessageSegment.text("b40已停止维护，对结果不负责")+MessageSegment.image(f"base64://{str(image_to_base64(img), encoding='utf-8')}"))
+        await best_40_pic.finish(MessageSegment.text("旧版b40已停止维护，对结果不负责")+MessageSegment.image(f"base64://{str(image_to_base64(img), encoding='utf-8')}"))
 
 best_50_pic = on_command('b50', priority = 10, block = True)
 

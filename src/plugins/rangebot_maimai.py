@@ -274,7 +274,8 @@ async def _plate(event: Event):
         if ((str(rec['song_id']) in ids) and (rec['level_index'] != 4)) or ((str(rec['song_id']) in remids) and (rec['level_index'] == 4)):
             tmp = {
                 "id":rec['song_id'],
-                "level_index": rec['level_index']
+                "level_index": rec['level_index'],
+                "ds": rec['ds']
                 }
             status[level_index_to_file[rec['level_index']]]["-"] -= 1
             if res[1] in "極极":
@@ -339,6 +340,7 @@ async def _plate(event: Event):
             records[lev].append({
                 "id":id,
                 "level_index":3,
+                "ds": music["ds"][3],
                 "cover":"",
                 "finished":False
             })
@@ -353,10 +355,11 @@ async def _plate(event: Event):
             records[lev].append({
                 "id":id,
                 "level_index":4,
+                "ds": music["ds"][4],
                 "cover":"",
                 "finished":False
             })
-    
+
     if version == "舞" and res[3] != "全":
         keys = list(records.keys())
         for key in keys:
@@ -374,10 +377,28 @@ async def _plate(event: Event):
     else:
         plate_file = "main_plate/" + platename_to_file["霸者"]
 
+    dacheng = True
+    for diff in status:
+        if status[diff]["-"] == 0 or status[diff]["X"] == 0:
+            dacheng = False
+            break
+
+    queren = True
+    for lev in records:
+        if lev in ["15","14+","14","13+"]:
+            for rec in records[lev]:
+                if not rec["finished"]:
+                    queren = False
+                    break
+            if not queren:
+                break
+
     info = {
         "qq": qq,
         "plate": plate_file,
-        "status": status
+        "status": status,
+        "queren": queren,
+        "dacheng": dacheng
     }
     img = await draw_final_rank_list(info = info,records = records)
 
@@ -448,7 +469,8 @@ async def _levelquery(event: Event):
         if str(rec['ds']) in records:
             tmp = {
                 "id":rec['song_id'],
-                "level_index": rec['level_index']
+                "level_index": rec['level_index'],
+                "ds": rec['ds']
                 }
             if rec['fc'][:2] == 'ap':
                 tmp['cover'] = rec['fc']
@@ -469,6 +491,7 @@ async def _levelquery(event: Event):
                     records[str(ds)].append({
                     "id": music['id'],
                     "level_index": i,
+                    "ds": ds,
                     "cover": "",
                     "finished": False
                     })
@@ -478,7 +501,9 @@ async def _levelquery(event: Event):
     info = {
         "qq": qq,
         "plate": plate_file_path,
-        "status":{}
+        "status":{},
+        "queren": False,
+        "dacheng": False
     }
 
     img = await draw_final_rank_list(info = info,records = records)

@@ -116,27 +116,15 @@ async def draw_final_rank_list(info:dict,records:dict)->Image.Image:
     else:
         statusoffset = 120
         status_img = draw_status(info["status"])
-        rest_records = 0
-        if "MST" in info["status"]:
-            rest_records += info["status"]["MST"]["X"] + info["status"]["MST"]["-"]
-        if "MST_Re" in info["status"]:
-            rest_records += info["status"]["MST_Re"]["X"] + info["status"]["MST_Re"]["-"]
-        if rest_records == 0:
-            finished_img = Image.open(f"{assets_path}已确认.png").convert("RGBA")
-        if "EXP" in info["status"]:
-            rest_records += info["status"]["EXP"]["X"] + info["status"]["EXP"]["-"]
-        if "ADV" in info["status"]:
-            rest_records += info["status"]["ADV"]["X"] + info["status"]["ADV"]["-"]
-        if "BSC" in info["status"]:
-            rest_records += info["status"]["BSC"]["X"] + info["status"]["BSC"]["-"]
-        if rest_records == 0:
+        if info["dacheng"]:
             finished_img = Image.open(f"{assets_path}已达成.png").convert("RGBA")
+        elif info["queren"]:
+            finished_img = Image.open(f"{assets_path}已确认.png").convert("RGBA")
 
     print(time.time()-a)
 
     # create new image
     img = Image.new('RGBA', (rank_list.size[0], rank_list.size[1] + 800 + statusoffset), color = (255, 255, 255, 255))
-    img_draw = ImageDraw.Draw(img)
 
     # draw bg
     rankbg = Image.open(f"{assets_path}rankbg.png").convert("RGBA")
@@ -152,22 +140,28 @@ async def draw_final_rank_list(info:dict,records:dict)->Image.Image:
     temp.alpha_composite(bott)
     img.paste(temp,(0,img.size[1]-bott.size[1]),temp)
 
-    # draw plate and qq
-    plate_shadow = Image.open(f"{assets_path}plate_shadow.png").convert("RGBA")
-    img.paste(plate_shadow,(256,150),plate_shadow)
-    plate = Image.open(f"{plate_path}{info['plate']}").convert("RGBA").resize((1440,232))
-    img.paste(plate,(256,150),plate)
-    qqlogo = get_qq_logo(info['qq']).resize((200,200))
-    img.paste(qqlogo,(256+16,150+15),qqlogo)
-
-
     print(time.time()-a)
     # draw status
     if status_img:
         img.paste(status_img,(int((img.size[0]-status_img.size[0])/2),430),status_img)
 
     if finished_img:
-        img.paste(finished_img,(1600,90),finished_img)
+        # draw plate and qq
+        plate_shadow = Image.open(f"{assets_path}plate_shadow.png").convert("RGBA")
+        img.paste(plate_shadow,(256-100,150),plate_shadow)
+        plate = Image.open(f"{plate_path}{info['plate']}").convert("RGBA").resize((1440,232))
+        img.paste(plate,(256-100,150),plate)
+        qqlogo = get_qq_logo(info['qq']).resize((200,200))
+        img.paste(qqlogo,(256+16-100,150+15),qqlogo)
+        img.paste(finished_img,(1600,120),finished_img)
+    else:
+        # draw plate and qq
+        plate_shadow = Image.open(f"{assets_path}plate_shadow.png").convert("RGBA")
+        img.paste(plate_shadow,(256,150),plate_shadow)
+        plate = Image.open(f"{plate_path}{info['plate']}").convert("RGBA").resize((1440,232))
+        img.paste(plate,(256,150),plate)
+        qqlogo = get_qq_logo(info['qq']).resize((200,200))
+        img.paste(qqlogo,(256+16,150+15),qqlogo)
 
     # draw rank list
     img.paste(rank_list,(0,500 + statusoffset),rank_list)
