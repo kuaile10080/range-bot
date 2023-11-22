@@ -269,7 +269,7 @@ async def _plate(event: Event):
 
     qq = str(event.get_user_id())
     if not_exist_data(qq):
-        await plate.send("每天第一次查询自动刷新成绩，可能需要较长时间。若需手动刷新成绩请发送“刷新成绩”")
+        await plate.send("每天第一次查询自动刷新成绩，可能需要较长时间。若需手动刷新请发送 刷新成绩")
     player_data,success = await read_full_data(qq)
     if success == 400:
         await plate.finish("未找到此玩家，请确登陆https://www.diving-fish.com/maimaidx/prober/ 录入分数，并正确填写用户名与QQ号。")
@@ -457,7 +457,7 @@ async def _levelquery(event: Event):
     
     qq = str(event.get_user_id())
     if not_exist_data(qq):
-        await levelquery.send("每天第一次查询自动刷新成绩，可能需要较长时间。若需手动刷新成绩请发送“刷新成绩”")
+        await levelquery.send("每天第一次查询自动刷新成绩，可能需要较长时间。若需手动刷新请发送 刷新成绩")
     player_data,success = await read_full_data(qq)
     if success == 400:
         await levelquery.finish("未找到此玩家，请确登陆https://www.diving-fish.com/maimaidx/prober/ 录入分数，并正确填写用户名与QQ号。")
@@ -557,7 +557,7 @@ async def _singlequery(event: Event, message: Message = CommandArg()):
 
     qq = str(event.get_user_id())
     if not_exist_data(qq):
-        await singlequery.send("每天第一次查询自动刷新成绩，可能需要较长时间。若需手动刷新成绩请发送“刷新成绩”")
+        await singlequery.send("每天第一次查询自动刷新成绩，可能需要较长时间。若需手动刷新请发送 刷新成绩")
     player_data,success = await read_full_data(qq)
     if success == 400:
         await singlequery.finish("未找到此玩家，请确登陆https://www.diving-fish.com/maimaidx/prober/ 录入分数，并正确填写用户名与QQ号。")
@@ -690,7 +690,7 @@ async def _fslb(event: Event):
         ds_h = level + 0.9
     qq = str(event.get_user_id())
     if not_exist_data(qq):
-        await fslb.send("每天第一次查询自动刷新成绩，可能需要较长时间。若需手动刷新成绩请发送“刷新成绩”")
+        await fslb.send("每天第一次查询自动刷新成绩，可能需要较长时间。若需手动刷新请发送 刷新成绩")
     player_data,success = await read_full_data(qq)
     if success == 400:
         await fslb.finish("未找到此玩家，请确登陆https://www.diving-fish.com/maimaidx/prober/ 录入分数，并正确填写用户名与QQ号。")
@@ -808,7 +808,7 @@ async def _apb50(event: Event, message: Message = CommandArg()):
     if username == "":
         qq = str(event.get_user_id())
         if not_exist_data(qq):
-            await apb50.send("每天第一次查询自动刷新成绩，可能需要较长时间。若需手动刷新成绩请发送“刷新成绩”")
+            await apb50.send("每天第一次查询自动刷新成绩，可能需要较长时间。若需手动刷新请发送 刷新成绩")
         player_data,success = await read_full_data(qq)
         if success == 400:
             await apb50.finish("未找到此玩家，请确登陆https://www.diving-fish.com/maimaidx/prober/ 录入分数，并正确填写用户名与QQ号。")
