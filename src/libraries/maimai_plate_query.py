@@ -167,11 +167,11 @@ async def draw_final_rank_list(info:dict,records:dict)->Image.Image:
         img.paste(status_img,(int((img.size[0]-status_img.size[0])/2),430),status_img)
 
     if finished_img:
-        print(1)
         img.paste(finished_img,(1600,90),finished_img)
 
     # draw rank list
     img.paste(rank_list,(0,500 + statusoffset),rank_list)
+    img = img.convert("RGB")
 
     print(time.time()-a)
     return img

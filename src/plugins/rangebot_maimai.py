@@ -380,9 +380,11 @@ async def _plate(event: Event):
         "status": status
     }
     img = await draw_final_rank_list(info = info,records = records)
-    if res[3] == "全":
-        # 压缩img
-        img = img.resize((int(img.size[0]*0.5),int(img.size[1]*0.5)))
+
+    if img.size[1]>3000:
+        b64 = image_to_base64(img,format="JPEG")
+    else:
+        b64 = image_to_base64(img,format="PNG")
 
     if version == "舞" and res[3] != "全":
         s = "舞系默认只展示14难度及以上。若需查看全部进度请在查询命令后加上“全”，如“舞将进度全”\n"
@@ -401,7 +403,7 @@ async def _plate(event: Event):
     await plate.finish(
         MessageSegment("at", {"qq": qq}) + \
         MessageSegment("text",{"text":s}) + \
-        MessageSegment("image",{"file": f"base64://{str(image_to_base64(img), encoding='utf-8')}"}))
+        MessageSegment("image",{"file": f"base64://{str(b64, encoding='utf-8')}"}))
 
 
 refresh_data = on_command("刷新成绩", priority = 10, block = True)
@@ -480,10 +482,16 @@ async def _levelquery(event: Event):
     }
 
     img = await draw_final_rank_list(info = info,records = records)
+    
+    if img.size[1]>3000:
+        b64 = image_to_base64(img,format="JPEG")
+    else:
+        b64 = image_to_base64(img,format="PNG")
+
     await levelquery.finish(
         MessageSegment("at", {"qq": qq}) + \
         MessageSegment("text",{"text":"您的" + str(event.get_message()) + "为："}) + \
-        MessageSegment("image",{"file": f"base64://{str(image_to_base64(img), encoding='utf-8')}"}))
+        MessageSegment("image",{"file": f"base64://{str(b64, encoding='utf-8')}"}))
     
 
 singlequery = on_command("info",priority = 10, block = True)
