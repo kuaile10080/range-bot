@@ -69,6 +69,12 @@ def draw_one_music(record:dict)->Image.Image:
 def draw_rank_list(records:dict)->Image.Image:
     keys = list(records.keys())
     keys.sort(reverse=True)
+    none_keys = []
+    for key in keys:
+        if records[key]==[]:
+            none_keys.append(key)
+    for key in none_keys:
+        keys.remove(key)
 
     lines = sum([1 + int((len(records[key])-0.1)/10) for key in keys])
     img = Image.new('RGBA', (1952, lines*160), color = (0, 0, 0,0))
