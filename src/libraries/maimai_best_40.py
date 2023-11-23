@@ -3,7 +3,7 @@ from typing import Optional, Dict, List, Tuple
 
 import os, aiohttp, random
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
-from src.libraries.maimaidx_music import total_list
+from src.libraries.maimaidx_music import total_list, compute_ra
 from src.libraries.image import get_music_cover, get_qq_logo
 from src.libraries.static_lists_and_dicts import platename_to_file
 
@@ -94,10 +94,10 @@ class DrawBest(object):
         self.sdRating = 0
         self.dxRating = 0
         for sd in sdBest:
-            sd.ra = computeRa(float(sd.ds),float(sd.achievement))
+            sd.ra = compute_ra(float(sd.ds), float(sd.achievement), b50=False)
             self.sdRating += sd.ra
         for dx in dxBest:
-            dx.ra = computeRa(float(dx.ds),float(dx.achievement))
+            dx.ra = compute_ra(float(dx.ds), float(dx.achievement), b50=False)
             self.dxRating += dx.ra
         self.playerRating = self.sdRating + self.dxRating
         self.musicRating = self.playerRating
@@ -380,36 +380,36 @@ class DrawBest(object):
         return self.img
 
 
-def computeRa(ds: float, achievement:float) -> int:
-    baseRa = 14.035
-    if achievement >= 50 and achievement < 60:
-        baseRa = 5.0
-    elif achievement < 70:
-        baseRa = 6.0
-    elif achievement < 75:
-        baseRa = 7.0
-    elif achievement < 80:
-        baseRa = 7.5
-    elif achievement < 90:
-        baseRa = 8.0
-    elif achievement < 94:
-        baseRa = 9.0
-    elif achievement < 97:
-        baseRa = 9.4
-    elif achievement < 98:
-        baseRa = 12.2
-    elif achievement < 98.5:
-        baseRa = 12.35
-    elif achievement < 99:
-        baseRa = 12.5
-    elif achievement < 99.5:
-        baseRa = 12.85
-    elif achievement < 100:
-        baseRa = 13.125
-    elif achievement < 100.5:
-        baseRa = 13.5
-    return int(ds*baseRa+0.5)
-    #return math.floor(ds * (min(100.5, achievement) / 100) * baseRa)
+# def computeRa(ds: float, achievement:float) -> int:
+#     baseRa = 14.035
+#     if achievement >= 50 and achievement < 60:
+#         baseRa = 5.0
+#     elif achievement < 70:
+#         baseRa = 6.0
+#     elif achievement < 75:
+#         baseRa = 7.0
+#     elif achievement < 80:
+#         baseRa = 7.5
+#     elif achievement < 90:
+#         baseRa = 8.0
+#     elif achievement < 94:
+#         baseRa = 9.0
+#     elif achievement < 97:
+#         baseRa = 9.4
+#     elif achievement < 98:
+#         baseRa = 12.2
+#     elif achievement < 98.5:
+#         baseRa = 12.35
+#     elif achievement < 99:
+#         baseRa = 12.5
+#     elif achievement < 99.5:
+#         baseRa = 12.85
+#     elif achievement < 100:
+#         baseRa = 13.125
+#     elif achievement < 100.5:
+#         baseRa = 13.5
+#     return int(ds*baseRa+0.5)
+#     #return math.floor(ds * (min(100.5, achievement) / 100) * baseRa)
 
 
 async def generate(payload: Dict) -> Tuple[Optional[Image.Image], int]:

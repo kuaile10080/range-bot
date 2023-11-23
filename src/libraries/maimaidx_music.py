@@ -1,7 +1,7 @@
-import json, random, nltk
+import json, random, nltk, math
 from typing import Dict, List, Optional, Union, Tuple, Any
 from src.libraries.tool import convert_cn2jp
-from src.libraries.static_lists_and_dicts import SCORE_COEFFICIENT_TABLE
+from src.libraries.static_lists_and_dicts import SCORE_COEFFICIENT_TABLE, SCORE_COEFFICIENT_TABLE_LEGANCY
 from copy import deepcopy
 
 def get_cover_len4_id(mid) -> str:
@@ -11,16 +11,20 @@ def get_cover_len4_id(mid) -> str:
         mid -= 10000
     return f'{mid:04d}'
 
-def compute_ra(ds:float, achievement:float)->int:
-    if achievement == 99.9999:
-        return int(SCORE_COEFFICIENT_TABLE[-2][1]*ds*achievement/100)-1
-    elif achievement == 100.4999:
-        return int(SCORE_COEFFICIENT_TABLE[-1][1]*ds*achievement/100)-1
+def compute_ra(ds:float, achievement:float, b50 = True)->int:
+    if b50:
+        score_table = SCORE_COEFFICIENT_TABLE
     else:
-        for i in range(len(SCORE_COEFFICIENT_TABLE)-1):
-            if SCORE_COEFFICIENT_TABLE[i][0] <= achievement < SCORE_COEFFICIENT_TABLE[i+1][0]:
-                return int(SCORE_COEFFICIENT_TABLE[i][1]*ds*achievement/100)
-        return int(SCORE_COEFFICIENT_TABLE[-1][1]*ds*100.5/100)
+        score_table = SCORE_COEFFICIENT_TABLE_LEGANCY
+    if achievement == 99.9999:
+        return math.floor(score_table[-2][1]*ds*achievement/100)-1
+    elif achievement == 100.4999:
+        return math.floor(score_table[-1][1]*ds*achievement/100)-1
+    else:
+        for i in range(len(score_table)-1):
+            if score_table[i][0] <= achievement < score_table[i+1][0]:
+                return math.floor(score_table[i][1]*ds*achievement/100)
+        return math.floor(score_table[-1][1]*ds*100.5/100)
 
 def cross(checker: List[Any], elem: Optional[Union[Any, List[Any]]], diff):
     ret = False
