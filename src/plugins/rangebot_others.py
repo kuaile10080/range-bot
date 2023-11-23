@@ -183,7 +183,7 @@ rghaishi = on_regex(r"^range.*还是.*", priority = 31, block = True)
 async def _(event: Event):
     haishilist = str(event.get_message())[5:].strip().split("还是")
     for s in haishilist:
-        if (s.strip() == ""):
+        if (s.strip() == "") or (s.strip() == "还是"):
             rghaishi.finish("蓝的盆")
         elif len(set(haishilist)) != len(haishilist):
             rghaishi.finish("蓝的盆")
