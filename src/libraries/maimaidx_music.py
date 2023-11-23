@@ -198,8 +198,10 @@ class MusicList(List[Music]):
         title_temp_equal = MusicList()
         alias_temp_equal = MusicList()
         alias_temp_in = MusicList()
-        ngram_temp = None
-        ngrams_max = 0
+        ngram_temp1 = None
+        ngram_temp2 = None
+        ngrams_max1 = 0
+        ngrams_max2 = 0
         for music in self:
             alias_list = alias_data[music.id]["Alias"]
             if title_search == music.title.lower():
@@ -212,18 +214,24 @@ class MusicList(List[Music]):
                         if title_search in alias.lower():
                             alias_temp_in.append(music)
                             break
-                        ngram_similarity = calculate_ngram_similarity(title_search, alias.lower(), 2)
-                        if ngram_similarity > ngrams_max:
-                            ngrams_max = ngram_similarity
-                            ngram_temp = music
+                        ngram_similarity1 = calculate_ngram_similarity(title_search, alias.lower(), 1)
+                        ngram_similarity2 = calculate_ngram_similarity(title_search, alias.lower(), 2)
+                        if ngram_similarity1 > ngrams_max1:
+                            ngrams_max1 = ngram_similarity1
+                            ngram_temp1 = music
+                        if ngram_similarity2 > ngrams_max2:
+                            ngrams_max2 = ngram_similarity2
+                            ngram_temp2 = music
         if len(title_temp_equal) != 0:
             return title_temp_equal
         elif len(alias_temp_equal) != 0:
             return alias_temp_equal
         elif len(alias_temp_in) != 0:
             return alias_temp_in
-        elif ngram_temp is not None:
-            new_list.append(ngram_temp)
+        elif ngram_temp2 is not None:
+            new_list.append(ngram_temp2)
+        elif ngram_temp1 is not None:
+            new_list.append(ngram_temp1)
         return new_list
 
 def calculate_ngram_similarity(text1_cn, text2, n):
