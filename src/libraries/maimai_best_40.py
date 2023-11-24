@@ -18,12 +18,12 @@ class ChartInfo(object):
         self.diff = diff
         self.tp = tp
         self.achievement = achievement
-        self.ra = ra
         self.comboId = comboId
         self.scoreId = scoreId
         self.title = title
         self.ds = ds
         self.lv = lv
+        self.ra = compute_ra(ds, achievement, b50=False)
 
     def __str__(self):
         return '%-50s' % f'{self.title} [{self.tp}]' + f'{self.ds}\t{diffs[self.diff]}\t{self.ra}'
@@ -44,7 +44,7 @@ class ChartInfo(object):
             idNum=total_list.by_title(data["title"]).id,
             title=data["title"],
             diff=data["level_index"],
-            ra=data["ra"],
+            ra=compute_ra(float(data["ds"]), float(data["achievements"]), b50=False),
             ds=data["ds"],
             comboId=fi,
             scoreId=ri,
