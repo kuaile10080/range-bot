@@ -132,7 +132,7 @@ async def _(event: Event):
         if music is None:
             await query_chart.finish("未找到该谱面")
         else:
-            await query_chart.finish(song_MessageSegment2(music))
+            await query_chart.finish(song_MessageSegment(music))
     else:
         try:
             level_index = level_labels.index(groups[0])

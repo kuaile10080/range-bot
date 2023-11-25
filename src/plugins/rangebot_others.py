@@ -74,7 +74,8 @@ async def _capoo(event: Event, message: Message = CommandArg()):
 jt_sh = ['qy','bl','hsh']
 jt_zb = ['yt','rs','wy','zc']
 jt_jn = ['lw']
-group_sh = ['751302572','775613195','780012208','742829700','646232811','698699856','606964743',TEST_GROUP]
+group_sh = ['751302572','775613195','780012208','742829700','646232811','698699856','606964743']
+group_sh.extend(MAIN_GROUPS)
 group_zb = ['419134739',TEST_GROUP]
 group_jn = ['784593881',TEST_GROUP]
 
