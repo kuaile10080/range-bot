@@ -236,6 +236,8 @@ fudu = on_message(priority = 20000, block = True)
 async def fudu_handle(event: Event):
     global fuducount, fudumessage
     if type(re.match("group_(.+)_(.+)",event.get_session_id())) == re.Match:
+        if '当前版本不支持该消息类型' in str(event.get_message()):
+            return
         group = str(re.match("group_(.+)_(.+)",event.get_session_id()).groups()[0])
         if len(str(event.get_message())) > 50:
             fuducount[group] = -1

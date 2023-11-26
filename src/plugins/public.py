@@ -9,13 +9,7 @@ from src.libraries.image import *
 #     if hasattr(event, 'message_type') and event.message_type == "private" and event.sub_type != "friend":
 #         raise IgnoredException("not reply group temp message")
 
-    
-
-help = on_command('help', priority = 5, block = True)
-
-@help.handle()
-async def _(bot: Bot, event: Event, state: T_State):
-    help_str = '''diving-fish功能：
+help_str = '''diving-fish功能：
 最近更新：
 查歌，info，查牌子有了全新UI
 查牌子有了个等级谱面清谱进度
@@ -79,4 +73,12 @@ zlh/舟立绘 <干员名> <1/2> -》 查询明日方舟干员普通/精2立绘
 单曲成绩和查牌子查等级完成度采用缓存机制，每天第一次查询刷新缓存，之后查询使用缓存。
 如果发现成绩不同步请发送 刷新成绩 
 b40/b50无需刷新，同步水鱼'''
-    await help.finish(MessageSegment.image(f"base64://{str(image_to_base64(text_to_image(help_str)), encoding='utf-8')}"))
+
+help_b64str = f"base64://{str(image_to_base64(text_to_image(help_str)), encoding='utf-8')}"
+    
+help = on_command('help', priority = 5, block = True)
+@help.handle()
+async def _(bot: Bot, event: Event, state: T_State):
+    if str(event.get_message()).strip() != "help":
+        return
+    await help.finish(MessageSegment.image(help_b64str))
