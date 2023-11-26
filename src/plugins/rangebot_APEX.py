@@ -4,7 +4,7 @@ from PIL import Image,ImageDraw,ImageFont
 from nonebot import on_command
 from nonebot.params import CommandArg
 from nonebot.adapters.onebot.v11 import Message, Event, MessageSegment
-from src.libraries.secrets import API_key
+from src.libraries.secrets import APEX_API_key
 
 from src.libraries.image import *
 
@@ -15,7 +15,7 @@ map_aliases = {"Kings Canyon": "猪王峡谷","World's Edge": "世界尽头","Ol
 Map_rotation = on_command('APEX地图轮换',aliases={"apex地图轮换","Apex地图轮换"}, priority = 20, block = True)
 @Map_rotation.handle()
 async def _(event: Event, message: Message = CommandArg()):
-    resp = requests.get(r"https://api.mozambiquehe.re/maprotation?auth=" + API_key)
+    resp = requests.get(r"https://api.mozambiquehe.re/maprotation?auth=" + APEX_API_key)
     if resp.status_code in [400,403,404,405,410,429,500]:
         await Map_rotation.finish(Message([
         {

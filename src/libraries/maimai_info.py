@@ -178,8 +178,6 @@ async def draw_new_info(record:dict,music:Music)->Image.Image:
     font_bpm = ImageFont.truetype("src/static/MFZhiShang_Noncommercial-Regular.otf", 16,encoding="utf-8")
     img_draw.text((290, 647), f"BPM  {bpm:03d}", font=font_bpm, fill=(0,0,0))
 
-    # img.save("test.png")
-
     return img
 
 
