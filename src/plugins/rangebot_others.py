@@ -231,7 +231,7 @@ async def sjst_handle(event: Event):
 fuducount = {}
 fudumessage = {}
 """-----------复读-----------"""
-fudu = on_message(priority = 20000, block = True)  
+fudu = on_message(priority = 20001, block = True)  
 @fudu.handle()
 async def fudu_handle(event: Event):
     global fuducount, fudumessage
@@ -263,13 +263,14 @@ async def fudu_handle(event: Event):
 
 """-----------dayday-----------"""
 daydaykeywords = ['自卑','焦虑','急','[CQ:face,id=107]']
-dayday = on_message(priority = 20001, block = False, rule = dayday_checker)
+dayday = on_message(priority = 20000, block = False, rule = dayday_checker)
 @dayday.handle()
-async def dayday_handle(event: Event):
+async def dayday_handle(event: Event, matcher: Matcher):
     s = str(event.get_message())
     for word in daydaykeywords:
         if word in s:
             msg = "你" + word + "你ma呢"
+            matcher.stop_propagation()
             await dayday.finish(msg)
     return
 

@@ -59,14 +59,14 @@ async def _(message: Message = CommandArg()):
             'url': 'http://yituliu.site',
             'key': key, 
             'w': '1000', 
-            'h': '880'
+            'h': '1321'
             }
         res = requests.get(html_to_img_url, params=params)
         if res.status_code != 200:
             await cailiao.finish("渲染失败")
         else:
             img = Image.open(BytesIO(res.content))
-            img = img.crop((0,134,img.size[0],img.size[1]))
+            img = img.crop((0,134,1000,885))
             img.save(mrfz_dir + '材料.png')
             await cailiao.finish(MessageSegment.image(f"base64://{str(image_to_base64(img), encoding='utf-8')}"))
 
@@ -79,13 +79,13 @@ async def _():
         'url': 'http://yituliu.site',
         'key': key, 
         'w': '1000', 
-        'h': '880'
+        'h': '1321'
         }
     res = requests.get(html_to_img_url, params=params)
     if res.status_code != 200:
         await cailiao.finish("渲染失败")
     else:
         img = Image.open(BytesIO(res.content))
-        img = img.crop((0,134,img.size[0],img.size[1]))
+        img = img.crop((0,134,1000,885))
         img.save(mrfz_dir + '材料.png')
         await cailiao.finish(MessageSegment.image(f"base64://{str(image_to_base64(img), encoding='utf-8')}"))

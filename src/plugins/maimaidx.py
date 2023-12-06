@@ -11,7 +11,6 @@ from src.libraries.maimai_best_40 import generate
 from src.libraries.maimai_best_50 import generate50
 from src.libraries.message_segment import *
 
-from PIL import Image
 import re
 
 cover_dir = 'src/static/mai/cover/'
