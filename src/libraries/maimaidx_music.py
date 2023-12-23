@@ -309,7 +309,11 @@ def refresh_music_list():
             
     for __i in range(len(_total_list)):
         _total_list[__i] = Music(_total_list[__i])
-        _total_list[__i]['Alias'] = _alias_data[_total_list[__i]['id']]["Alias"]
+        id = _total_list[__i]['id']
+        if id in _alias_data:
+            _total_list[__i]['Alias'] = _alias_data[id]["Alias"]
+        else:
+            _total_list[__i]['Alias'] = []
         _total_list[__i].alias = _total_list[__i]['Alias']
         _total_list[__i]['cn_version'] = get_cn_version(_total_list[__i])
         _total_list[__i].cn_version = _total_list[__i]['cn_version']

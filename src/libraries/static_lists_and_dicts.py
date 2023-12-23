@@ -183,7 +183,13 @@ genre_icon_path = {
     "其他游戏": "UI_CMN_TabTitle_Variety.png",
     "niconico & VOCALOID": "UI_CMN_TabTitle_Niconico.png",
     "东方Project": "UI_CMN_TabTitle_Toho.png",
-    "音击&中二节奏": "UI_CMN_TabTitle_Chugeki.png"
+    "音击&中二节奏": "UI_CMN_TabTitle_Chugeki.png",
+    "maimai": "UI_CMN_TabTitle_Original.png",
+    "POPSアニメ": "UI_CMN_TabTitle_PopsAnime.png",
+    "ゲームバラエティ": "UI_CMN_TabTitle_Variety.png",
+    "niconicoボーカロイド": "UI_CMN_TabTitle_Niconico.png",
+    "東方Project": "UI_CMN_TabTitle_Toho.png",
+    "オンゲキCHUNITHM": "UI_CMN_TabTitle_Chugeki.png"
 }
 
 info_to_file_dict = {

@@ -725,32 +725,33 @@ async def _fslb(event: Event):
     await fslb.finish(MessageSegment.image(f"base64://{str(image_to_base64(text_to_image(s)), encoding='utf-8')}"))
 
 """-----------------别名增删查----------------"""
-select_alias = on_command("别名", priority = 10, block = True, rule = maiqun_checker)
-@select_alias.handle()
-async def _select_alias(event: Event, message: Message = CommandArg()):
+select_alias_vip = on_command("别名", priority = 10, block = True, rule = maiqun_checker)
+@select_alias_vip.handle()
+async def _select_alias_vip(event: Event, message: Message = CommandArg()):
     msg = str(message).strip().split(" ")
     if len(msg) == 1 and msg[0] != "":
         id = msg[0]
         with open("src/static/all_alias_temp.json", "r", encoding='utf-8') as fp:
             alias_data = json.load(fp)
         if id not in alias_data:
-            await select_alias.finish("未找到该乐曲，请直接输入乐曲id。")
+            await select_alias_vip.finish("未找到该乐曲，请直接输入乐曲id。")
         else:
             s = f"{id}. {alias_data[id]['Name']}的别名有：\n"
-            for i in range(1, len(alias_data[id]['Alias'])):
-                s += f"{alias_data[id]['Alias'][i]}\n"
-            await select_alias.finish(s)
+            for i in range(len(alias_data[id]['Alias'])):
+                if alias_data[id]['Alias'][i] != total_list.by_id(id)['title']:
+                    s += f"{alias_data[id]['Alias'][i]}\n"
+            await select_alias_vip.finish(s)
     elif len(msg) == 3:
         qq = str(event.get_user_id())
         id = msg[1]
         with open("src/static/all_alias_temp.json", "r", encoding='utf-8') as fp:
             alias_data = json.load(fp)
         if id not in alias_data:
-            await select_alias.finish("未找到该乐曲，请直接输入乐曲id。")
+            await select_alias_vip.finish("未找到该乐曲，请直接输入乐曲id。")
         else:
             if ("增" in msg[0]) or ("加" in msg[0]):
                 if msg[2] in alias_data[id]["Alias"]:
-                    await select_alias.finish("该别名已存在。")
+                    await select_alias_vip.finish("该别名已存在。")
                 else:
                     with open("src/static/alias_pre_process_add.json", "r", encoding='utf-8') as fp:
                         alias_pre_process_add = json.load(fp)
@@ -770,10 +771,10 @@ async def _select_alias(event: Event, message: Message = CommandArg()):
                     with open("src/static/alias_log.csv", "a", encoding='utf-8') as fp:
                         fp.write(f"{qq},{','.join(msg)}\n")
                     if refresh_alias_temp():
-                        await select_alias.finish(f"添加成功。\n已为 {id}.{alias_data[id]['Name']} 添加别名：\n{msg[2]}")
+                        await select_alias_vip.finish(f"添加成功。\n已为 {id}.{alias_data[id]['Name']} 添加别名：\n{msg[2]}")
             elif ("删" in msg[0]) or ("减" in msg[0]):
                 if msg[2] not in alias_data[id]["Alias"]:
-                    await select_alias.finish("该别名不存在。")
+                    await select_alias_vip.finish("该别名不存在。")
                 else:
                     with open("src/static/alias_pre_process_remove.json", "r", encoding='utf-8') as fp:
                         alias_pre_process_remove = json.load(fp)
@@ -793,12 +794,31 @@ async def _select_alias(event: Event, message: Message = CommandArg()):
                     with open("src/static/alias_log.csv", "a", encoding='utf-8') as fp:
                         fp.write(f"{qq},{','.join(msg)}\n")
                     if refresh_alias_temp():
-                        await select_alias.finish("删除成功")
+                        await select_alias_vip.finish("删除成功")
             else:
-                await select_alias.finish('输入格式错误。\n查别名请输入“别名 id”\n增加别名请输入“别名 增 id 别名”\n删除别名请输入“别名 删 id 别名”')
+                await select_alias_vip.finish('输入格式错误。\n查别名请输入“别名 id”\n增加别名请输入“别名 增 id 别名”\n删除别名请输入“别名 删 id 别名”')
 
     else:
-        await select_alias.finish('输入格式错误。\n查别名请输入“别名 id”\n增加别名请输入“别名 增 id 别名”\n删除别名请输入“别名 删 id 别名”\n')
+        await select_alias_vip.finish('输入格式错误。\n查别名请输入“别名 id”\n增加别名请输入“别名 增 id 别名”\n删除别名请输入“别名 删 id 别名”\n')
+
+"""-----------------有什么别名----------------"""
+select_alias = on_regex(r"^([0-9]+)有什么别名$", priority = 11, block = True)
+@select_alias.handle()
+async def _select_alias(event: Event):
+    msg = str(event.get_message()).strip()
+    pattern = r"^([0-9]+)有什么别名$"
+    res = re.match(pattern, msg)
+    id = str(int(res.group(1)))
+    with open("src/static/all_alias_temp.json", "r", encoding='utf-8') as fp:
+        alias_data = json.load(fp)
+    if id not in alias_data:
+        await select_alias.finish("未找到该乐曲，输入乐曲id。")
+    else:
+        s = f"{id}. {alias_data[id]['Name']}的别名有：\n"
+        for i in range(1, len(alias_data[id]['Alias'])):
+            s += f"{alias_data[id]['Alias'][i]}\n"
+        await select_alias.finish(s)
+
 
 """-----------------apb50----------------"""
 apb50 = on_command("apb50", priority = 10, block = True)
