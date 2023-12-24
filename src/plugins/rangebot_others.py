@@ -76,7 +76,7 @@ jt_zb = ['yt','rs','wy','zc','wxh']
 jt_jn = ['lw']
 group_sh = ['751302572','775613195','780012208','742829700','646232811','698699856','606964743']
 group_sh.extend(MAIN_GROUPS)
-group_zb = ['419134739',TEST_GROUP]
+group_zb = ['419134739','610587231',TEST_GROUP]
 group_jn = ['784593881',TEST_GROUP]
 
 #jtregex = r"(?i)^(qy|bl|hsh|yt|rs|wy|wxh)(j|-?[0-9]+|\+?[0-9]+)$"

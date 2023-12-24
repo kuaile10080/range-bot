@@ -2,6 +2,7 @@ from nonebot import on_command
 from nonebot.typing import T_State
 from nonebot.adapters.onebot.v11 import Event, Bot, MessageSegment
 from src.libraries.image import *
+from src.libraries.secrets import maiapi_checker
 
 
 # @event_preprocessor
@@ -78,7 +79,12 @@ help_b64str = f"base64://{str(image_to_base64(text_to_image(help_str)), encoding
     
 help = on_command('help', priority = 5, block = True)
 @help.handle()
-async def _(bot: Bot, event: Event, state: T_State):
+async def _(event: Event):
     if str(event.get_message()).strip() != "help":
         return
+    if maiapi_checker(event):
+        with open("src/static/mai/rghelp.png","rb")as fp:
+            encoded = base64.b64encode(fp.read())
+        url = "base64://" + encoded.decode('utf-8')
+        await help.send(MessageSegment.image(url))
     await help.finish(MessageSegment.image(help_b64str))
