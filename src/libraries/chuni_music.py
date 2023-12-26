@@ -37,6 +37,28 @@ def get_chuni_cover(jid:str) -> Image.Image:
         except:
             return Image.open(chuni_path + "cover/0.jpg").convert("RGB")
 
+def get_chuni_cover_by_title(title:str) -> Image.Image:
+    flag = False
+    for music in chuni_music:
+        if music["title"] == title:
+            image_url = music["image"]
+            jid = music["id"]
+            flag = True
+            break
+    if flag:
+        if os.path.exists(chuni_path + f"cover/{jid}.jpg"):
+            return Image.open(chuni_path + f"cover/{jid}.jpg").convert("RGB")
+        else:
+            try:
+                url = "https://new.chunithm-net.com/chuni-mobile/html/mobile/img/" + image_url
+                path = chuni_path + f"cover/{jid}.jpg"
+                wget.download(url, path)
+                return Image.open(chuni_path + f"cover/{jid}.jpg").convert("RGB")
+            except:
+                return Image.open(chuni_path + "cover/0.jpg").convert("RGB")
+    else:
+        return Image.open(chuni_path + "cover/0.jpg").convert("RGB")
+
 def get_chuni_music_list():
     try:
         mdatafile = open(chuni_path + "chuni_music_g.json", encoding="utf-8")
@@ -53,6 +75,7 @@ def get_chuni_music_list():
     return _total_list, _music_data
 
 total_list, music_data = get_chuni_music_list()
+
 
 #开抄————————————————————————————————————————————————————————————————————————————
 
@@ -198,7 +221,7 @@ class DrawChuni(object):
             i = num // 6
             j = num % 6
             chartInfo = b30[num]
-            temp = get_chuni_cover(str(chartInfo["mid"]))
+            temp = get_chuni_cover_by_title(chartInfo["title"])
             temp = self._resizePic(temp, itemW / temp.size[0])
             temp = temp.crop((0, (temp.size[1] - itemH) / 2, itemW, (temp.size[1] + itemH) / 2))
             temp = temp.filter(ImageFilter.GaussianBlur(3))
@@ -242,7 +265,7 @@ class DrawChuni(object):
             i = num // 2
             j = num % 2
             chartInfo = r10[num]
-            temp = get_chuni_cover(str(chartInfo["mid"]))
+            temp = get_chuni_cover_by_title(chartInfo["title"])
             temp = self._resizePic(temp, itemW / temp.size[0])
             temp = temp.crop((0, (temp.size[1] - itemH) / 2, itemW, (temp.size[1] + itemH) / 2))
             temp = temp.filter(ImageFilter.GaussianBlur(3))
