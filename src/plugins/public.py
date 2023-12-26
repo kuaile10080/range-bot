@@ -10,13 +10,13 @@ from src.libraries.secrets import maiapi_checker
 #     if hasattr(event, 'message_type') and event.message_type == "private" and event.sub_type != "friend":
 #         raise IgnoredException("not reply group temp message")
 
-help_str = '''diving-fish功能：
-最近更新：
+help_str = '''最近更新：
 查歌，info，查牌子有了全新UI
 查牌子有了个等级谱面清谱进度
 查牌子修复了不同版本需要完成的曲目不正确的问题
 可能会有其他bug
 
+diving-fish功能：
 b40 b50 —》 查分
 今日舞萌/今日mai —》 查看今天的舞萌运势
 XXXmaimaiXXX什么 —》 随机一首歌
@@ -75,16 +75,29 @@ zlh/舟立绘 <干员名> <1/2> -》 查询明日方舟干员普通/精2立绘
 如果发现成绩不同步请发送 刷新成绩 
 b40/b50无需刷新，同步水鱼'''
 
+help_str_rg = "神秘功能帮助请发送rghelp" + "\n" + help_str
+
 help_b64str = f"base64://{str(image_to_base64(text_to_image(help_str)), encoding='utf-8')}"
+help_b64str_rg = f"base64://{str(image_to_base64(text_to_image(help_str_rg)), encoding='utf-8')}"
+
     
 help = on_command('help', priority = 5, block = True)
 @help.handle()
 async def _(event: Event):
     if str(event.get_message()).strip() != "help":
         return
-    if maiapi_checker(event):
-        with open("src/static/mai/rghelp.png","rb")as fp:
-            encoded = base64.b64encode(fp.read())
-        url = "base64://" + encoded.decode('utf-8')
-        await help.send(MessageSegment.image(url))
-    await help.finish(MessageSegment.image(help_b64str))
+    bool_maiapi_checker = await maiapi_checker(event)
+    if bool_maiapi_checker:
+        await help.finish(MessageSegment.image(help_b64str_rg))
+    else:
+        await help.finish(MessageSegment.image(help_b64str))
+
+help_rg = on_command('rghelp', priority = 5, block = True, rule = maiapi_checker)
+@help_rg.handle()
+async def _(event: Event):
+    if str(event.get_message()).strip() != "rghelp":
+        return
+    with open("src/static/mai/rghelp.png","rb")as fp:
+        encoded = base64.b64encode(fp.read())
+    url = "base64://" + encoded.decode('utf-8')
+    await help.send(MessageSegment.image(url))

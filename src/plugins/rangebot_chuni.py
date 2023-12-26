@@ -33,7 +33,7 @@ cover_dir = 'src/static/chunithm/cover/'
 
 def song_txt(music: Music):
     return MessageSegment.text(f"{music.id}. {music.title}\n") + \
-        MessageSegment.image(f"base64://{str(image_to_base64(get_chuni_cover(music.id)), encoding='utf-8')}") + \
+        MessageSegment.image(f"base64://{str(image_to_base64(get_chuni_cover_by_title(music.title)), encoding='utf-8')}") + \
         MessageSegment.text(f"\n定数:{'/'.join(str(ds) for ds in music['ds'])}\n") + \
         MessageSegment.text(f"艺术家: {music['basic_info']['artist']}\n") + \
         MessageSegment.text(f"分类: {music['basic_info']['genre']}\n") + \
@@ -49,7 +49,7 @@ def song_txt_r(music: dict):
         else:
             lev_list.append("-")
     return MessageSegment.text(f"{music['id']}. {music['title']}\n") + \
-        MessageSegment.image(f"base64://{str(image_to_base64(get_chuni_cover(music['id'])), encoding='utf-8')}") + \
+        MessageSegment.image(f"base64://{str(image_to_base64(get_chuni_cover_by_title(music['title'])), encoding='utf-8')}") + \
         MessageSegment.text(f"\n等级:{'/'.join(lev_list)}\n") + \
         MessageSegment.text(f"艺术家: {music['artist']}\n") + \
         MessageSegment.text(f"分类: {music['catname']}\n") + \
@@ -191,7 +191,7 @@ async def _(event: Event):
             chart = music['charts'][level_index]
             ds = music['ds'][level_index]
             level = music['level'][level_index]
-            img = get_chuni_cover(music.id)
+            img = get_chuni_cover_by_title(music['title'])
             msg = f"{level_name[level_index]} {level}({ds})\n谱师: {chart['charter']}\nCombo: {chart['combo']}"
             await query_chart.finish(MessageSegment.text(f"{music['id']}. {music['title']}\n") +
                                      MessageSegment.image(f"base64://{str(image_to_base64(img), encoding='utf-8')}") +
