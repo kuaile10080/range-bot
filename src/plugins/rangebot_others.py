@@ -39,7 +39,7 @@ capoo_dir_ = 'src/static/capoo/'
 long_dir_ = 'src/static/long/'
 
 """-----------随机龙图-----------"""
-longtu = on_command('随机龙图', aliases={"来个龙图","来张龙图","来点龙图"}, priority = 30, block = True)
+longtu = on_command('随机龙图', aliases={"来个龙图","来张龙图","来点龙图"}, priority = 30, block = True, rule=ex_fdu_checker)
 @longtu.handle()
 async def _longtu(event: Event, message: Message = CommandArg()):
     if random.random() < 0.02:
@@ -179,7 +179,7 @@ async def _jtadd(event: Event):
 
 
 """-----------帮你做决定（抄的）-----------"""    
-rghaishi = on_regex(r"^range.*还是.*", priority = 31, block = True)
+rghaishi = on_regex(r"^range.*还是.*", priority = 31, block = True, rule=ex_fdu_checker)
 @rghaishi.handle()
 async def _(event: Event):
     haishilist = str(event.get_message())[5:].strip().split("还是")
