@@ -35,10 +35,10 @@ with open("src/static/musicGroup.json","r",encoding="utf-8") as f:
 #         if arr[i] != "":
 #             music_aliases[arr[i].lower()].append(arr[0])
 
-find_song = on_regex(r".+是什么歌", priority = 10, block = True)
+find_song = on_regex(r".+是什么歌$", priority = 10, block = True)
 @find_song.handle()
 async def _(event: Event):
-    regex = "(.+)是什么歌"
+    regex = "(.+)是什么歌$"
     name = re.match(regex, str(event.get_message())).groups()[0].strip()
     result_list = total_list.filt_by_name(name)
     if len(result_list) == 0:
