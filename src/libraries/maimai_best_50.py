@@ -91,10 +91,10 @@ class BestList(object):
 
 class DrawBest(object):
 
-    def __init__(self, sdBest:BestList, dxBest:BestList, userName:str, plate:str, qq:str, additional_rating:int):
+    def __init__(self, sdBest:BestList, dxBest:BestList, nickname:str, plate:str, qq:str, additional_rating:int):
         self.sdBest = sdBest
         self.dxBest = dxBest
-        self.userName = self._stringQ2B(userName)
+        self.nickname = self._stringQ2B(nickname)
         self.plate = plate
         self.qq = qq
         self.adr = additional_rating
@@ -343,7 +343,7 @@ class DrawBest(object):
         namePlateImg = namePlateImg.resize((253, 32))
         namePlateDraw = ImageDraw.Draw(namePlateImg)
         font1 = ImageFont.truetype('src/static/msyh.ttc', 22, encoding='unic')
-        namePlateDraw.text((8, 0), ' '.join(list(self.userName)), 'black', font1)
+        namePlateDraw.text((8, 0), ' '.join(list(self.nickname)), 'black', font1)
         #nameDxImg = Image.open(self.pic_dir + 'UI_CMN_Name_DX.png').convert('RGBA')
         #nameDxImg = self._resizePic(nameDxImg, 0.9)
         #namePlateImg.paste(nameDxImg, (200, 0), mask=nameDxImg.split()[3])

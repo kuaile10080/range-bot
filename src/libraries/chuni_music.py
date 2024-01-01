@@ -80,7 +80,7 @@ total_list, music_data = get_chuni_music_list()
 #开抄————————————————————————————————————————————————————————————————————————————
 
 class DrawChuni(object):
-    def __init__(self, b30:list, r10:list, userName:str, playerRating:float, qq:str) -> None:
+    def __init__(self, b30:list, r10:list, nickname:str, playerRating:float, qq:str) -> None:
         self.b30 = b30
         self.r10 = r10
         self.qq = qq
@@ -93,7 +93,7 @@ class DrawChuni(object):
             self.r10ra += song["ra"]
         self.b30ra = self.b30ra/30
         self.r10ra = self.r10ra/10
-        self.userName = self._stringQ2B(userName)
+        self.nickname = self._stringQ2B(nickname)
         self.pic_dir = chuni_path + 'pic/'
         self.icon_dir = chuni_path + 'icon/'
         self.temp_dir = chuni_path + 'temp/'
@@ -330,7 +330,7 @@ class DrawChuni(object):
         namePlateImg = namePlateImg.resize((253, 32))
         namePlateDraw = ImageDraw.Draw(namePlateImg)
         font1 = ImageFont.truetype('src/static/msyh.ttc', 22, encoding='unic')
-        namePlateDraw.text((8, 0), ' '.join(list(self.userName)), 'black', font1)
+        namePlateDraw.text((8, 0), ' '.join(list(self.nickname)), 'black', font1)
         nameDxImg = Image.open(self.pic_dir + 'UI_CMN_Name_DX.png').convert('RGBA')
         nameDxImg = self._resizePic(nameDxImg, 0.9)
         namePlateImg.paste(nameDxImg, (200, 0), mask=nameDxImg.split()[3])
