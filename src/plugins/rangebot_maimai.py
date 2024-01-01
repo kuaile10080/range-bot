@@ -136,41 +136,6 @@ async def _(event: Event, message: Message = CommandArg()):
         s += f"No.{i+1:02d} BPM:{int(music_dict['basic_info']['bpm']):>3d} [{music_dict['id']}] {music_dict['title']}\n"
     await bpm_search.finish(MessageSegment.image(f"base64://{str(image_to_base64(text_to_image(s)), encoding='utf-8')}"))
 
-
-"""-----------不知道两个oncommand能不能分配给一个handle所以先放在这里--------"""
-range_best_40_pic = on_command('range b40', priority = 10, block = True)
-@range_best_40_pic.handle()
-async def _(event: Event, message: Message = CommandArg()):
-    username = str(message).strip()
-    if username == "":
-        payload = {'qq': str(event.get_user_id())}
-    else:
-        payload = {'username': username}
-    img, success = await generate(payload)
-    if success == 400:
-        await range_best_40_pic.finish("未找到此玩家，请确登陆https://www.diving-fish.com/maimaidx/prober/录入分数，并正确填写用户名与QQ号。")
-    elif success == 403:
-        await range_best_40_pic.finish("该用户禁止了其他人获取数据。")
-    else:
-        await range_best_40_pic.finish(MessageSegment.image(f"base64://{str(image_to_base64(img), encoding='utf-8')}"))
-
-
-range_best_50_pic = on_command('range b50', priority = 10, block = True)
-@range_best_50_pic.handle()
-async def _(event: Event, message: Message = CommandArg()):
-    username = str(message).strip()
-    if username == "":
-        payload = {'qq': str(event.get_user_id()),'b50':True}
-    else:
-        payload = {'username': username,'b50':True}
-    img, success = await generate50(payload)
-    if success == 400:
-        await range_best_50_pic.finish("未找到此玩家，请确登陆https://www.diving-fish.com/maimaidx/prober/录入分数，并正确填写用户名与QQ号。")
-    elif success == 403:
-        await range_best_50_pic.finish("该用户禁止了其他人获取数据。")
-    else:
-        await range_best_50_pic.finish(MessageSegment.image(f"base64://{str(image_to_base64(img), encoding='utf-8')}"))
-
 update_music_data = on_command("更新歌曲列表", priority = 5, block = True, rule = range_checker)
 @update_music_data.handle()
 async def _update_music_data(event: Event, message: Message = CommandArg()):

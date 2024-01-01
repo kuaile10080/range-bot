@@ -328,3 +328,6 @@ def refresh_music_list():
 
 refresh_alias_temp()
 total_list, music_data, alias_data = refresh_music_list()
+music_data_byidstr = {}
+for music in music_data:
+    music_data_byidstr[music['id']] = music

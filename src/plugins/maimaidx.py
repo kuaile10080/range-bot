@@ -7,8 +7,8 @@ from nonebot.exception import FinishedException
 from src.libraries.tool import hash
 from src.libraries.maimaidx_music import *
 from src.libraries.image import *
-from src.libraries.maimai_best_40 import generate
-from src.libraries.maimai_best_50 import generate50
+from src.libraries.maimai_best_40 import generate, generateb40_by_player_data
+from src.libraries.maimai_best_50 import generate50, generateb50_by_player_data
 from src.libraries.message_segment import *
 
 import re
@@ -250,10 +250,9 @@ BREAK 50落(一共{brk}个)等价于 {(break_50_reduce / 100):.3f} 个 TAP GREAT
         except Exception:
             await query_chart.finish("格式错误，输入“分数线 帮助”以查看帮助信息")
 
+temp_dir = 'src/static/mai/temp/'
 
 best_40_pic = on_command('b40', priority = 10, block = True)
-
-
 @best_40_pic.handle()
 async def _(event: Event, message: Message = CommandArg()):
     username = str(message).strip()
@@ -262,16 +261,23 @@ async def _(event: Event, message: Message = CommandArg()):
     else:
         payload = {'username': username}
     img, success = await generate(payload)
-    if success == 400:
-        await best_40_pic.finish("未找到此玩家，请确登陆https://www.diving-fish.com/maimaidx/prober/录入分数，并正确填写用户名与QQ号。")
-    elif success == 403:
-        await best_40_pic.finish("该用户禁止了其他人获取数据。")
-    else:
-        await best_40_pic.finish(MessageSegment.text("旧版b40已停止维护，对结果不负责")+MessageSegment.image(f"base64://{str(image_to_base64(img), encoding='utf-8')}"))
+    if success != 0:
+        if username == "":
+            qq = str(event.get_user_id())
+            if os.path.exists(temp_dir + 'mairec/' + qq + ".json"):
+                with open(temp_dir + 'mairec/' + qq + ".json", "r", encoding='utf-8') as fp:
+                    player_data = json.load(fp)
+                img = await generateb40_by_player_data(player_data,qq)
+                await best_40_pic.finish(MessageSegment.image(f"base64://{str(image_to_base64(img), encoding='utf-8')}"))
+        if success == 400:
+            await best_40_pic.finish("未找到此玩家，请确登陆https://www.diving-fish.com/maimaidx/prober/录入分数，并正确填写用户名与QQ号。")
+        elif success == 403:
+            await best_40_pic.finish("该用户禁止了其他人获取数据。")
+        else:
+            await best_40_pic.finish(MessageSegment.text("旧版b40已停止维护，对结果不负责")+MessageSegment.image(f"base64://{str(image_to_base64(img), encoding='utf-8')}"))
+
 
 best_50_pic = on_command('b50', priority = 10, block = True)
-
-
 @best_50_pic.handle()
 async def _(event: Event, message: Message = CommandArg()):
     username = str(message).strip()
@@ -280,9 +286,17 @@ async def _(event: Event, message: Message = CommandArg()):
     else:
         payload = {'username': username,'b50':True}
     img, success = await generate50(payload)
-    if success == 400:
-        await best_50_pic.finish("未找到此玩家，请确登陆https://www.diving-fish.com/maimaidx/prober/录入分数，并正确填写用户名与QQ号。")
-    elif success == 403:
-        await best_50_pic.finish("该用户禁止了其他人获取数据。")
-    else:
-        await best_50_pic.finish(MessageSegment.image(f"base64://{str(image_to_base64(img), encoding='utf-8')}"))
+    if success != 0:
+        if username == "":
+            qq = str(event.get_user_id())
+            if os.path.exists(temp_dir + 'mairec/' + qq + ".json"):
+                with open(temp_dir + 'mairec/' + qq + ".json", "r", encoding='utf-8') as fp:
+                    player_data = json.load(fp)
+                img = await generateb50_by_player_data(player_data,qq)
+                await best_50_pic.finish(MessageSegment.image(f"base64://{str(image_to_base64(img), encoding='utf-8')}"))
+        if success == 400:
+            await best_50_pic.finish("未找到此玩家，请确登陆https://www.diving-fish.com/maimaidx/prober/录入分数，并正确填写用户名与QQ号。")
+        elif success == 403:
+            await best_50_pic.finish("该用户禁止了其他人获取数据。")
+        else:
+            await best_50_pic.finish(MessageSegment.image(f"base64://{str(image_to_base64(img), encoding='utf-8')}"))

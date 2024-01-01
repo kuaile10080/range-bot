@@ -1,7 +1,7 @@
 # Author: xyb, Diving_Fish
-from typing import Optional, Dict, List, Tuple
 
-import os, aiohttp, random
+import os, aiohttp, random, heapq
+from typing import Optional, Dict, List, Tuple
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 from src.libraries.maimaidx_music import total_list, compute_ra
 from src.libraries.image import get_music_cover, get_qq_logo
@@ -62,16 +62,17 @@ class BestList(object):
         self.size = size
 
     def push(self, elem:ChartInfo):
-        if len(self.data) >= self.size and elem < self.data[-1]:
+        if len(self.data) >= self.size and elem < self.data[0]:
             return
-        self.data.append(elem)
-        self.data.sort()
-        self.data.reverse()
-        while(len(self.data) > self.size):
-            del self.data[-1]
+        heapq.heappush(self.data, elem)
+        while len(self.data) > self.size:
+            heapq.heappop(self.data)
 
     def pop(self):
-        del self.data[-1]
+        heapq.heappop(self.data)
+    
+    def sort(self):
+        self.data.sort(reverse=True)
 
     def __str__(self):
         return '[\n\t' + ', \n\t'.join([str(ci) for ci in self.data]) + '\n]'
@@ -427,6 +428,8 @@ async def generate(payload: Dict) -> Tuple[Optional[Image.Image], int]:
             sd_best.push(ChartInfo.from_json(c))
         for c in dx:
             dx_best.push(ChartInfo.from_json(c))
+        sd_best.sort()
+        dx_best.sort()
         if 'qq' in payload :
             qq = payload['qq']
         else :
@@ -443,6 +446,8 @@ async def generateap40(player_data,qq) -> Image.Image:
                 dx_best.push(ChartInfo.from_json(rec))
             else:
                 sd_best.push(ChartInfo.from_json(rec))
+    sd_best.sort()
+    dx_best.sort()
     pic = DrawBest(sd_best, dx_best, player_data["nickname"], player_data["plate"], qq).getDir()
     return pic
 
@@ -454,5 +459,7 @@ async def generateb40_by_player_data(player_data,qq) -> Image.Image:
             dx_best.push(ChartInfo.from_json(rec))
         else:
             sd_best.push(ChartInfo.from_json(rec))
+    sd_best.sort()
+    dx_best.sort()
     pic = DrawBest(sd_best, dx_best, player_data["nickname"], player_data["plate"], qq).getDir()
     return pic
