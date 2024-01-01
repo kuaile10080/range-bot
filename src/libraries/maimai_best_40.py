@@ -85,7 +85,7 @@ class BestList(object):
 
 class DrawBest(object):
 
-    def __init__(self, sdBest:BestList, dxBest:BestList, userName:str, plate:str, playerRating:int, musicRating:int, qq:str):
+    def __init__(self, sdBest:BestList, dxBest:BestList, userName:str, plate:str, qq:str):
         self.sdBest = sdBest
         self.dxBest = dxBest
         self.userName = self._stringQ2B(userName)
@@ -431,5 +431,28 @@ async def generate(payload: Dict) -> Tuple[Optional[Image.Image], int]:
             qq = payload['qq']
         else :
             qq = '0'
-        pic = DrawBest(sd_best, dx_best, obj["nickname"], obj["plate"], obj["rating"] + obj["additional_rating"], obj["rating"], qq).getDir()
+        pic = DrawBest(sd_best, dx_best, obj["nickname"], obj["plate"], qq).getDir()
         return pic, 0
+
+async def generateap40(player_data,qq) -> Image.Image:
+    sd_best = BestList(25)
+    dx_best = BestList(15)
+    for rec in player_data['records']:
+        if rec['fc'] in ['ap','app']:
+            if total_list.by_id(rec["song_id"]).cn_version == "舞萌DX2023":
+                dx_best.push(ChartInfo.from_json(rec))
+            else:
+                sd_best.push(ChartInfo.from_json(rec))
+    pic = DrawBest(sd_best, dx_best, player_data["nickname"], player_data["plate"], qq).getDir()
+    return pic
+
+async def generateb40_by_player_data(player_data,qq) -> Image.Image:
+    sd_best = BestList(25)
+    dx_best = BestList(15)
+    for rec in player_data['records']:
+        if total_list.by_id(rec["song_id"]).cn_version == "舞萌DX2023":
+            dx_best.push(ChartInfo.from_json(rec))
+        else:
+            sd_best.push(ChartInfo.from_json(rec))
+    pic = DrawBest(sd_best, dx_best, player_data["nickname"], player_data["plate"], qq).getDir()
+    return pic

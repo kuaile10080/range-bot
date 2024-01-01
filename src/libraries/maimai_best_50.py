@@ -347,14 +347,15 @@ class DrawBest(object):
         #nameDxImg = Image.open(self.pic_dir + 'UI_CMN_Name_DX.png').convert('RGBA')
         #nameDxImg = self._resizePic(nameDxImg, 0.9)
         #namePlateImg.paste(nameDxImg, (200, 0), mask=nameDxImg.split()[3])
-        try:
-            if self.adr > 10:
-                self.adr += 1
-            nameDxImg = Image.open(self.rank_dir + f'UI_DNM_DaniPlate_{self.adr:02d}.png').convert('RGBA')
-        except:
-            nameDxImg = Image.open(self.rank_dir + 'UI_DNM_DaniPlate_00.png').convert('RGBA')
-        nameDxImg = self._resizePic(nameDxImg, 0.2)
-        namePlateImg.paste(nameDxImg, (200-30, 0+1), mask=nameDxImg.split()[3])
+        if self.adr != -1:
+            try:
+                if self.adr > 10:
+                    self.adr += 1
+                nameDxImg = Image.open(self.rank_dir + f'UI_DNM_DaniPlate_{self.adr:02d}.png').convert('RGBA')
+            except:
+                nameDxImg = Image.open(self.rank_dir + 'UI_DNM_DaniPlate_00.png').convert('RGBA')
+            nameDxImg = self._resizePic(nameDxImg, 0.2)
+            namePlateImg.paste(nameDxImg, (200-30, 0+1), mask=nameDxImg.split()[3])
         self.img.paste(namePlateImg, (119, 47), mask=namePlateImg.split()[3])
 
         shougouImg = Image.open(self.pic_dir + 'UI_CMN_Shougou_Rainbow.png').convert('RGBA')
@@ -464,5 +465,16 @@ async def generateap50(player_data,qq) -> Image.Image:
                 dx_best.push(ChartInfo.from_json(rec))
             else:
                 sd_best.push(ChartInfo.from_json(rec))
+    pic = DrawBest(sd_best, dx_best, player_data["nickname"], player_data["plate"], qq, player_data["additional_rating"]).getDir()
+    return pic
+
+async def generateb50_by_player_data(player_data,qq) -> Image.Image:
+    sd_best = BestList(35)
+    dx_best = BestList(15)
+    for rec in player_data['records']:
+        if total_list.by_id(rec["song_id"]).cn_version == "舞萌DX2023":
+            dx_best.push(ChartInfo.from_json(rec))
+        else:
+            sd_best.push(ChartInfo.from_json(rec))
     pic = DrawBest(sd_best, dx_best, player_data["nickname"], player_data["plate"], qq, player_data["additional_rating"]).getDir()
     return pic
