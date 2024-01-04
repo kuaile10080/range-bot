@@ -17,6 +17,8 @@ from src.libraries.static_lists_and_dicts import pnconvert, platename_to_file, l
 from PIL import Image, ImageDraw, ImageFont
 import re,base64,random,os,json
 
+DEFAULT_PRIORITY = 10
+
 cover_dir = 'src/static/mai/cover/'
 long_dir_ = 'src/static/long/'
 plate_path = "src/static/mai/plate/"
@@ -35,7 +37,7 @@ with open("src/static/musicGroup.json","r",encoding="utf-8") as f:
 #         if arr[i] != "":
 #             music_aliases[arr[i].lower()].append(arr[0])
 
-find_song = on_regex(r".+是什么歌$", priority = 10, block = True)
+find_song = on_regex(r".+是什么歌$", priority = DEFAULT_PRIORITY, block = True)
 @find_song.handle()
 async def _(event: Event):
     regex = "(.+)是什么歌$"
@@ -57,7 +59,7 @@ async def _(event: Event):
 """-----------谱师查歌&曲师查歌&新歌查歌&BPM查歌&版本查歌-----------"""
 hardlist = ['Basic','Advance','Expert','Master','Re:Master']
 
-charter_search = on_command('谱师查歌', priority = 10, block = True)
+charter_search = on_command('谱师查歌', priority = DEFAULT_PRIORITY, block = True)
 @charter_search.handle()
 async def _(event: Event, message: Message = CommandArg()):
     temp_dict = {
@@ -80,7 +82,7 @@ async def _(event: Event, message: Message = CommandArg()):
     await charter_search.finish(MessageSegment.image(f"base64://{str(image_to_base64(text_to_image(s)), encoding='utf-8')}"))
 
 
-artist_search = on_command('曲师查歌', priority = 10, block = True)
+artist_search = on_command('曲师查歌', priority = DEFAULT_PRIORITY, block = True)
 @artist_search.handle()
 async def _(event: Event, message: Message = CommandArg()):
     artist = str(message).strip()
@@ -96,7 +98,7 @@ async def _(event: Event, message: Message = CommandArg()):
         await artist_search.finish(f"没有找到结果，请检查搜索条件。")
     await artist_search.finish(MessageSegment.image(f"base64://{str(image_to_base64(text_to_image(s)), encoding='utf-8')}"))
 
-new_search = on_command('新歌查歌', priority = 10, block = True)
+new_search = on_command('新歌查歌', priority = DEFAULT_PRIORITY, block = True)
 @new_search.handle()
 async def _(event: Event, message: Message = CommandArg()):
     k=0
@@ -111,7 +113,7 @@ async def _(event: Event, message: Message = CommandArg()):
         await new_search.finish(f"没有找到结果，请检查搜索条件。")
     await new_search.finish(MessageSegment.image(f"base64://{str(image_to_base64(text_to_image(s)), encoding='utf-8')}"))
 
-bpm_search = on_command('bpm查歌' , aliases={"BPM查歌","Bpm查歌"}, priority = 10, block = True)
+bpm_search = on_command('bpm查歌' , aliases={"BPM查歌","Bpm查歌"}, priority = DEFAULT_PRIORITY, block = True)
 @bpm_search.handle()
 async def _(event: Event, message: Message = CommandArg()):
     argv = str(message).strip().split(" ")
@@ -136,7 +138,7 @@ async def _(event: Event, message: Message = CommandArg()):
         s += f"No.{i+1:02d} BPM:{int(music_dict['basic_info']['bpm']):>3d} [{music_dict['id']}] {music_dict['title']}\n"
     await bpm_search.finish(MessageSegment.image(f"base64://{str(image_to_base64(text_to_image(s)), encoding='utf-8')}"))
 
-update_music_data = on_command("更新歌曲列表", priority = 5, block = True, rule = range_checker)
+update_music_data = on_command("更新歌曲列表", priority = DEFAULT_PRIORITY, block = True, rule = range_checker)
 @update_music_data.handle()
 async def _update_music_data(event: Event, message: Message = CommandArg()):
     status,strr = await offlineinit()
@@ -148,7 +150,7 @@ async def _update_music_data(event: Event, message: Message = CommandArg()):
         await update_music_data.finish(strr)
 
 
-version_search = on_command('版本查歌', priority = 10, block = True)
+version_search = on_command('版本查歌', priority = DEFAULT_PRIORITY, block = True)
 @version_search.handle()
 async def _(event: Event, message: Message = CommandArg()):
     msg = str(message).strip()
@@ -182,7 +184,7 @@ async def _(event: Event, message: Message = CommandArg()):
 
 
 
-plate = on_regex(r'^([真超檄橙暁晓桃櫻樱紫菫堇白雪輝辉熊華华爽煌舞霸宙星祭])([極极将舞神者])(舞?)(?:进度|完成表|完成度)\s?(全?)$', priority = 10, block = True)
+plate = on_regex(r'^([真超檄橙暁晓桃櫻樱紫菫堇白雪輝辉熊華华爽煌舞霸宙星祭])([極极将舞神者])(舞?)(?:进度|完成表|完成度)\s?(全?)$', priority = DEFAULT_PRIORITY, block = True)
 @plate.handle()
 async def _plate(event: Event):
     regex = r'^([真超檄橙暁晓桃櫻樱紫菫堇白雪輝辉熊華华爽煌舞霸宙星祭])([極极将舞神者])(舞?)(?:进度|完成表|完成度)\s?(全?)$'
@@ -399,7 +401,7 @@ async def _plate(event: Event):
         MessageSegment("image",{"file": f"base64://{str(b64, encoding='utf-8')}"}))
 
 
-refresh_data = on_command("刷新成绩", priority = 10, block = True)
+refresh_data = on_command("刷新成绩", priority = DEFAULT_PRIORITY, block = True)
 @refresh_data.handle()
 async def _refresh_data(event: Event, message: Message = CommandArg()):
     qq = str(event.get_user_id())
@@ -411,7 +413,7 @@ async def _refresh_data(event: Event, message: Message = CommandArg()):
 
 
 
-levelquery = on_regex(r"^([0-9]+)([＋\+]?)(?:进度|完成表|完成度)$",priority = 10, block = True)
+levelquery = on_regex(r"^([0-9]+)([＋\+]?)(?:进度|完成表|完成度)$",priority = DEFAULT_PRIORITY, block = True)
 @levelquery.handle()
 async def _levelquery(event: Event):
     regex = r"^([0-9]+)([＋\+]?)(?:进度|完成表|完成度)$"
@@ -491,10 +493,16 @@ async def _levelquery(event: Event):
         MessageSegment("image",{"file": f"base64://{str(b64, encoding='utf-8')}"}))
     
 
-singlequery = on_command("info",priority = 10, block = True)
+singlequery = on_command("info",priority = DEFAULT_PRIORITY, block = True)
 @singlequery.handle()
 async def _singlequery(event: Event, message: Message = CommandArg()):
     msg = str(message).strip()
+    diff = {'绿':0,'黄':1,'红':2,'紫':3,'白':4}
+    if msg[0] in diff:
+        diff = diff[msg[0]]
+        msg = msg[1:]
+    else:
+        diff = -1
     music = None
     try:
         id = int(msg)
@@ -531,15 +539,30 @@ async def _singlequery(event: Event, message: Message = CommandArg()):
         if rec['song_id'] == id:
             records[4-rec['level_index']] = rec
     if records == [{},{},{},{},{}]:
-        await singlequery.finish(f"您查询的是{music.title}\n您还没有打过这首歌")
+        await singlequery.finish(f"您查询的是{music.title}\n您还没有打过这首歌。")
     else:
         imgs = []
-        for rec in records:
-            if rec == {}:
-                continue
-            else:
-                img = await draw_new_info(rec,music)
-                imgs.append(img)
+        with open("src/static/mai/rgplct.json","r",encoding="utf-8") as f:
+            rgplct = json.load(f)
+        flag = False
+        if qq in rgplct:
+            flag = rgplct[qq]
+        if diff == -1:
+            for rec in records:
+                if rec == {}:
+                    continue
+                else:
+                    img = await draw_new_info(rec,music,plct=flag)
+                    imgs.append(img)
+        else:
+            for rec in records:
+                if rec == {}:
+                    continue
+                elif rec['level_index'] == diff:
+                    img = await draw_new_info(rec,music,plct=flag)
+                    imgs.append(img)
+            if len(imgs) == 0:
+                await singlequery.finish(f"您查询的是{music.title}\n您还没有打过该难度谱面。")
         width_sum = 5
         imgs.reverse()
         for img in imgs:
@@ -557,7 +580,7 @@ async def _singlequery(event: Event, message: Message = CommandArg()):
 
 
 """-----------------随n个x-----------------"""
-rand_n = on_regex(r"^随[0-9]+[个|首][绿黄红紫白]?[0-9]+[＋\+]?", priority = 10, block = True)
+rand_n = on_regex(r"^随[0-9]+[个|首][绿黄红紫白]?[0-9]+[＋\+]?", priority = DEFAULT_PRIORITY, block = True)
 @rand_n.handle()
 async def _rand_n(event: Event):
     pattern = r"^随([0-9]+)[个|首]([绿黄红紫白]?)([0-9]+)([＋\+]?)(.*)"
@@ -639,7 +662,7 @@ async def _rand_n(event: Event):
         await rand_n.finish(msg)
 
 """-----------------分数列表-----------------"""
-fslb = on_regex(r"^([0-9]+)([＋\+]?)分数列?表([1-9]?)$", priority = 10, block = True)
+fslb = on_regex(r"^([0-9]+)([＋\+]?)分数列?表([1-9]?)$", priority = DEFAULT_PRIORITY, block = True)
 @fslb.handle()
 async def _fslb(event: Event):
     pattern = r"^([0-9]+)([＋\+]?)分数列?表([1-9]?)$"
@@ -690,7 +713,7 @@ async def _fslb(event: Event):
     await fslb.finish(MessageSegment.image(f"base64://{str(image_to_base64(text_to_image(s)), encoding='utf-8')}"))
 
 """-----------------别名增删查----------------"""
-select_alias_vip = on_command("别名", priority = 10, block = True, rule = maiqun_checker)
+select_alias_vip = on_command("别名", priority = DEFAULT_PRIORITY, block = True, rule = maiqun_checker)
 @select_alias_vip.handle()
 async def _select_alias_vip(event: Event, message: Message = CommandArg()):
     msg = str(message).strip().split(" ")
@@ -767,7 +790,7 @@ async def _select_alias_vip(event: Event, message: Message = CommandArg()):
         await select_alias_vip.finish('输入格式错误。\n查别名请输入“别名 id”\n增加别名请输入“别名 增 id 别名”\n删除别名请输入“别名 删 id 别名”\n')
 
 """-----------------有什么别名----------------"""
-select_alias = on_regex(r"^([0-9]+)有什么别名$", priority = 11, block = True)
+select_alias = on_regex(r"^([0-9]+)有什么别名$", priority = DEFAULT_PRIORITY, block = True)
 @select_alias.handle()
 async def _select_alias(event: Event):
     msg = str(event.get_message()).strip()
@@ -786,7 +809,7 @@ async def _select_alias(event: Event):
 
 
 """-----------------apb50----------------"""
-apb50 = on_command("apb50", priority = 10, block = True)
+apb50 = on_command("apb50", priority = DEFAULT_PRIORITY, block = True)
 @apb50.handle()
 async def _apb50(event: Event, message: Message = CommandArg()):
     username = str(message).strip()

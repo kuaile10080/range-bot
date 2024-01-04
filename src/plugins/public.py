@@ -4,6 +4,7 @@ from nonebot.adapters.onebot.v11 import Event, Bot, MessageSegment
 from src.libraries.image import *
 from src.libraries.secrets import maiapi_checker
 
+DEFAULT_PRIORITY = 5
 
 # @event_preprocessor
 # async def preprocessor(bot, event, state):
@@ -81,7 +82,7 @@ help_b64str = f"base64://{str(image_to_base64(text_to_image(help_str)), encoding
 help_b64str_rg = f"base64://{str(image_to_base64(text_to_image(help_str_rg)), encoding='utf-8')}"
 
     
-help = on_command('help', priority = 5, block = True)
+help = on_command('help', priority = DEFAULT_PRIORITY, block = True)
 @help.handle()
 async def _(event: Event):
     if str(event.get_message()).strip() != "help":
@@ -92,7 +93,7 @@ async def _(event: Event):
     else:
         await help.finish(MessageSegment.image(help_b64str))
 
-help_rg = on_command('rghelp', priority = 5, block = True, rule = maiapi_checker)
+help_rg = on_command('rghelp', priority = DEFAULT_PRIORITY, block = True, rule = maiapi_checker)
 @help_rg.handle()
 async def _(event: Event):
     if str(event.get_message()).strip() != "rghelp":

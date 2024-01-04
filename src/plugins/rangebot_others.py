@@ -12,6 +12,8 @@ import matplotlib.pyplot as plt
 import os,re,random,json,time,math,pymysql,wget,base64,io,requests
 import numpy as np
 
+PRIORITY_BASE = 10
+
 db = pymysql.connect(   host = SQL_HOST, 
                         port = SQL_PORT,
                         user = 'root', 
@@ -39,7 +41,7 @@ capoo_dir_ = 'src/static/capoo/'
 long_dir_ = 'src/static/long/'
 
 """-----------随机龙图-----------"""
-longtu = on_command('随机龙图', aliases={"来个龙图","来张龙图","来点龙图"}, priority = 30, block = True, rule=ex_fdu_checker)
+longtu = on_command('随机龙图', aliases={"来个龙图","来张龙图","来点龙图"}, priority = PRIORITY_BASE*5, block = True, rule=ex_fdu_checker)
 @longtu.handle()
 async def _longtu(event: Event, message: Message = CommandArg()):
     if random.random() < 0.02:
@@ -54,7 +56,7 @@ async def _longtu(event: Event, message: Message = CommandArg()):
     await longtu.finish(MessageSegment.image(url))
 
 """-----------随机cappo-----------"""
-capoo = on_command('/capoo', priority = 30, block = True)
+capoo = on_command('/capoo', priority = PRIORITY_BASE*5, block = True)
 @capoo.handle()
 async def _capoo(event: Event, message: Message = CommandArg()):
     if random.random() < 0.02:
@@ -82,7 +84,7 @@ group_jn = ['784593881',TEST_GROUP]
 #jtregex = r"(?i)^(qy|bl|hsh|yt|rs|wy|wxh)(j|-?[0-9]+|\+?[0-9]+)$"
 jtregex = r"(?i)^(qy|bl|hsh|yt|rs|wy|lw|zc|wxh)(j|几|[0-9]+)$"
 jtmax = {"qy":40,"bl":40,"hsh":20,"yt":50,"rs":30,"wy":30,"lw":30,"zc":30,"wxh":30}
-jtj = on_regex(jtregex, priority = 21, block = True)
+jtj = on_regex(jtregex, priority = PRIORITY_BASE*1, block = True)
 @jtj.handle()
 async def _jtj(event: Event):
     msg = re.match(jtregex,str(event.get_message()).strip().lower()).groups()
@@ -99,7 +101,7 @@ async def _jtj(event: Event):
                 else:
                     m = int((time.time() - jtjson['time'])/60)
                     num = jtjson['num']
-                    if 'source' in jtjson.keys():
+                    if 'source' in jtjson:
                         source = '信息提供者: ' + jtjson['source']
                     else:
                         source = ''
@@ -137,7 +139,7 @@ async def _jtj(event: Event):
             await jtj.finish("看看几点了")
 
 jtaddre = r"(?i)^(qy|bl|hsh|yt|rs|wy|lw|zc|wxh)([\+＋\-－])(\d+)$"
-jtadd = on_regex(jtaddre, priority = 22, block = True)
+jtadd = on_regex(jtaddre, priority = PRIORITY_BASE*1, block = True)
 @jtadd.handle()
 async def _jtadd(event: Event):
     msg = re.match(jtaddre,str(event.get_message()).strip().lower()).groups()
@@ -179,7 +181,7 @@ async def _jtadd(event: Event):
 
 
 """-----------帮你做决定（抄的）-----------"""    
-rghaishi = on_regex(r"^range.*还是.*", priority = 31, block = True, rule=ex_fdu_checker)
+rghaishi = on_regex(r"^range.*还是.*", priority = PRIORITY_BASE*5, block = True, rule=ex_fdu_checker)
 @rghaishi.handle()
 async def _(event: Event):
     haishilist = str(event.get_message())[5:].strip().split("还是")
@@ -192,7 +194,7 @@ async def _(event: Event):
 SETU_TIMING = 30
 """-----------随机色图(开发中)-----------"""
 setu_dir = 'src/static/setu/'
-sjst = on_keyword(['色图','涩图','瑟图'], rule = setu_checker, priority = 10000, block = True) #取消priority = 10 
+sjst = on_keyword(['色图','涩图','瑟图'], rule = setu_checker, priority = PRIORITY_BASE*10, block = True) #取消priority = 10 
 @sjst.handle()
 async def sjst_handle(event: Event):
     timelist = readjson(static_dir + "seturecord.json")
@@ -231,10 +233,13 @@ async def sjst_handle(event: Event):
 fuducount = {}
 fudumessage = {}
 """-----------复读-----------"""
-fudu = on_message(priority = 20001, block = True)  
+fudu = on_message(priority = PRIORITY_BASE*1000, block = True)  
 @fudu.handle()
 async def fudu_handle(event: Event):
     global fuducount, fudumessage
+    msg = json.loads(event.json())["message"]
+    if len(msg)!=1 or msg[0]["type"]!="text":
+        return
     if type(re.match("group_(.+)_(.+)",event.get_session_id())) == re.Match:
         if '当前版本不支持该消息类型' in str(event.get_message()):
             return
@@ -243,7 +248,7 @@ async def fudu_handle(event: Event):
             fuducount[group] = -1
             fudumessage[group] = ''
             return
-        if (group in fuducount.keys()) & (group in fudumessage.keys()):
+        if (group in fuducount) & (group in fudumessage):
             if fudumessage[group] == str(event.get_message()):
                 fuducount[group] +=1
                 if fuducount[group] > 2:
@@ -263,7 +268,7 @@ async def fudu_handle(event: Event):
 
 """-----------dayday-----------"""
 daydaykeywords = ['自卑','焦虑','急','[CQ:face,id=107]']
-dayday = on_message(priority = 20000, block = False, rule = dayday_checker)
+dayday = on_message(priority = PRIORITY_BASE*10, block = False, rule = dayday_checker)
 @dayday.handle()
 async def dayday_handle(event: Event, matcher: Matcher):
     s = str(event.get_message())
@@ -281,7 +286,7 @@ with open("src/static/gre/GRE_3.json",encoding='utf-8')as fp:
 gre_temp = {}
 gre_status = 0
 ans_pattern = ""
-gre_event = on_message(priority = 19999, block = False, rule = gre_checker)
+gre_event = on_message(priority = PRIORITY_BASE*10-1, block = False, rule = gre_checker)
 @gre_event.handle()
 async def gre_handle(event: Event,matcher: Matcher):
     global gre_temp, gre_status, gre_dict, ans_pattern
@@ -300,7 +305,7 @@ async def gre_handle(event: Event,matcher: Matcher):
             qq = str(event.get_user_id())
             with open("src/static/gre/rank.json","r",encoding='utf-8')as fp:
                 rank = json.load(fp)
-            if qq in rank.keys():
+            if qq in rank:
                 # if rank[qq]["point"]>2:
                 rank[qq]["point"] -= 3
                 with open("src/static/gre/rank.json","w",encoding='utf-8')as fp:
@@ -327,7 +332,7 @@ async def gre_handle(event: Event,matcher: Matcher):
                 qq = str(event.get_user_id())
                 with open("src/static/gre/rank.json","r",encoding='utf-8')as fp:
                     rank = json.load(fp)
-                if qq not in rank.keys():
+                if qq not in rank:
                     rank[qq] = {
                         "right": 0,
                         "trys": 0,
@@ -400,7 +405,7 @@ async def gre_handle(event: Event,matcher: Matcher):
         await gre_event.finish(msg)
 
 """-----------gre rank-----------"""
-gre_rank = on_regex(r"^gre rank$", priority = 19998, block = True, rule = gre_checker)
+gre_rank = on_regex(r"^gre rank$", priority = PRIORITY_BASE*10-1, block = True, rule = gre_checker)
 @gre_rank.handle()
 async def gre_rank_handle(event: Event):
     with open("src/static/gre/rank.json","r",encoding='utf-8')as fp:
@@ -450,7 +455,7 @@ async def gre_rank_handle(event: Event):
 
 """-----------daimao-----------"""
 daimao_font = ImageFont.truetype("src/static/PingFangBold.ttf", 16, encoding="utf-8")
-daimao_edit = on_command("daimao", priority = 10, block = True)
+daimao_edit = on_command("daimao", priority = PRIORITY_BASE, block = True)
 @daimao_edit.handle()
 async def _daimao_edit(event: Event, message: Message = CommandArg()):
     msg = str(message).strip().split(" ")
@@ -501,7 +506,7 @@ async def _daimao_edit(event: Event, message: Message = CommandArg()):
     await daimao_edit.finish(MessageSegment.image(url))
 
 MIRROR_TIMING = 30
-mirror_img = on_command("mirror", priority = 10, block = True, rule=ex_fdu_checker)
+mirror_img = on_command("mirror", priority = PRIORITY_BASE, block = True, rule=ex_fdu_checker)
 @mirror_img.handle()
 async def _mirror_img(event: Event, message: Message = CommandArg()):
 

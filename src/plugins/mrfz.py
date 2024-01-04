@@ -10,10 +10,11 @@ from PIL import Image
 from io import BytesIO
 import glob, random, base64, requests, os, time
 
+DEFAULT_PRIORITY = 40
 
 mrfz_dir = 'src/static/mrfz/'
 
-lihui = on_command('zlh', aliases={'舟立绘'}, priority=40, block=True)
+lihui = on_command('zlh', aliases={'舟立绘'}, priority=DEFAULT_PRIORITY, block=True)
 @lihui.handle()
 async def _(message: Message = CommandArg()):
     argv = str(message).strip().split(" ")
@@ -37,7 +38,7 @@ async def _(message: Message = CommandArg()):
         url = "base64://" + encoded.decode('utf-8')
         await lihui.finish(MessageSegment.image(url))
 
-cailiao = on_command('舟材料', aliases={'zcl'}, priority=40, block=True)
+cailiao = on_command('舟材料', aliases={'zcl'}, priority=DEFAULT_PRIORITY, block=True)
 @cailiao.handle()
 async def _(message: Message = CommandArg()):
     if str(message).strip() != "":

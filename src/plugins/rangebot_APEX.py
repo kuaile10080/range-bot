@@ -8,11 +8,13 @@ from src.libraries.secrets import APEX_API_key
 
 from src.libraries.image import *
 
+DEFAULT_PRIORITY = 40
+
 path = 'src/static/apex/'
 map_aliases = {"Kings Canyon": "猪王峡谷","World's Edge": "世界尽头","Olympus": "奥林匹斯","Storm Point": "风暴点","Broken Moon":"破碎月球"}
 
 """-----------APEX地图轮换-----------"""   
-Map_rotation = on_command('APEX地图轮换',aliases={"apex地图轮换","Apex地图轮换"}, priority = 20, block = True)
+Map_rotation = on_command('APEX地图轮换',aliases={"apex地图轮换","Apex地图轮换"}, priority = DEFAULT_PRIORITY, block = True)
 @Map_rotation.handle()
 async def _(event: Event, message: Message = CommandArg()):
     resp = requests.get(r"https://api.mozambiquehe.re/maprotation?auth=" + APEX_API_key)

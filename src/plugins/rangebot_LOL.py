@@ -8,12 +8,13 @@ from nonebot.adapters import Event
 from nonebot.adapters.onebot.v11 import Message, MessageSegment
 from src.libraries.image import *
 
+DEFAULT_PRIORITY = 40
 
 path = 'src/static/lol/'
 # icon_url = r"https://game.gtimg.cn/images/lol/act/img/champion/" # + HeroList[i]['alias'] + '.png'
 
     
-zhoumian = on_command('周免', aliases={"lol周免","LOL周免","Lol周免","101周免"}, priority = 20, block = True)
+zhoumian = on_command('周免', aliases={"lol周免","LOL周免","Lol周免","101周免"}, priority = DEFAULT_PRIORITY, block = True)
 @zhoumian.handle()
 async def _(event: Event, message: Message = CommandArg()):
     BullBoard = requests.get("https://lol.qq.com/act/AutoCMS/publish/LOLAct/ZMSubject_Board_Site/ZMSubject_Board_Site.js")
@@ -22,7 +23,7 @@ async def _(event: Event, message: Message = CommandArg()):
     heroGet = requests.get("https://game.gtimg.cn/images/lol/act/img/js/heroList/hero_list.js")
     HeroList = json.loads(heroGet.text)['hero']
     k = 0
-    for i in hero_all.keys():
+    for i in hero_all:
         if int(i) > k:
             k = int(i)
     freeHero = json.loads('[' + hero_all[str(k)]['freeHero'] + ']')
@@ -34,7 +35,7 @@ async def _(event: Event, message: Message = CommandArg()):
                 break
     Hero_BG = Image.open(path + '/Hero_BG.png').convert('RGBA')
     tempDraw = ImageDraw.Draw(Hero_BG)
-    font = ImageFont.truetype(path[:-4] + 'Tahoma.ttf', 20, encoding='utf-8')
+    font = ImageFont.truetype(path[:-4] + 'Tahoma.ttf', DEFAULT_PRIORITY, encoding='utf-8')
     for i in range(0,2):
         for j in range(0,10):
             try:
@@ -57,7 +58,7 @@ async def _(event: Event, message: Message = CommandArg()):
     Hero_BG.paste(Hero_Mask, (0,0),mask=Hero_Mask.split()[3])
     await zhoumian.finish(MessageSegment.image(f"base64://{str(image_to_base64(Hero_BG), encoding='utf-8')}"))
 
-ldzhoumian = on_command('大乱斗周免', aliases={"大乱斗免费英雄","乱斗周免"}, priority = 20, block = True)
+ldzhoumian = on_command('大乱斗周免', aliases={"大乱斗免费英雄","乱斗周免"}, priority = DEFAULT_PRIORITY, block = True)
 @ldzhoumian.handle()
 async def _(event: Event, message: Message = CommandArg()):
     BullBoard = requests.get("https://lol.qq.com/act/AutoCMS/publish/LOLAct/ZMSubject_Board_Site/ZMSubject_Board_Site.js")
@@ -66,7 +67,7 @@ async def _(event: Event, message: Message = CommandArg()):
     heroGet = requests.get("https://game.gtimg.cn/images/lol/act/img/js/heroList/hero_list.js")
     HeroList = json.loads(heroGet.text)['hero']
     k = 0
-    for i in hero_all.keys():
+    for i in hero_all:
         if int(i) > k:
             k = int(i)
     fightHero = json.loads('[' + hero_all[str(k)]['fightHero'] + ']')

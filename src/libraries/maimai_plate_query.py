@@ -61,7 +61,7 @@ def draw_one_music(record:dict)->Image.Image:
         cover.alpha_composite(f)
         
     base.paste(cover,(5,5),cover)
-    if record['cover'] in info_to_file_dict.keys():
+    if record['cover'] in info_to_file_dict:
         cover = Image.open(f"{assets_path}UI_{info_to_file_dict[record['cover']]}.png").convert("RGBA")
         base.paste(cover,(int((base.size[0]-cover.size[0])/2),int((base.size[1]-cover.size[1])/2)),cover)
 

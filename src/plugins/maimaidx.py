@@ -13,6 +13,8 @@ from src.libraries.message_segment import *
 
 import re
 
+DEFAULT_PRIORITY = 10
+
 cover_dir = 'src/static/mai/cover/'
 
 def inner_level_q(ds1, ds2=None):
@@ -28,7 +30,7 @@ def inner_level_q(ds1, ds2=None):
     return result_set
 
 
-inner_level = on_command('inner_level ', aliases={'定数查歌 '}, priority = 10, block = True)
+inner_level = on_command('inner_level ', aliases={'定数查歌 '}, priority = DEFAULT_PRIORITY, block = True)
 
 @inner_level.handle()
 async def _(event: Event, message: Message = CommandArg()):
@@ -50,7 +52,7 @@ async def _(event: Event, message: Message = CommandArg()):
     await inner_level.finish(MessageSegment.image(f"base64://{str(image_to_base64(text_to_image(s)), encoding='utf-8')}"))
 
 
-spec_rand = on_regex(r"^随个(?:dx|sd|标准)?[绿黄红紫白]?[0-9]+\+?", priority = 10, block = True)
+spec_rand = on_regex(r"^随个(?:dx|sd|标准)?[绿黄红紫白]?[0-9]+\+?", priority = DEFAULT_PRIORITY, block = True)
 @spec_rand.handle()
 async def _(event: Event):
     #level_labels = ['绿', '黄', '红', '紫', '白']
@@ -74,13 +76,13 @@ async def _(event: Event):
     await spec_rand.finish(rand_result)
 
 
-mr = on_regex(r".*maimai.*什么", priority = 100, block = True)
+mr = on_regex(r".*maimai.*什么", priority = DEFAULT_PRIORITY*10, block = True)
 @mr.handle()
 async def _():
     await mr.finish(song_MessageSegment2(total_list.random()))
 
 
-search_music = on_regex(r"^查歌.+", priority = 10, block = True)
+search_music = on_regex(r"^查歌.+", priority = DEFAULT_PRIORITY, block = True)
 @search_music.handle()
 async def _(event: Event):
     regex = "^查歌(.+)"
@@ -112,7 +114,7 @@ async def _(event: Event):
         await search_music.finish(f"结果过多（{len(res)} 条），请缩小查询范围。")
 
 
-query_chart = on_regex(r"^([绿黄红紫白老]?) ?id ?([0-9]+)" , priority = 10, block = True)
+query_chart = on_regex(r"^([绿黄红紫白老]?) ?id ?([0-9]+)" , priority = DEFAULT_PRIORITY, block = True)
 @query_chart.handle()
 async def _(event: Event):
     regex = "^([绿黄红紫白老]?) ?id ?([0-9]+)"
@@ -187,7 +189,7 @@ BREAK: {chart['notes'][4]}
 
 wm_list = ['拼机', '推分', '越级', '下埋', '夜勤', '练底力', '练手法', '打旧框', '干饭', '抓绝赞', '收歌']
 
-jrwm = on_command('今日舞萌', aliases={'今日mai'}, priority = 10, block = True)
+jrwm = on_command('今日舞萌', aliases={'今日mai'}, priority = DEFAULT_PRIORITY, block = True)
 @jrwm.handle()
 async def _(event: Event, message: Message = CommandArg()):
     qq = int(event.get_user_id())
@@ -208,7 +210,7 @@ async def _(event: Event, message: Message = CommandArg()):
     await jrwm.finish(MessageSegment.text(s) + song_MessageSegment(music))
 
 
-query_score = on_command('分数线', priority = 10, block = True)
+query_score = on_command('分数线', priority = DEFAULT_PRIORITY, block = True)
 @query_score.handle()
 async def _(event: Event, message: Message = CommandArg()):
     r = "([绿黄红紫白])(id)?([0-9]+)"
@@ -252,7 +254,7 @@ BREAK 50落(一共{brk}个)等价于 {(break_50_reduce / 100):.3f} 个 TAP GREAT
 
 temp_dir = 'src/static/mai/temp/'
 
-best_40_pic = on_command('b40', priority = 10, block = True)
+best_40_pic = on_command('b40', priority = DEFAULT_PRIORITY, block = True)
 @best_40_pic.handle()
 async def _(event: Event, message: Message = CommandArg()):
     username = str(message).strip()
@@ -277,7 +279,7 @@ async def _(event: Event, message: Message = CommandArg()):
         await best_40_pic.finish(MessageSegment.text("旧版b40已停止维护，对结果不负责")+MessageSegment.image(f"base64://{str(image_to_base64(img), encoding='utf-8')}"))
 
 
-best_50_pic = on_command('b50', priority = 10, block = True)
+best_50_pic = on_command('b50', priority = DEFAULT_PRIORITY, block = True)
 @best_50_pic.handle()
 async def _(event: Event, message: Message = CommandArg()):
     username = str(message).strip()
