@@ -64,3 +64,6 @@ def convert_cn2jp(text:str) -> str:
         if char in kanjic2j:
             text = text.replace(char, kanjic2j[char][0])
     return text
+
+def get_nickname_from_event(event_json: dict) -> str:
+    return event_json["sender"]["nickname"]
