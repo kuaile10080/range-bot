@@ -230,41 +230,40 @@ async def sjst_handle(event: Event):
         await sjst.finish("本群CD还剩" + str( SETU_TIMING - int(rest)) + "秒，请稍后再试")
 
 
-fuducount = {}
-fudumessage = {}
+fududict = {}
 """-----------复读-----------"""
 fudu = on_message(priority = PRIORITY_BASE*1000, block = True)  
 @fudu.handle()
 async def fudu_handle(event: Event):
-    global fuducount, fudumessage
+    global fududict
     msg = json.loads(event.json())["message"]
     if len(msg)!=1 or msg[0]["type"]!="text":
         return
+    msg = str(msg[0]["data"]["text"]).strip()
+    if msg[:4] == ".mai" or '当前版本不支持该消息类型' in msg:
+        return
     if type(re.match("group_(.+)_(.+)",event.get_session_id())) == re.Match:
-        if '当前版本不支持该消息类型' in str(event.get_message()):
-            return
         group = str(re.match("group_(.+)_(.+)",event.get_session_id()).groups()[0])
-        if len(str(event.get_message())) > 50:
-            fuducount[group] = -1
-            fudumessage[group] = ''
-            return
-        if (group in fuducount) & (group in fudumessage):
-            if fudumessage[group] == str(event.get_message()):
-                fuducount[group] +=1
-                if fuducount[group] > 2:
-                    fuducount[group] = -1000
-                    await fudu.finish(Message(str(event.get_message())))
+        if group in fududict:
+            if fududict[group]["msg"] == msg:
+                fududict[group]["count"] +=1
+                if fududict[group]["count"] > 2:
+                    fududict[group]["count"] = -99999
+                    await fudu.finish(msg)
                 else:
                     return
             else:
-                fuducount[group] = 1
-                fudumessage[group] = str(event.get_message())
+                fududict[group]["msg"] = msg
+                fududict[group]["count"] = 1
                 return
         else:
-            fuducount[group] = 1
-            fudumessage[group] = str(event.get_message())
+            fududict[group] = {
+                "msg":msg,
+                "count":1
+                }
             return
-    return
+    else:
+        return
 
 """-----------dayday-----------"""
 daydaykeywords = ['自卑','焦虑','急','[CQ:face,id=107]']
