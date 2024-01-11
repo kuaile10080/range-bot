@@ -6,6 +6,7 @@ from nonebot.adapters.onebot.v11 import Message, MessageSegment
 from src.libraries.image import *
 from src.libraries.secrets import *
 
+from playwright.async_api import async_playwright
 from PIL import Image
 from io import BytesIO
 import glob, random, base64, requests, os, time
@@ -38,55 +39,34 @@ async def _(message: Message = CommandArg()):
         url = "base64://" + encoded.decode('utf-8')
         await lihui.finish(MessageSegment.image(url))
 
+#舟材料
+zcl_url = "https://ytl.viktorlab.cn/"
+
 cailiao = on_command('舟材料', aliases={'zcl'}, priority=DEFAULT_PRIORITY, block=True)
 @cailiao.handle()
 async def _(message: Message = CommandArg()):
     if str(message).strip() != "":
         return
-    
-    try:
-        if os.path.getmtime(mrfz_dir + '材料.png') < time.time() - 86400:
-            os.remove(mrfz_dir + '材料.png')
-    except:
-        pass
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=True)
+        page = await browser.new_page()
+        await page.goto(zcl_url)
 
-    if os.path.exists(mrfz_dir + '材料.png'):
-        await cailiao.finish(MessageSegment.image(f"base64://{str(image_to_base64(Image.open(mrfz_dir + '材料.png')), encoding='utf-8')}"))
+        # 等待直到id为"stage_3"的元素出现 
+        stage_3_element = await page.wait_for_selector("#stage_3")
 
-    else:
-        html_to_img_url = f"http://{TENCENT_CLOUD_IP}:{HTML_TO_IMAGE_PORT}/screenshot"
-        key = HTML_TO_IMAGE_KEY
-        params = {
-            'url': 'http://yituliu.site',
-            'key': key, 
-            'w': '1000', 
-            'h': '1321'
-            }
-        res = requests.get(html_to_img_url, params=params)
-        if res.status_code != 200:
-            await cailiao.finish("渲染失败")
-        else:
-            img = Image.open(BytesIO(res.content))
-            img = img.crop((0,134,1000,885))
-            img.save(mrfz_dir + '材料.png')
-            await cailiao.finish(MessageSegment.image(f"base64://{str(image_to_base64(img), encoding='utf-8')}"))
+        async def count_stage_card_3():
+            # 计算id为"stage_3"的元素下class为"stage_card_3"的元素数量
+            return len(await page.query_selector_all("#stage_3 .stage_card_3"))
 
-shuaxincailiao = on_command('刷新舟材料', priority=40, block=True, rule=range_checker)
-@shuaxincailiao.handle()
-async def _():
-    html_to_img_url = f"http://{TENCENT_CLOUD_IP}:{HTML_TO_IMAGE_PORT}/screenshot"
-    key = HTML_TO_IMAGE_KEY
-    params = {
-        'url': 'http://yituliu.site',
-        'key': key, 
-        'w': '1000', 
-        'h': '1321'
-        }
-    res = requests.get(html_to_img_url, params=params)
-    if res.status_code != 200:
-        await cailiao.finish("渲染失败")
-    else:
-        img = Image.open(BytesIO(res.content))
-        img = img.crop((0,134,1000,885))
-        img.save(mrfz_dir + '材料.png')
-        await cailiao.finish(MessageSegment.image(f"base64://{str(image_to_base64(img), encoding='utf-8')}"))
+        # 循环检查条件，直到满足18个class="stage_card_3"的元素
+        while await count_stage_card_3() < 18:
+            # 等待一小段时间再重新检查条件
+            await page.wait_for_timeout(200)  # 等待500ms
+
+        # 当条件满足时，对id为"stage_3"的整个DOM进行截图
+        img_bytes = await stage_3_element.screenshot()
+
+        await browser.close()
+        
+    await cailiao.finish(MessageSegment.image(f"base64://{str(base64.b64encode(img_bytes), encoding='utf-8')}"))
