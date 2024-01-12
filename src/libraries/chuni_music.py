@@ -80,19 +80,21 @@ total_list, music_data = get_chuni_music_list()
 #开抄————————————————————————————————————————————————————————————————————————————
 
 class DrawChuni(object):
-    def __init__(self, b30:list, r10:list, nickname:str, playerRating:float, qq:str) -> None:
+    def __init__(self, b30:list, r10:list, nickname:str, qq:str) -> None:
         self.b30 = b30
         self.r10 = r10
         self.qq = qq
         self.b30ra = 0
         self.r10ra = 0
-        self.playerRating = playerRating
+        self.playerRating = 0.0
         for song in b30:
             self.b30ra += song["ra"]
         for song in r10:
             self.r10ra += song["ra"]
+        self.playerRating = self.b30ra + self.r10ra
         self.b30ra = self.b30ra/30
         self.r10ra = self.r10ra/10
+        self.playerRating = self.playerRating/40
         self.nickname = self._stringQ2B(nickname)
         self.pic_dir = chuni_path + 'pic/'
         self.icon_dir = chuni_path + 'icon/'
@@ -394,5 +396,5 @@ async def generate_chuni40(payload: Dict) -> Tuple[Optional[Image.Image], int]:
             qq = payload['qq']
         else :
             qq = '0'
-        pic = DrawChuni(b30,r10,obj["nickname"],obj["rating"],qq).getDir()
+        pic = DrawChuni(b30,r10,obj["nickname"],qq).getDir()
         return pic, 0
