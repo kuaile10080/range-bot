@@ -78,6 +78,28 @@ total_list, music_data = get_chuni_music_list()
 
 
 #开抄————————————————————————————————————————————————————————————————————————————
+chuni_ra_list = [(1010000,2.15),
+                 (1009000,2.15),
+                 (1007500,2.00),
+                 (1005000,1.50),
+                 (1000000,1.00),
+                 (990000,0.60),
+                 (975000,0.00),
+                 (925000,-3.00),
+                 (900000,-5.00)]
+
+def cal_chuni_ra(score:int,ds:float)->float:
+    if score <= 500000:
+        return 0
+    elif score <= 800000:
+        return (score-500000)/800000*(ds-5)/2
+    elif score <= 900000:
+        return (score-800000)/100000*(ds-5)/2 + (ds-5)/2
+    else:
+        for i in range(len(chuni_ra_list)):
+            if score >= chuni_ra_list[i][0]:
+                return ds + (score-chuni_ra_list[i][0])/(chuni_ra_list[i-1][0]-chuni_ra_list[i][0])*(chuni_ra_list[i-1][1]-chuni_ra_list[i][1]) + chuni_ra_list[i][1]
+
 
 class DrawChuni(object):
     def __init__(self, b30:list, r10:list, nickname:str, qq:str) -> None:
@@ -88,9 +110,9 @@ class DrawChuni(object):
         self.r10ra = 0
         self.playerRating = 0.0
         for song in b30:
-            self.b30ra += song["ra"]
+            self.b30ra += cal_chuni_ra(song["score"],song["ds"])
         for song in r10:
-            self.r10ra += song["ra"]
+            self.r10ra += cal_chuni_ra(song["score"],song["ds"])
         self.playerRating = self.b30ra + self.r10ra
         self.b30ra = self.b30ra/30
         self.r10ra = self.r10ra/10
