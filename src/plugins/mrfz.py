@@ -51,18 +51,10 @@ async def _(message: Message = CommandArg()):
         browser = await p.chromium.launch(headless=True)
         page = await browser.new_page()
         await page.goto(zcl_url)
+        await page.set_viewport_size({"width": 1200, "height": 1080})
 
         # 等待直到id为"stage_3"的元素出现 
         stage_3_element = await page.wait_for_selector("#stage_3")
-
-        async def count_stage_card_3():
-            # 计算id为"stage_3"的元素下class为"stage_card_3"的元素数量
-            return len(await page.query_selector_all("#stage_3 .stage_card_3"))
-
-        # 循环检查条件，直到满足18个class="stage_card_3"的元素
-        while await count_stage_card_3() < 18:
-            # 等待一小段时间再重新检查条件
-            await page.wait_for_timeout(200)  # 等待500ms
 
         # 当条件满足时，对id为"stage_3"的整个DOM进行截图
         img_bytes = await stage_3_element.screenshot()
