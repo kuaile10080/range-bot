@@ -8,8 +8,9 @@ from src.libraries.image import *
 from src.libraries.chuni_music import *
 from src.libraries.tool import hash
 from src.libraries.image import *
+from src.libraries.secrets import *
 
-import re
+import re,aiohttp,json
 
 DEFAULT_PRIORITY = 10
 
@@ -331,3 +332,63 @@ async def _(event: Event, message: Message = CommandArg()):
     elif k == 0:
         await cbpm_search.finish(f"没有找到结果，请检查搜索条件。")
     await cbpm_search.finish(MessageSegment.image(f"base64://{str(image_to_base64(text_to_image(s)), encoding='utf-8')}"))
+
+
+cinfo = on_command('cinfo', priority = DEFAULT_PRIORITY, block=True)
+@cinfo.handle()
+async def _cinfo(event: Event, message: Message = CommandArg()):
+    msg = str(message).strip()
+    if msg == "":
+        await cinfo.finish("命令格式为\ncinfo <乐曲ID/部分乐曲名>\n暂不支持别名搜索")
+    id = None
+    try:
+        id = int(msg)
+    except:
+        pass
+    name = msg
+    qq = event.get_user_id()
+    async with aiohttp.request("GET","https://www.diving-fish.com/api/chunithmprober/dev/player/records",params={"qq":qq},headers={"developer-token":DF_Dev_Token})as resp:
+        if resp.status != 200:
+            await cinfo.finish("未找到此玩家，请确登陆https://www.diving-fish.com/chunithm/prober/录入分数，并正确填写用户名与QQ号。")
+        full_data = await resp.json()
+    res = []
+    for music in full_data['records']['best']:
+        if music['mid'] == id or name.lower() in music['title'].lower():
+            res.append(music)
+    if len(res) == 0:
+        await cinfo.finish("未找到此乐曲或该乐曲没打过。")
+    else:
+        s = "\n"
+        for music in res:
+            s += f"{music['mid']}. {music['title']} 【{music['level_label']} {music['ds']}】 {music['score']}\n"
+        await cinfo.finish(MessageSegment.image(f"base64://{str(image_to_base64(text_to_image(s)), encoding='utf-8')}"))
+
+clevelquery = on_regex(r"^c([0-9]+)([＋\+]?)(?:进度|完成表|完成度)$",priority = DEFAULT_PRIORITY, block = True)
+@clevelquery.handle()
+async def _clevelquery(event: Event):
+    regex = r"^c([0-9]+)([＋\+]?)(?:进度|完成表|完成度)$"
+    res = re.match(regex, str(event.get_message()))
+    level = int(res.group(1))
+    if (level > 15) or (level < 1):
+        await clevelquery.finish("蓝的盆")
+    plus = res.group(2)
+    if plus != "":
+        level += 0.5
+
+    qq = event.get_user_id()
+    async with aiohttp.request("GET","https://www.diving-fish.com/api/chunithmprober/dev/player/records",params={"qq":qq},headers={"developer-token":DF_Dev_Token})as resp:
+        if resp.status != 200:
+            await cinfo.finish("未找到此玩家，请确登陆https://www.diving-fish.com/chunithm/prober/录入分数，并正确填写用户名与QQ号。")
+        full_data = await resp.json()
+    
+    res = []
+    for music in full_data['records']['best']:
+        if level <= music['ds'] < level + 0.5:
+            res.append(music)
+    if len(res) == 0:
+        await clevelquery.finish("没有打过这个等级的乐曲")
+    else:
+        s = "\n"
+        for music in res:
+            s += f"{music['mid']}. {music['title']} 【{music['level_label']} {music['ds']}】 {music['score']}\n"
+        await clevelquery.finish(MessageSegment.image(f"base64://{str(image_to_base64(text_to_image(s)), encoding='utf-8')}"))
