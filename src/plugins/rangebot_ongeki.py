@@ -9,8 +9,6 @@ from src.libraries.image import *
 import re, random
 DEFAULT_PRIORITY = 10
 
-diffs = ["Basic", "Advanced", "Expert", "Master","Lunatic"]
-
 osearch_music = on_regex(r"^o(.*)查歌(.+)",priority = DEFAULT_PRIORITY, block=True)
 @osearch_music.handle()
 async def _jrog(event: Event):
@@ -43,22 +41,9 @@ async def _jrog(event: Event):
                     s += f"{music['id']}. {music['title']}\n"
                 await osearch_music.finish(MessageSegment.image(f"base64://{str(image_to_base64(text_to_image(s)), encoding='utf-8')}"))
 
-        elif match.group(1) == "新歌":
-            res = []
-            for title in my_ongeki_music:
-                if my_ongeki_music[title]["new"]:
-                    res.append(my_ongeki_music[title])
-            if len(res) == 0:
-                await osearch_music.finish("没有找到这样的歌")
-            elif len(res) == 1:
-                await osearch_music.finish(osong_txt(res[0]))
-            else:
-                s = "\n"
-                for music in res:
-                    s += f"{music['id']}. {music['title']}\n"
-                await osearch_music.finish(MessageSegment.image(f"base64://{str(image_to_base64(text_to_image(s)), encoding='utf-8')}"))
         elif match.group(1) == "定数":
             ds = msg2.split(" ")
+
             if len(ds) == 1:
                 # 格式化为保留一位小数的字符串
                 try:
@@ -67,14 +52,15 @@ async def _jrog(event: Event):
                 except:
                     await osearch_music.finish("请输入正确的定数")
                 s = "\n"
-                for title in my_ongeki_music:
-                    for i,ds in enumerate(my_ongeki_music[title]["ds"]):
-                        if ds == ds1:
-                            s += f"{my_ongeki_music[title]['id']}. [{diffs[i]}:{ds}] {my_ongeki_music[title]['title']}\n"
+                for id in ongeki_music:
+                    for i,chart in enumerate(ongeki_music[id]["charts"]):
+                        if chart["ds"] == ds1:
+                            s += f"{id}. [{diffs[i]}:{ds1}] {ongeki_music[id]['title']}\n"
                 if s == "\n":
                     await osearch_music.finish("没有找到这样的歌")
                 else:
                     await osearch_music.finish(MessageSegment.image(f"base64://{str(image_to_base64(text_to_image(s)), encoding='utf-8')}"))
+
             elif len(ds) == 2:
                 try:
                     ds1 = float(ds[0])
@@ -84,12 +70,16 @@ async def _jrog(event: Event):
                 except:
                     await osearch_music.finish("请输入正确的定数")
                 s = "\n"
-                for title in my_ongeki_music:
-                    for i,ds in enumerate(my_ongeki_music[title]["ds"]):
-                        if float(ds1) <= float(ds) <= float(ds2):
-                            s += f"{my_ongeki_music[title]['id']}. [{diffs[i]}:{ds}] {my_ongeki_music[title]['title']}\n"
+                count = 0
+                for id in ongeki_music:
+                    for i,chart in enumerate(ongeki_music[id]["charts"]):
+                        if float(ds1) <= float(chart["ds"]) <= float(ds2):
+                            count += 1
+                            s += f"{id}. [{diffs[i]}:{chart['ds']}] {ongeki_music[id]['title']}\n"
                 if s == "\n":
                     await osearch_music.finish("没有找到这样的歌")
+                elif count>200:
+                    await osearch_music.finish("结果过多，请输入更精确的定数范围")
                 else:
                     await osearch_music.finish(MessageSegment.image(f"base64://{str(image_to_base64(text_to_image(s)), encoding='utf-8')}"))       
             else:
@@ -112,11 +102,11 @@ async def _jrog(event: Event, message: Message = CommandArg()):
             s += f'宜 {wm_list[i]}\n'
         elif wm_value[i] == 0:
             s += f'忌 {wm_list[i]}\n'
-    s += "然哥提醒您：打几把中二快去学习\n"
-    title = random.choice(list(my_ongeki_music.keys()))
-    while my_ongeki_music[title]["title_sort"]=="":
-        title = random.choice(list(my_ongeki_music.keys()))
-    music = my_ongeki_music[title]
+    s += "然哥提醒您：打几把音击快去学习\n"
+    id = random.choice(list(ongeki_music.keys()))
+    while int(id) >= 8000 and ongeki_music[id]["bas_id"] != "":
+        id = random.choice(list(ongeki_music.keys()))
+    music = ongeki_music[id]
     await jrog.finish(MessageSegment.text(s) + osong_txt(music))
 
 oid = on_command('oid', priority = DEFAULT_PRIORITY, block=True)
@@ -126,6 +116,9 @@ async def _(event: Event, message: Message = CommandArg()):
     try:
         id = int(msg)
         music = get_music_by_id(id)
-        await oid.finish(osong_txt(music))
+        if music:
+            await oid.finish(osong_txt(music))
+        else:
+            await oid.finish("没有找到这首歌")
     except:
         return
