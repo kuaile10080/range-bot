@@ -59,9 +59,11 @@ def osong_txt(music: dict):
             if music["charts"][i]["charter"] != "":
                 s += f"{diffs[i]}谱师:{music['charts'][i]['charter']}\n"
     s = s.strip()
-        
+    
+    img = get_ongeki_cover_by_id(music['id']).resize((190, 190))
+
     return MessageSegment.text(f"{music['id']}. {music['title']}\n") + \
-        MessageSegment.image(f"base64://{str(image_to_base64(get_ongeki_cover_by_id(music['id'])), encoding='utf-8')}") + \
+        MessageSegment.image(f"base64://{str(image_to_base64(img), encoding='utf-8')}") + \
         MessageSegment.text(f"\n定数:{music['ds']}\n") + \
         MessageSegment.text(f"BPM:{music['bpm']}\n") + \
         MessageSegment.text(f"艺术家: {music['artist']}\n") + \

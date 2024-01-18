@@ -210,8 +210,9 @@ jrzhe = on_command('今日中二', aliases={'今日chuni'}, priority = DEFAULT_P
 @jrzhe.handle()
 async def _(event: Event, message: Message = CommandArg()):
     qq = int(event.get_user_id())
-    h = hash(qq)
+    h = hash(qq) 
     rp = h % 100
+    h >>= 80
     wm_value = []
     for i in range(len(wm_list)):
         wm_value.append(h & 3)

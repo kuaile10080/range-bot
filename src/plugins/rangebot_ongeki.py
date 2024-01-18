@@ -93,6 +93,7 @@ async def _jrog(event: Event, message: Message = CommandArg()):
     qq = int(event.get_user_id())
     h = hash(qq)
     rp = h % 100
+    h >>= 160
     wm_value = []
     for i in range(len(wm_list)):
         wm_value.append(h & 3)
