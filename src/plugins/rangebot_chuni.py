@@ -230,7 +230,7 @@ async def _(event: Event, message: Message = CommandArg()):
 
 
 """-----------谱师查歌&曲师查歌&新歌查歌&BPM查歌&版本查歌-----------"""
-hardlist = ['Basic', 'Advance', 'Expert', 'Master', 'Re:Master']
+hardlist = ['Basic', 'Advance', 'Expert', 'Master', 'ULTIMA', 'World End']
 
 ccharter_search = on_command('c谱师查歌', priority = DEFAULT_PRIORITY, block=True)
 @ccharter_search.handle()
