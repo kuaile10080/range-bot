@@ -361,7 +361,7 @@ async def _cinfo(event: Event, message: Message = CommandArg()):
         s = "\n"
         for music in res:
             s += f"{music['mid']}. {music['title']} 【{music['level_label']} {music['ds']}】 {music['score']}\n"
-        await cinfo.finish(MessageSegment.image(f"base64://{str(image_to_base64(text_to_image(s)), encoding='utf-8')}"))
+        await cinfo.finish(MessageSegment.at(qq) + MessageSegment.image(f"base64://{str(image_to_base64(text_to_image(s)), encoding='utf-8')}"))
 
 clevelquery = on_regex(r"^c([0-9]+)([＋\+]?)(?:进度|完成表|完成度)$",priority = DEFAULT_PRIORITY, block = True)
 @clevelquery.handle()
