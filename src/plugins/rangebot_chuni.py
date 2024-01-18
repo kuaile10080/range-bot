@@ -205,7 +205,7 @@ async def _(event: Event):
         await query_chart.finish(song_txt(music))
 
 
-wm_list = ['推分', '越级', '下埋', '夜勤', '练底力','练手法', '打SUN', '干饭', '抓大J', '收歌', '扭头去打mai']
+wm_list = ['拼机', '推分', '越级', '下埋', '夜勤', '练底力', '练手法', '干饭', '搓纵连', '收歌', '打舞萌', '打音击']
 jrzhe = on_command('今日中二', aliases={'今日chuni'}, priority = DEFAULT_PRIORITY, block=True)
 @jrzhe.handle()
 async def _(event: Event, message: Message = CommandArg()):
@@ -213,11 +213,11 @@ async def _(event: Event, message: Message = CommandArg()):
     h = hash(qq)
     rp = h % 100
     wm_value = []
-    for i in range(11):
+    for i in range(len(wm_list)):
         wm_value.append(h & 3)
         h >>= 2
     s = f"今日人品值：{rp}\n"
-    for i in range(11):
+    for i in range(len(wm_list)):
         if wm_value[i] == 3:
             s += f'宜 {wm_list[i]}\n'
         elif wm_value[i] == 0:

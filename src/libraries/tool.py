@@ -1,9 +1,11 @@
-import time, json, aiohttp, pickle
+import datetime, hashlib, json, aiohttp, pickle
 
-def hash(qq: int):
-    days = int(time.strftime("%d", time.localtime(time.time()))) + 31 * int(
-        time.strftime("%m", time.localtime(time.time()+28800))) + 77
-    return (days * qq) >> 8
+def hash(qq) -> int:
+    return int(hashlib.md5(datetime.datetime.now().strftime("%y%m%d")+str(qq).strip().encode()).hexdigest(),16)
+# def hash(qq: int):
+#     days = int(time.strftime("%d", time.localtime(time.time()))) + 31 * int(
+#         time.strftime("%m", time.localtime(time.time()+28800))) + 77
+#     return (days * qq) >> 8
 
 async def offlineinit():
     s = ""

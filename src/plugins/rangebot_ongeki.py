@@ -5,6 +5,7 @@ from nonebot.adapters.onebot.v11 import Message, MessageSegment
 
 from src.libraries.ongeki_music import *
 from src.libraries.image import *
+from src.libraries.tool import hash
 
 import re, random
 DEFAULT_PRIORITY = 10
@@ -85,7 +86,7 @@ async def _jrog(event: Event):
             else:
                 await osearch_music.finish("定数查询格式错误")
 
-wm_list = ['推分', '越级', '下埋', '夜勤', '练底力','练手法', '打mai', '干饭', '接弹幕', '收歌', '打中2']
+wm_list = ['拼机', '推分', '越级', '下埋', '夜勤', '练底力', '练手法', '干饭', '接弹幕', '收歌', '打舞萌', '打中二']
 jrog = on_command('今日音击', aliases={'今日ongeki','今日o'}, priority = DEFAULT_PRIORITY, block=True)
 @jrog.handle()
 async def _jrog(event: Event, message: Message = CommandArg()):
@@ -93,20 +94,18 @@ async def _jrog(event: Event, message: Message = CommandArg()):
     h = hash(qq)
     rp = h % 100
     wm_value = []
-    for i in range(11):
+    for i in range(len(wm_list)):
         wm_value.append(h & 3)
         h >>= 2
     s = f"今日人品值：{rp}\n"
-    for i in range(11):
+    for i in range(len(wm_list)):
         if wm_value[i] == 3:
             s += f'宜 {wm_list[i]}\n'
         elif wm_value[i] == 0:
             s += f'忌 {wm_list[i]}\n'
     s += "然哥提醒您：打几把音击快去学习\n"
-    id = random.choice(list(ongeki_music.keys()))
-    while int(id) >= 8000 and ongeki_music[id]["bas_id"] != "":
-        id = random.choice(list(ongeki_music.keys()))
-    music = ongeki_music[id]
+    idlist = list(ongeki_music.keys())
+    music = ongeki_music[idlist[h % len(idlist)]]
     await jrog.finish(MessageSegment.text(s) + osong_txt(music))
 
 oid = on_command('oid', priority = DEFAULT_PRIORITY, block=True)
