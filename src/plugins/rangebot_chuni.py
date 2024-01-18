@@ -207,8 +207,6 @@ async def _(event: Event):
 
 wm_list = ['推分', '越级', '下埋', '夜勤', '练底力','练手法', '打SUN', '干饭', '抓大J', '收歌', '扭头去打mai']
 jrzhe = on_command('今日中二', aliases={'今日chuni'}, priority = DEFAULT_PRIORITY, block=True)
-
-
 @jrzhe.handle()
 async def _(event: Event, message: Message = CommandArg()):
     qq = int(event.get_user_id())
