@@ -82,7 +82,7 @@ group_zb = ['419134739','610587231',TEST_GROUP]
 group_jn = ['784593881',TEST_GROUP]
 
 #jtregex = r"(?i)^(qy|bl|hsh|yt|rs|wy|wxh|sm)(j|-?[0-9]+|\+?[0-9]+)$"
-jtregex = r"(?i)^(qy|bl|hsh|yt|rs|wy|lw|zc|wxh)(j|几|[0-9]+)$"
+jtregex = r"(?i)^(qy|bl|hsh|yt|rs|wy|lw|zc|wxh|sm)(j|几|[0-9]+)$"
 jtmax = {"qy":40,"bl":40,"hsh":20,"yt":50,"rs":30,"wy":30,"lw":30,"zc":30,"wxh":30,"sm":30}
 jtj = on_regex(jtregex, priority = PRIORITY_BASE*1, block = True)
 @jtj.handle()
