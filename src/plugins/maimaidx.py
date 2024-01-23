@@ -209,10 +209,16 @@ async def _(event: Event, message: Message = CommandArg()):
             s += f'忌 {wm_list[i]}\n'
     # if dawumeng == 1:
     #     s += "宜 打舞萌\n"
+    # else:
+    #     s += "忌 打舞萌\n"
     if dazhonger == 1:
         s += "宜 打中二\n"
+    else:
+        s += "忌 打中二\n"
     if dayinji == 1:
         s += "宜 打音击\n"
+    else:
+        s += "忌 打音击\n"
     s += "然哥提醒您：打几把舞萌快去学习\n谁拆机，我拆谁\n"
     music = total_list[h % len(total_list)]
     await jrwm.finish(MessageSegment.text(s) + song_MessageSegment(music))
