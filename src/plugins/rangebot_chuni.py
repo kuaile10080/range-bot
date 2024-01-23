@@ -205,12 +205,15 @@ async def _(event: Event):
         await query_chart.finish(song_txt(music))
 
 
-wm_list = ['拼机', '推分', '越级', '下埋', '夜勤', '练底力', '练手法', '干饭', '搓纵连', '收歌', '打舞萌', '打音击']
+wm_list = ['拼机', '推分', '越级', '下埋', '夜勤', '练底力', '练手法', '干饭', '搓纵连', '收歌']
 jrzhe = on_command('今日中二', aliases={'今日chuni'}, priority = DEFAULT_PRIORITY, block=True)
 @jrzhe.handle()
 async def _(event: Event, message: Message = CommandArg()):
     qq = int(event.get_user_id())
-    h = hash(qq) 
+    h = hash(qq)
+    dawumeng = (h >> 250)&1
+    dazhonger = (h >> 251)&1
+    dayinji = (h >> 252)&1
     rp = h % 100
     h >>= 80
     wm_value = []
@@ -223,6 +226,12 @@ async def _(event: Event, message: Message = CommandArg()):
             s += f'宜 {wm_list[i]}\n'
         elif wm_value[i] == 0:
             s += f'忌 {wm_list[i]}\n'
+    if dawumeng == 1:
+        s += "宜 打舞萌\n"
+    # if dazhonger == 1:
+    #     s += "宜 打中二\n"
+    if dayinji == 1:
+        s += "宜 打音击\n"
     s += "然哥提醒您：打几把中二快去学习\n"
     music = total_list[h % len(total_list)]
     await jrzhe.finish(MessageSegment.text(s) + song_txt(music))

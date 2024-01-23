@@ -446,6 +446,8 @@ async def generate50(payload: Dict) -> Tuple[Optional[Image.Image], int]:
         obj = await resp.json()
         dx: List[Dict] = obj["charts"]["dx"]
         sd: List[Dict] = obj["charts"]["sd"]
+        # if len(dx) == 0 and len(sd) == 0:
+        #     return None, 404
         for c in sd:
             sd_best.push(ChartInfo.from_json(c))
         for c in dx:

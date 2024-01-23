@@ -86,12 +86,15 @@ async def _jrog(event: Event):
             else:
                 await osearch_music.finish("定数查询格式错误")
 
-wm_list = ['拼机', '推分', '越级', '下埋', '夜勤', '练底力', '练手法', '干饭', '接弹幕', '收歌', '打舞萌', '打中二']
+wm_list = ['拼机', '推分', '越级', '下埋', '夜勤', '练底力', '练手法', '干饭', '接弹幕', '收歌']
 jrog = on_command('今日音击', aliases={'今日ongeki','今日o'}, priority = DEFAULT_PRIORITY, block=True)
 @jrog.handle()
 async def _jrog(event: Event, message: Message = CommandArg()):
     qq = int(event.get_user_id())
     h = hash(qq)
+    dawumeng = (h >> 250)&1
+    dazhonger = (h >> 251)&1
+    dayinji = (h >> 252)&1
     rp = h % 100
     h >>= 160
     wm_value = []
@@ -104,6 +107,12 @@ async def _jrog(event: Event, message: Message = CommandArg()):
             s += f'宜 {wm_list[i]}\n'
         elif wm_value[i] == 0:
             s += f'忌 {wm_list[i]}\n'
+    if dawumeng == 1:
+        s += "宜 打舞萌\n"
+    if dazhonger == 1:
+        s += "宜 打中二\n"
+    # if dayinji == 1:
+    #     s += "宜 打音击\n"
     s += "然哥提醒您：打几把音击快去学习\n"
     idlist = list(ongeki_music.keys())
     music = ongeki_music[idlist[h % len(idlist)]]
