@@ -115,7 +115,11 @@ platename_to_file = {
     "祭极": "UI_Plate_359101.png",
     "祭将": "UI_Plate_359102.png",
     "祭神": "UI_Plate_359103.png",
-    "祭舞舞": "UI_Plate_359104.png"
+    "祭舞舞": "UI_Plate_359104.png",
+    "祝极": "UI_Plate_409101.png",
+    "祝将": "UI_Plate_409102.png",
+    "祝神": "UI_Plate_409103.png",
+    "祝舞舞": "UI_Plate_409104.png",
 }
 
 level_index_to_file = {

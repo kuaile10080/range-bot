@@ -184,17 +184,17 @@ async def _(event: Event, message: Message = CommandArg()):
 
 
 
-plate = on_regex(r'^([真超檄橙暁晓桃櫻樱紫菫堇白雪輝辉熊華华爽煌舞霸宙星祭])([極极将舞神者])(舞?)(?:进度|完成表|完成度)\s?(全?)$', priority = DEFAULT_PRIORITY, block = True)
+plate = on_regex(r'^([真超檄橙暁晓桃櫻樱紫菫堇白雪輝辉熊華华爽煌舞霸宙星祭祝])([極极将舞神者])(舞?)(?:进度|完成表|完成度)\s?(全?)$', priority = DEFAULT_PRIORITY, block = True)
 @plate.handle()
 async def _plate(event: Event):
-    regex = r'^([真超檄橙暁晓桃櫻樱紫菫堇白雪輝辉熊華华爽煌舞霸宙星祭])([極极将舞神者])(舞?)(?:进度|完成表|完成度)\s?(全?)$'
+    regex = r'^([真超檄橙暁晓桃櫻樱紫菫堇白雪輝辉熊華华爽煌舞霸宙星祭祝])([極极将舞神者])(舞?)(?:进度|完成表|完成度)\s?(全?)$'
     res = re.match(regex, str(event.get_message())).groups()
     if ((res[0]=="霸") ^ (res[1]=="者")) or ((res[1]=="舞") ^ (res[2]=="舞")):
         await plate.finish("¿")
     version = pnconvert[res[0]]
     if version == "霸":
         version = "舞"
-    if version != "祭":
+    if version not in "祭祝":
         ids = musicGroup[version]
     else:
         ids = []
@@ -387,7 +387,7 @@ async def _plate(event: Event):
         s = "请注意，国服爽代与煌代成就需一同清谱舞萌DX2021版本获得\n"
     elif version in "宙星":
         s = "请注意，国服宙代与星代成就需一同清谱舞萌DX2022版本获得\n"
-    elif version in "祭":
+    elif version in "祭祝":
         s = "舞萌DX2023目前尚未更新完成，以下仅展示当前曲目\n"
     elif version in "真" and res[1] == "将":
         s = "真代没有真将，但是我可以假装帮你查\n"
