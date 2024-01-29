@@ -39,7 +39,7 @@ async def _(message: Message = CommandArg()):
         url = "base64://" + encoded.decode('utf-8')
         await lihui.finish(MessageSegment.image(url))
 
-#舟材料
+# 舟材料
 zcl_url = "https://ytl.viktorlab.cn/"
 
 cailiao = on_command('舟材料', aliases={'zcl'}, priority=DEFAULT_PRIORITY, block=True)
@@ -53,12 +53,12 @@ async def _(message: Message = CommandArg()):
         await page.goto(zcl_url)
         await page.set_viewport_size({"width": 1200, "height": 1080})
 
-        # 等待直到id为"stage_3"的元素出现 
-        stage_3_element = await page.wait_for_selector("#stage_3")
+        # 等待直到id为"stage_3"的元素出现
+        stage_element = await page.query_selector_all("#stage")[1]
 
         # 当条件满足时，对id为"stage_3"的整个DOM进行截图
-        img_bytes = await stage_3_element.screenshot()
+        img_bytes = await stage_element.screenshot()
 
         await browser.close()
-        
+
     await cailiao.finish(MessageSegment.image(f"base64://{str(base64.b64encode(img_bytes), encoding='utf-8')}"))
