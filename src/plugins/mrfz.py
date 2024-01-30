@@ -47,6 +47,7 @@ cailiao = on_command('舟材料', aliases={'zcl'}, priority=DEFAULT_PRIORITY, bl
 async def _(message: Message = CommandArg()):
     if str(message).strip() != "":
         return
+    img_bytes = b''
     try:
         async with async_playwright() as p:
             browser = await p.chromium.launch(headless=True)
@@ -54,7 +55,7 @@ async def _(message: Message = CommandArg()):
             await page.goto(zcl_url)
             await page.set_viewport_size({"width": 1200, "height": 1080})
 
-            await page.wait_for_load_state("networkidle", timeout=50000)  # 等待最多5秒钟
+            await page.wait_for_load_state("networkidle", timeout=10000) 
 
             # 选中所有id为stage的元素
             stage_elements = await page.query_selector_all("#stage")
@@ -63,8 +64,14 @@ async def _(message: Message = CommandArg()):
                 # 选中第二个id为stage的元素
                 stage_2_element = stage_elements[1]
                 img_bytes = await stage_2_element.screenshot()
-                await cailiao.finish(MessageSegment.image(f"base64://{str(base64.b64encode(img_bytes), encoding='utf-8')}"))
             else:
-                await cailiao.finish("网页元素获取失败")
-    except:
-        await cailiao.finish("网页加载失败")
+                img_bytes = b'0'
+    except Exception as e:
+        print(e)
+        pass
+    if img_bytes == b'0':
+        await cailiao.finish("网页元素获取失败")
+    elif img_bytes == b'':
+        await cailiao.finish("网页访问或加载失败")
+    else:
+        await cailiao.finish(MessageSegment.image(f"base64://{str(base64.b64encode(img_bytes), encoding='utf-8')}"))
