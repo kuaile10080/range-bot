@@ -47,18 +47,24 @@ cailiao = on_command('舟材料', aliases={'zcl'}, priority=DEFAULT_PRIORITY, bl
 async def _(message: Message = CommandArg()):
     if str(message).strip() != "":
         return
-    async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=True)
-        page = await browser.new_page()
-        await page.goto(zcl_url)
-        await page.set_viewport_size({"width": 1200, "height": 1080})
+    try:
+        async with async_playwright() as p:
+            browser = await p.chromium.launch(headless=True)
+            page = await browser.new_page()
+            await page.goto(zcl_url)
+            await page.set_viewport_size({"width": 1200, "height": 1080})
 
-        # 等待直到id为"stage_3"的元素出现 
-        stage_3_element = await page.wait_for_selector("#stage_3")
+            await page.wait_for_load_state("networkidle", timeout=50000)  # 等待最多5秒钟
 
-        # 当条件满足时，对id为"stage_3"的整个DOM进行截图
-        img_bytes = await stage_3_element.screenshot()
-
-        await browser.close()
-        
-    await cailiao.finish(MessageSegment.image(f"base64://{str(base64.b64encode(img_bytes), encoding='utf-8')}"))
+            # 选中所有id为stage的元素
+            stage_elements = await page.query_selector_all("#stage")
+            print(len(stage_elements))
+            if len(stage_elements) >= 2:
+                # 选中第二个id为stage的元素
+                stage_2_element = stage_elements[1]
+                img_bytes = await stage_2_element.screenshot()
+                await cailiao.finish(MessageSegment.image(f"base64://{str(base64.b64encode(img_bytes), encoding='utf-8')}"))
+            else:
+                await cailiao.finish("网页元素获取失败")
+    except:
+        await cailiao.finish("网页加载失败")
