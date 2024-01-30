@@ -39,7 +39,7 @@ async def _(message: Message = CommandArg()):
         url = "base64://" + encoded.decode('utf-8')
         await lihui.finish(MessageSegment.image(url))
 
-#舟材料
+# 舟材料
 zcl_url = "https://ytl.viktorlab.cn/"
 
 cailiao = on_command('舟材料', aliases={'zcl'}, priority=DEFAULT_PRIORITY, block=True)
