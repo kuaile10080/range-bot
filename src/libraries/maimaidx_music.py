@@ -198,6 +198,15 @@ class MusicList(List[Music]):
             alias_data = json.load(fp)
 
         title_search = title_search.lower()
+        sdflag = False
+        dxflag = False
+        if title_search.startswith("标"):
+            sdflag = True
+            title_search = title_search[1:]
+        elif title_search.startswith("dx"):
+            dxflag = True
+            title_search = title_search[2:]
+
         new_list = MusicList()
         title_temp_equal = MusicList()
         alias_temp_equal = MusicList()
@@ -207,6 +216,10 @@ class MusicList(List[Music]):
         ngrams_max1 = 0
         ngrams_max2 = 0
         for music in self:
+            if sdflag and int(music.id) >= 10000:
+                continue
+            if dxflag and int(music.id) < 10000:
+                continue
             alias_list = alias_data[music.id]["Alias"]
             if title_search == music.title.lower():
                 title_temp_equal.append(music)
