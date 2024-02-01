@@ -57,15 +57,9 @@ async def _(message: Message = CommandArg()):
 
             await page.wait_for_load_state("networkidle", timeout=10000) 
 
-            # 选中所有id为stage的元素
-            stage_elements = await page.query_selector_all("#stage")
-            print(len(stage_elements))
-            if len(stage_elements) >= 2:
-                # 选中第二个id为stage的元素
-                stage_2_element = stage_elements[1]
-                img_bytes = await stage_2_element.screenshot()
-            else:
-                img_bytes = b'0'
+            # 选中id为stageForCards的元素
+            stage_elements = await page.query_selector("#stageForCards")
+            img_bytes = await stage_elements.screenshot()
     except Exception as e:
         print(e)
         pass

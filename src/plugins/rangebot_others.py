@@ -240,7 +240,7 @@ async def fudu_handle(event: Event):
     if len(msg)!=1 or msg[0]["type"]!="text":
         return
     msg = str(msg[0]["data"]["text"]).strip()
-    if msg[:4] == ".mai" or '当前版本不支持该消息类型' in msg:
+    if (msg[:4] == ".mai") or ('当前版本不支持该消息类型' in msg) or (msg.startswith('[') and msg.endswith(']')):
         return
     if type(re.match("group_(.+)_(.+)",event.get_session_id())) == re.Match:
         group = str(re.match("group_(.+)_(.+)",event.get_session_id()).groups()[0])
