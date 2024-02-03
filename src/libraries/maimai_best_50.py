@@ -95,7 +95,10 @@ class DrawBest(object):
     def __init__(self, sdBest:BestList, dxBest:BestList, nickname:str, plate:str, qq:str, additional_rating:int):
         self.sdBest = sdBest
         self.dxBest = dxBest
-        self.nickname = self._stringQ2B(nickname)
+        if nickname == None or nickname == "":
+            self.nickname = "舞萌DX2023"
+        else:
+            self.nickname = self._stringQ2B(nickname)
         self.plate = plate
         self.qq = qq
         self.adr = additional_rating

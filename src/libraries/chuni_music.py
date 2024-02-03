@@ -117,7 +117,10 @@ class DrawChuni(object):
         self.b30ra = self.b30ra/30
         self.r10ra = self.r10ra/10
         self.playerRating = self.playerRating/40
-        self.nickname = self._stringQ2B(nickname)
+        if nickname == None or nickname == "":
+            self.nickname = "chunithm"
+        else:
+            self.nickname = self._stringQ2B(nickname)
         self.pic_dir = chuni_path + 'pic/'
         self.icon_dir = chuni_path + 'icon/'
         self.temp_dir = chuni_path + 'temp/'
