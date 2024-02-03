@@ -14,11 +14,14 @@ def cosine_similarity_function(feature_vector_a, feature_vector_b):
     similarity = cosine_similarity(feature_vector_a.reshape(1, -1), feature_vector_b.reshape(1, -1))
     return similarity[0, 0]
 
+CUT_SIDE = 0.02
+IMG_SIZE = 29
+
 # 图片预处理
 def preprocess_image(image:Image.Image,targetsize:int):
     l,h = image.getbbox()[2:]
     if l>h:
-        side = int(h*0.05)
+        side = int(h*CUT_SIDE)
         upcrop = (l-h)//2
         downcrop = l-h-upcrop
         image = image.crop((upcrop+side,side,l-downcrop-side,h-side))
@@ -37,7 +40,7 @@ def preprocess_image(image:Image.Image,targetsize:int):
     return input_batch
 
 # 提取特征向量
-def extract_features(image:Image.Image, model,target_size:int = 30):
+def extract_features(image:Image.Image, model,target_size:int):
     input_batch = preprocess_image(image,target_size)
     device = torch.device("cpu") #("cuda" if torch.cuda.is_available() else "cpu")
     model.to(device)
@@ -52,7 +55,7 @@ squeezenet_model.eval()
 loaded_features = torch.load("src/static/others/squeezenet_features.pt")
 
 def find_cover_id(image:Image.Image)->int:
-    img_feature = extract_features(image, squeezenet_model)
+    img_feature = extract_features(image, squeezenet_model,target_size=IMG_SIZE)
     temp_id = -1
     temp_similarity = 0
     for img_id, feature in loaded_features.items():
