@@ -1,4 +1,4 @@
-from nonebot import on_command, on_regex
+from nonebot import on_command, on_regex, on_message
 from nonebot.params import CommandArg
 from nonebot.adapters import Event
 from nonebot.adapters.onebot.v11 import Message, MessageSegment
@@ -13,9 +13,10 @@ from src.libraries.secrets import *
 from src.libraries.maimai_info import draw_new_info
 from src.libraries.message_segment import song_MessageSegment2
 from src.libraries.static_lists_and_dicts import pnconvert, platename_to_file, level_index_to_file, ptv, versionlist
+from src.libraries.find_cover import find_cover_id
 
 from PIL import Image, ImageDraw, ImageFont
-import re,base64,random,os,json
+import re,base64,random,os,json,requests,io
 
 DEFAULT_PRIORITY = 10
 
@@ -42,6 +43,8 @@ find_song = on_regex(r".+是什么歌$", priority = DEFAULT_PRIORITY, block = Tr
 async def _(event: Event):
     regex = "(.+)是什么歌$"
     name = re.match(regex, str(event.get_message())).groups()[0].strip()
+    if name.startswith("[CQ:"):
+        return
     result_list = total_list.filt_by_name(name)
     if len(result_list) == 0:
         await find_song.finish("未找到此歌曲\n添加曲名别名请联系CDRange(50835696)")
@@ -54,6 +57,43 @@ async def _(event: Event):
         await find_song.finish(search_result.strip())
     else:
         await find_song.finish(f"结果过多（{len(result_list)} 条），请缩小查询范围。")
+
+find_song_by_cover = on_message(priority = DEFAULT_PRIORITY, block = True)
+@find_song_by_cover.handle()
+async def _(event: Event):
+    msg = json.loads(event.json())["message"]
+    if len(msg)!=2:
+        return
+    if msg[0]["type"] == "image" and msg[1]["type"] == "text":
+        img_url = msg[0]["data"]["file"]
+        text = msg[1]["data"]["text"]
+    elif msg[1]["type"] == "image" and msg[0]["type"] == "text":
+        img_url = msg[1]["data"]["file"]
+        text = msg[0]["data"]["text"]
+    else:
+        return
+    if text.strip() != "是什么歌":
+        return
+    try:
+        r = requests.get(img_url, stream=True)
+        file_io = io.BytesIO(r.content)
+        img = Image.open(file_io).convert("RGB")
+    except:
+        await find_song_by_cover.finish("图片获取失败")
+    music_id = find_cover_id(img)
+    cover_id = f'{int(music_id):05d}'
+    music = total_list.by_id(music_id)
+    if music == None:
+        filenames = os.listdir(cover_dir)
+        if cover_id + ".png" in filenames:
+            img = Image.open(cover_dir + cover_id + ".png").convert('RGB').resize((190, 190))
+            await find_song_by_cover.finish(MessageSegment.text("匹配到相似图片，但该歌曲未登录国服或已删除：\n") + MessageSegment.image(f"base64://{str(image_to_base64(img), encoding='utf-8')}"))
+        else:
+            await find_song_by_cover.finish("未知错误")
+    else:
+        await find_song_by_cover.finish(MessageSegment.text("您要找的是不是：\n") + song_MessageSegment2(music))
+
+
 
 
 """-----------谱师查歌&曲师查歌&新歌查歌&BPM查歌&版本查歌-----------"""
