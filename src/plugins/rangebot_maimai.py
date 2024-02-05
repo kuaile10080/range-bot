@@ -2,6 +2,7 @@ from nonebot import on_command, on_regex, on_message
 from nonebot.params import CommandArg
 from nonebot.adapters import Event
 from nonebot.adapters.onebot.v11 import Message, MessageSegment
+from nonebot.matcher import Matcher
 
 from src.libraries.tool import offlineinit, convert_cn2jp
 from src.libraries.maimaidx_music import total_list, music_data, refresh_music_list, refresh_alias_temp
@@ -58,9 +59,9 @@ async def _(event: Event):
     else:
         await find_song.finish(f"结果过多（{len(result_list)} 条），请缩小查询范围。")
 
-find_song_by_cover = on_message(priority = DEFAULT_PRIORITY, block = True)
+find_song_by_cover = on_message(priority = DEFAULT_PRIORITY, block = False)
 @find_song_by_cover.handle()
-async def _(event: Event):
+async def _(event: Event, matcher: Matcher):
     msg = json.loads(event.json())["message"]
     if len(msg)!=2:
         return
@@ -74,6 +75,7 @@ async def _(event: Event):
         return
     if text.strip() != "是什么歌":
         return
+    matcher.stop_propagation()
     try:
         r = requests.get(img_url, stream=True)
         file_io = io.BytesIO(r.content)
