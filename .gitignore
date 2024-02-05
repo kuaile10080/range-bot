@@ -8,3 +8,4 @@ src/plugins/testport.py
 src/libraries/secrets.py
 /.env
 event.json*
+.vscode
