@@ -8,7 +8,7 @@ from src.libraries.tool import offlineinit, convert_cn2jp
 from src.libraries.maimaidx_music import total_list, music_data, refresh_music_list, refresh_alias_temp
 from src.libraries.image import text_to_image, image_to_base64
 from src.libraries.maimai_best_40 import generate
-from src.libraries.maimai_best_50 import generate50, generateap50
+from src.libraries.maimai_best_50 import generate50, generateap50, generateb50_water_msg
 from src.libraries.maimai_plate_query import *
 from src.libraries.secrets import *
 from src.libraries.maimai_info import draw_new_info
@@ -871,3 +871,25 @@ async def _apb50(event: Event, message: Message = CommandArg()):
             await apb50.finish("该用户禁止了其他人获取数据。")
     img = await generateap50(player_data,qq)
     await apb50.finish(MessageSegment.image(f"base64://{str(image_to_base64(img), encoding='utf-8')}"))
+
+
+
+"""-----------------b50水分检测----------------"""
+b50_water = on_command('b50水分检测', priority = DEFAULT_PRIORITY - 1, block = True)
+@b50_water.handle()
+async def _b50_water(event: Event, message: Message = CommandArg()):
+    s = str(message).strip()
+    if s != "":
+        return
+    
+    qq = str(event.get_user_id())
+    if not_exist_data(qq):
+        await b50_water.send("每天第一次查询自动刷新成绩，可能需要较长时间。若需手动刷新请发送 刷新成绩")
+    player_data,success = await read_full_data(qq)
+    if success == 400:
+        await b50_water.finish("未找到此玩家，请确登陆https://www.diving-fish.com/maimaidx/prober/ 录入分数，并正确填写用户名与QQ号。")
+    msg = "\n"
+    msg += "本功能根据拟合定数进行计算，仅供娱乐，不具有任何参考价值，请勿上纲上线！\n下图为您b50的含水图\n"
+    img,msg2 = await generateb50_water_msg(player_data,qq)
+    await b50_water.finish(MessageSegment.at(qq) + MessageSegment.text(msg) + MessageSegment.image(f"base64://{str(image_to_base64(img), encoding='utf-8')}") + MessageSegment.text(msg2))
+    

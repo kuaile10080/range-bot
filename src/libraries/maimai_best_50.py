@@ -1,6 +1,9 @@
 # Author: xyb, Diving_Fish
 
-import os, aiohttp, random, heapq
+import os, aiohttp, random, heapq, io, time
+import matplotlib.pyplot as plt
+import numpy as np
+
 from typing import Optional, Dict, List, Tuple
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 from src.libraries.maimaidx_music import total_list, compute_ra
@@ -46,7 +49,7 @@ class ChartInfo(object):
         fs = ['', 'fs', 'fsp', 'fsd', 'fsdp']
         fsi = fs.index(data["fs"])
         return cls(
-            idNum=total_list.by_title(data["title"]).id,
+            idNum=data["song_id"],
             title=data["title"],
             diff=data["level_index"],
             ra=data["ra"],
@@ -490,3 +493,122 @@ async def generateb50_by_player_data(player_data,qq) -> Image.Image:
     dx_best.sort()
     pic = DrawBest(sd_best, dx_best, player_data["nickname"], player_data["plate"], qq, player_data["additional_rating"]).getDir()
     return pic
+
+async def draw_water_pic(fit_diffs:list)->Image.Image:
+    # 清除之前的图形状态
+    plt.clf()
+
+    y_values = fit_diffs
+    y_values.sort(reverse=True)
+
+    # 设置柱子之间的间隔
+    bar_width = 1  # 调整宽度
+    x_positions = np.arange(len(y_values))
+
+    # 创建颜色列表，根据y值的正负选择颜色
+    colors = ['red' if y < 0 else 'blue' for y in y_values]
+
+    # 创建条形图
+    plt.bar(x_positions, y_values, width=bar_width, color=colors, alpha=0.7)
+    # 在y=0处添加一条横线
+    plt.axhline(0, color='black', linestyle='-', linewidth=1)
+    # 设置y轴范围
+    plt.ylim(-1, 1)
+    # 隐藏边框和标签
+    plt.tick_params(top=False, right=False, left=False, bottom=False, labelleft=False, labelbottom=False)
+    # 隐藏图形边框
+    plt.box(False)
+    # 删除白边
+    plt.tight_layout()
+
+    buffer = io.BytesIO()
+    plt.savefig(buffer, format='png')
+    buffer.seek(0)
+    img = Image.open(buffer).convert('RGB')
+
+    # fpath = "src/static/mai/temp/" + str(time.time()) + '.png'
+    # plt.savefig(fpath, format='png')
+    # img = Image.open(fpath).convert('RGB')
+    return img
+
+async def generateb50_water_msg(player_data,qq):
+    sd_best = BestList(35)
+    dx_best = BestList(15)
+    for rec in player_data['records']:
+        if total_list.by_id(rec["song_id"]).cn_version == "舞萌DX2023":
+            dx_best.push(ChartInfo.from_json(rec))
+        else:
+            sd_best.push(ChartInfo.from_json(rec))
+    sd_best.sort()
+    dx_best.sort()
+    print(sd_best)
+    print(dx_best)
+    id_record_list = []
+    min_ds = 20
+
+    fit_diffs = []
+    tempmusic = {
+        "id": "",
+        "title": "",
+        "dsdistance": 100,
+        "ds": 0,
+        "fitds": 0
+    }
+    for chartinfo in sd_best:
+        id_record_list.append(chartinfo.idNum)
+        if chartinfo.ds<min_ds:
+            min_ds = chartinfo.ds
+        try:
+            ds = float(chartinfo.ds)
+            fitds = float(total_list.by_id(chartinfo.idNum).stats[chartinfo.diff]['fit_diff'])
+        except:
+            continue
+        distance = ds-fitds
+        fit_diffs.append(distance)
+        if distance < tempmusic["dsdistance"]:
+            tempmusic["id"] = chartinfo.idNum
+            tempmusic["title"] = chartinfo.title
+            tempmusic["dsdistance"] = distance
+            tempmusic["ds"] = ds
+            tempmusic["fitds"] = fitds
+    for chartinfo in dx_best:
+        id_record_list.append(chartinfo.idNum)
+        if chartinfo.ds<min_ds:
+            min_ds = chartinfo.ds
+        try:
+            ds = float(chartinfo.ds)
+            fitds = float(total_list.by_id(chartinfo.idNum).stats[chartinfo.diff]['fit_diff'])
+        except:
+            continue
+        distance = ds-fitds
+        fit_diffs.append(distance)
+        if distance < tempmusic["dsdistance"]:
+            tempmusic["id"] = chartinfo.idNum
+            tempmusic["title"] = chartinfo.title
+            tempmusic["dsdistance"] = distance
+            tempmusic["ds"] = ds
+            tempmusic["fitds"] = fitds
+    img = await draw_water_pic(fit_diffs)
+    msg = f"您的b50中平均含水量为{np.mean(fit_diffs)*100:.2f}毫升。\n"
+    msg += f"含水量标准差为{np.std(fit_diffs)*100:.2f}毫升。\n"
+    msg += f"最有含金量谱面为 {tempmusic['id']}.{tempmusic['title']}\n"
+    msg += f"该谱面定数：{tempmusic['ds']} 拟合定数：{tempmusic['fitds']}\n"
+
+    min_ds = round(random.randint(2,4)/10 + min_ds,1)
+    musics = total_list.filter(ds=min_ds)
+    musics.extend(total_list.filter(ds=min_ds+0.1))
+    t = random.randint(1,8)
+    i = 0
+    temp = ""
+    while i < len(musics) and t>0:
+        music = musics[i]
+        if music.id not in id_record_list:
+            for j in range(len(music['ds'])):
+                if music['ds'][j] == min_ds:
+                    if 'fit_diff' in music.stats[j]:
+                        if music.stats[j]['fit_diff']-min_ds > 0.1:
+                            t-=1
+                            temp = f"推荐降水推分金曲\n{music.id}.{music.title}[{diffs[j]}]\n定数：{music['ds'][j]}\n拟合定数：{music.stats[j]['fit_diff']}\n"
+        i += 1
+    msg += temp
+    return img, msg

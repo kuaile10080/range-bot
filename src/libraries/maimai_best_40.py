@@ -41,7 +41,7 @@ class ChartInfo(object):
         fc = ['', 'fc', 'fcp', 'ap', 'app']
         fi = fc.index(data["fc"])
         return cls(
-            idNum=total_list.by_title(data["title"]).id,
+            idNum=data["song_id"],
             title=data["title"],
             diff=data["level_index"],
             ra=compute_ra(float(data["ds"]), float(data["achievements"]), b50=False),
