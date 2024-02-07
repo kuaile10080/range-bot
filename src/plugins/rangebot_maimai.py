@@ -8,7 +8,7 @@ from src.libraries.tool import offlineinit, convert_cn2jp
 from src.libraries.maimaidx_music import total_list, music_data, refresh_music_list, refresh_alias_temp
 from src.libraries.image import text_to_image, image_to_base64
 from src.libraries.maimai_best_40 import generate
-from src.libraries.maimai_best_50 import generate50, generateap50, generateb50_water_msg
+from src.libraries.maimai_best_50 import generate50, generateap50, generateb50_water_msg, generateb50_by_player_data
 from src.libraries.maimai_plate_query import *
 from src.libraries.secrets import *
 from src.libraries.maimai_info import draw_new_info
@@ -893,3 +893,29 @@ async def _b50_water(event: Event, message: Message = CommandArg()):
     img,msg2 = await generateb50_water_msg(player_data,qq)
     await b50_water.finish(MessageSegment.at(qq) + MessageSegment.text(msg) + MessageSegment.image(f"base64://{str(image_to_base64(img), encoding='utf-8')}") + MessageSegment.text(msg2))
     
+"""-----------------b50娱乐版----------------"""
+b50_yuleban = on_command('b50娱乐版', priority = DEFAULT_PRIORITY - 1, block = True)
+@b50_yuleban.handle()
+async def _b50_yuleban(event: Event, message: Message = CommandArg()):
+    s = str(message).strip()
+    if s != "":
+        return
+    
+    qq = str(event.get_user_id())
+    if not_exist_data(qq):
+        await b50_yuleban.send("每天第一次查询自动刷新成绩，可能需要较长时间。若需手动刷新请发送 刷新成绩")
+    player_data,success = await read_full_data(qq)
+    if success == 400:
+        await b50_yuleban.finish("未找到此玩家，请确登陆https://www.diving-fish.com/maimaidx/prober/ 录入分数，并正确填写用户名与QQ号。")
+    for song in player_data['records']:
+        fitds = 0
+        try:
+            fitds = round(total_list.by_id(song['song_id']).stats[song['level_index']]['fit_diff'],2)
+        except:
+            pass
+        if fitds != 0:
+            song['ds'] = fitds
+    msg = "\n"
+    msg += "本功能根据拟合定数进行计算，仅供娱乐，不具有任何参考价值，请勿上纲上线！\n下图为您b50的娱乐版\n（定数的小数保留一位的歌曲为没有足够的数据生成拟合定数的歌曲）\n"
+    img = await generateb50_by_player_data(player_data,qq,yule=True)
+    await b50_yuleban.finish(MessageSegment.at(qq) + MessageSegment.text(msg) + MessageSegment.image(f"base64://{str(image_to_base64(img), encoding='utf-8')}"))

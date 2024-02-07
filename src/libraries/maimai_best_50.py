@@ -52,7 +52,7 @@ class ChartInfo(object):
             idNum=data["song_id"],
             title=data["title"],
             diff=data["level_index"],
-            ra=data["ra"],
+            ra=compute_ra(data["ds"], data["achievements"]),
             ds=data["ds"],
             comboId=fi,
             fsId=fsi,
@@ -325,12 +325,13 @@ class DrawBest(object):
     def draw(self):
         if self.plate in platename_to_file:
             PlateImg = Image.open(self.plate_dir + 'main_plate/' + platename_to_file[self.plate]).convert('RGBA')
+        elif self.plate in os.listdir(self.plate_dir + 'private_plate/'):
+            PlateImg = Image.open(self.plate_dir + 'private_plate/' + self.plate).convert('RGBA')
+        elif self.qq + '.png' in os.listdir(self.plate_dir + 'private_plate/'):
+            PlateImg = Image.open(self.plate_dir + 'private_plate/' + self.qq + '.png').convert('RGBA')
         else:
-            try:
-                PlateImg = Image.open(self.plate_dir + 'private_plate/' + self.qq + '.png').convert('RGBA')
-            except:
-                plates = os.listdir(self.plate_dir + 'other_plate/')
-                PlateImg = Image.open(self.plate_dir + 'other_plate/' + random.choice(plates)).convert('RGBA')
+            plates = os.listdir(self.plate_dir + 'other_plate/')
+            PlateImg = Image.open(self.plate_dir + 'other_plate/' + random.choice(plates)).convert('RGBA')
         self.img.paste(PlateImg, (5, 3), mask=PlateImg.split()[3])
         
         if self.qq != '0':
@@ -481,7 +482,7 @@ async def generateap50(player_data,qq) -> Image.Image:
     pic = DrawBest(sd_best, dx_best, player_data["nickname"], player_data["plate"], qq, player_data["additional_rating"]).getDir()
     return pic
 
-async def generateb50_by_player_data(player_data,qq) -> Image.Image:
+async def generateb50_by_player_data(player_data,qq,yule=False) -> Image.Image:
     sd_best = BestList(35)
     dx_best = BestList(15)
     for rec in player_data['records']:
@@ -491,6 +492,8 @@ async def generateb50_by_player_data(player_data,qq) -> Image.Image:
             sd_best.push(ChartInfo.from_json(rec))
     sd_best.sort()
     dx_best.sort()
+    if yule:
+        player_data["plate"] = "yule.png"
     pic = DrawBest(sd_best, dx_best, player_data["nickname"], player_data["plate"], qq, player_data["additional_rating"]).getDir()
     return pic
 
