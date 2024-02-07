@@ -916,6 +916,6 @@ async def _b50_yuleban(event: Event, message: Message = CommandArg()):
         if fitds != 0:
             song['ds'] = fitds
     msg = "\n"
-    msg += "本功能根据拟合定数进行计算，仅供娱乐，不具有任何参考价值，请勿上纲上线！\n下图为您b50的娱乐版\n（定数的小数保留一位的歌曲为没有足够的数据生成拟合定数的歌曲）\n"
+    msg += "本功能根据拟合定数进行计算，仅供娱乐，不具有任何参考价值，请勿上纲上线！\n下图为您b50的娱乐版\n（部分定数的小数保留一位的歌曲为没有足够的数据生成拟合定数的歌曲）\n"
     img = await generateb50_by_player_data(player_data,qq,yule=True)
     await b50_yuleban.finish(MessageSegment.at(qq) + MessageSegment.text(msg) + MessageSegment.image(f"base64://{str(image_to_base64(img), encoding='utf-8')}"))

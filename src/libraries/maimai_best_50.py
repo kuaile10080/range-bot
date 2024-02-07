@@ -257,7 +257,7 @@ class DrawBest(object):
                 fsImg = self._resizePic(fsImg, 0.6)
                 temp.paste(fsImg, (100, 22), fsImg.split()[3])
             font = ImageFont.truetype('src/static/adobe_simhei.otf', 12, encoding='utf-8')
-            tempDraw.text((8, 44), f'Base: {chartInfo.ds} -> {compute_ra(chartInfo.ds, chartInfo.achievement)}', 'white', font)
+            tempDraw.text((8, 44), f'Base: {chartInfo.ds} -> {chartInfo.ra}', 'white', font)
             font = ImageFont.truetype('src/static/adobe_simhei.otf', 18, encoding='utf-8')
             tempDraw.text((8, 60), f'#{num + 1}', 'white', font)
 
