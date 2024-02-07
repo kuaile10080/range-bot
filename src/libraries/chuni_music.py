@@ -423,3 +423,21 @@ async def generate_chuni40(payload: Dict) -> Tuple[Optional[Image.Image], int]:
             qq = '0'
         pic = DrawChuni(b30,r10,obj["nickname"],qq).getDir()
         return pic, 0
+
+async def draw_ajb30(obj: Dict, qq: str) -> Image.Image:
+    b30 = []
+    for rec in obj["records"]["best"]:
+        if rec["fc"] == "alljustice":
+            b30.append(rec)
+    b30.sort(key=lambda x:x['ra'],reverse=True)
+    if len(b30) > 30:
+        b30 = b30[:30]
+    r10 = []
+    for rec in obj["records"]["r10"]:
+        if rec["fc"] == "alljustice":
+            r10.append(rec)
+    r10.sort(key=lambda x:x['ra'],reverse=True)
+    if len(r10) > 10:
+        r10 = r10[:10]
+    pic = DrawChuni(b30,r10,obj["nickname"],qq).getDir()
+    return pic

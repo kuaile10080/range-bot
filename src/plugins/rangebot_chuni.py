@@ -406,3 +406,16 @@ async def _clevelquery(event: Event):
         for music in res:
             s += f"{music['mid']}. {music['title']} 【{music['level_label']} {music['ds']}】 {music['score']}\n"
         await clevelquery.finish(MessageSegment.image(f"base64://{str(image_to_base64(text_to_image(s)), encoding='utf-8')}"))
+
+cajb30 = on_command('cajb30', priority = DEFAULT_PRIORITY, block=True)
+@cajb30.handle()
+async def _cajb30(event: Event, message: Message = CommandArg()):
+    if str(message).strip() != "":
+        return
+    qq = str(event.get_user_id())
+    async with aiohttp.request("GET","https://www.diving-fish.com/api/chunithmprober/dev/player/records",params={"qq":qq},headers={"developer-token":DF_Dev_Token})as resp:
+        if resp.status != 200:
+            await cajb30.finish("未找到此玩家，请确登陆https://www.diving-fish.com/chunithm/prober/录入分数，并正确填写用户名与QQ号。")
+        full_data = await resp.json()
+    img = await draw_ajb30(full_data,qq)
+    await cajb30.finish(MessageSegment.at(qq) + MessageSegment.image(f"base64://{str(image_to_base64(img), encoding='utf-8')}"))
