@@ -11,7 +11,7 @@ from src.libraries.maimai_best_40 import generate, generateb40_by_player_data
 from src.libraries.maimai_best_50 import generate50, generateb50_by_player_data
 from src.libraries.message_segment import *
 
-import re
+import re, datetime
 
 DEFAULT_PRIORITY = 10
 
@@ -207,10 +207,6 @@ async def _(event: Event, message: Message = CommandArg()):
             s += f'宜 {wm_list[i]}\n'
         elif wm_value[i] == 0:
             s += f'忌 {wm_list[i]}\n'
-    # if dawumeng == 1:
-    #     s += "宜 打舞萌\n"
-    # else:
-    #     s += "忌 打舞萌\n"
     if dazhonger == 1:
         s += "宜 打中二\n"
     else:
@@ -219,8 +215,22 @@ async def _(event: Event, message: Message = CommandArg()):
         s += "宜 打音击\n"
     else:
         s += "忌 打音击\n"
-    s += "然哥提醒您：打几把舞萌快去学习\n谁拆机，我拆谁\n"
-    music = total_list[h % len(total_list)]
+    day = datetime.datetime.now().strftime("%y%m%d")
+    if day == "240209":
+        s += "然哥提醒您：除夕快乐！\n兔年最后一天，打机当然打：\n"
+        music = total_list.by_id("301")
+    elif day == "240210":
+        s += "然哥提醒您：大年初一，新年快乐！\n龙年打机当然打：\n"
+        music = total_list.by_id("270")
+    elif day == "240211":
+        s += "然哥提醒您：大年初二，新年快乐！\n龙年打机当然打：\n"
+        music = total_list.by_id("212")
+    elif day == "240212":
+        s += "然哥提醒您：大年初三，新年快乐！\n龙年打机当然打：\n"
+        music = total_list.by_id("367")
+    else:
+        s += "然哥提醒您：打几把舞萌快去学习\n谁拆机，我拆谁\n"
+        music = total_list[h % len(total_list)]
     await jrwm.finish(MessageSegment.text(s) + song_MessageSegment(music))
 
 
