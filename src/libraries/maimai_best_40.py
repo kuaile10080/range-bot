@@ -5,7 +5,7 @@ from typing import Optional, Dict, List, Tuple
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 from src.libraries.maimaidx_music import total_list, compute_ra
 from src.libraries.image import get_music_cover, get_qq_logo
-from src.libraries.static_lists_and_dicts import platename_to_file
+from src.libraries.static_lists_and_dicts import platename_to_file, pnconvert
 
 scoreRank = 'D C B BB BBB A AA AAA S S+ SS SS+ SSS SSS+'.split(' ')
 combo = ' FC FC+ AP AP+'.split(' ')
@@ -93,7 +93,9 @@ class DrawBest(object):
             self.nickname = "舞萌DX"
         else:
             self.nickname = self._stringQ2B(nickname)
-        self.plate = plate
+        self.plate = ""
+        for c in plate:
+            self.plate += pnconvert[c]
         self.qq = qq
         self.sdRating = 0
         self.dxRating = 0
