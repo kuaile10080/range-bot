@@ -242,6 +242,7 @@ class DrawChuni(object):
         imgDraw = ImageDraw.Draw(img)
         comboPic = {"fullcombo":"FC",
                     "fullchain":"FS",
+                    "fullchain2":"FSD",
                     "alljustice":"AP"}
         titleFontName = 'src/static/adobe_simhei.otf'
         for num in range(0, len(b30)):
