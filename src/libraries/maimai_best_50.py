@@ -104,7 +104,10 @@ class DrawBest(object):
             self.nickname = self._stringQ2B(nickname)
         self.plate = ""
         for c in plate:
-            self.plate += pnconvert[c]
+            if c in pnconvert:
+                self.plate += pnconvert[c]
+            else:
+                self.plate += c
         self.qq = qq
         self.adr = additional_rating
         self.sdRating = 0
