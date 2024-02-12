@@ -26,7 +26,13 @@ async def get_full_data_by_username(username: str):
         full_data = await resp.json()
         return full_data, 0
 
-async def read_full_data(qq:str):
+async def read_full_data(qq:str,username:str = None):
+    if username:
+        async with aiohttp.request("GET","https://www.diving-fish.com/api/maimaidxprober/dev/player/records",params={"username":username},headers={"developer-token":DF_Dev_Token}) as resp:
+            if resp.status != 200:
+                return None, resp.status
+            full_data = await resp.json()
+            return full_data, 0
     if os.path.exists(f"{temp_dir}mairec/{qq}.json"):
         with open(f"{temp_dir}mairec/{qq}.json","r",encoding="utf-8") as f:
             data = json.load(f)

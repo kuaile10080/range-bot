@@ -40,7 +40,7 @@ async def _(message: Message = CommandArg()):
         await lihui.finish(MessageSegment.image(url))
 
 # 舟材料
-zcl_url = "https://ytl.viktorlab.cn/"
+zcl_url = "https://ark.yituliu.cn/"
 
 cailiao = on_command('舟材料', aliases={'zcl'}, priority=DEFAULT_PRIORITY, block=True)
 @cailiao.handle()

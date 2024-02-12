@@ -898,15 +898,18 @@ b50_yuleban = on_command('b50娱乐版', priority = DEFAULT_PRIORITY - 1, block 
 @b50_yuleban.handle()
 async def _b50_yuleban(event: Event, message: Message = CommandArg()):
     s = str(message).strip()
+    qq = str(event.get_user_id())
     if s != "":
         return
-    
-    qq = str(event.get_user_id())
-    if not_exist_data(qq):
-        await b50_yuleban.send("每天第一次查询自动刷新成绩，可能需要较长时间。若需手动刷新请发送 刷新成绩")
-    player_data,success = await read_full_data(qq)
+        player_data,success = await read_full_data(qq='0',username = s)
+    else:
+        if not_exist_data(qq):
+            await b50_yuleban.send("每天第一次查询自动刷新成绩，可能需要较长时间。若需手动刷新请发送 刷新成绩")
+        player_data,success = await read_full_data(qq)
     if success == 400:
         await b50_yuleban.finish("未找到此玩家，请确登陆https://www.diving-fish.com/maimaidx/prober/ 录入分数，并正确填写用户名与QQ号。")
+    elif success == 403:
+        await b50_yuleban.finish("该用户禁止了其他人获取数据。")
     for song in player_data['records']:
         fitds = 0
         try:
@@ -917,5 +920,8 @@ async def _b50_yuleban(event: Event, message: Message = CommandArg()):
             song['ds'] = fitds
     msg = "\n"
     msg += "本功能根据拟合定数进行计算，仅供娱乐，不具有任何参考价值，请勿上纲上线！\n下图为您b50的娱乐版\n（部分定数的小数保留一位的歌曲为没有足够的数据生成拟合定数的歌曲）\n"
-    img = await generateb50_by_player_data(player_data,qq,yule=True)
+    if s != "":
+        img = await generateb50_by_player_data(player_data,qq='0',yule=True)
+    else:
+        img = await generateb50_by_player_data(player_data,qq=qq,yule=True)
     await b50_yuleban.finish(MessageSegment.at(qq) + MessageSegment.text(msg) + MessageSegment.image(f"base64://{str(image_to_base64(img), encoding='utf-8')}"))
