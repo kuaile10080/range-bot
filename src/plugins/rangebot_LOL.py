@@ -35,7 +35,7 @@ async def _(event: Event, message: Message = CommandArg()):
                 break
     Hero_BG = Image.open(path + '/Hero_BG.png').convert('RGBA')
     tempDraw = ImageDraw.Draw(Hero_BG)
-    font = ImageFont.truetype(path[:-4] + 'Tahoma.ttf', DEFAULT_PRIORITY, encoding='utf-8')
+    font = ImageFont.truetype(path[:-4] + 'Tahoma.ttf', 20, encoding='utf-8')
     for i in range(0,2):
         for j in range(0,10):
             try:
