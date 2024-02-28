@@ -900,8 +900,18 @@ async def _b50_yuleban(event: Event, message: Message = CommandArg()):
     s = str(message).strip()
     qq = str(event.get_user_id())
     if s != "":
-        return
-        player_data,success = await read_full_data(qq='0',username = s)
+        if type(re.match("group_(.+)_(.+)",event.get_session_id())) != re.Match:
+            return
+        else:
+            groupid = str(re.match("group_(.+)_(.+)",event.get_session_id()).groups()[0])
+        if groupid not in MAIN_GROUPS:
+            return
+        else:
+            try:
+                qq = int(s)
+                player_data,success = await read_full_data(qq)
+            except:
+                player_data,success = await read_full_data(qq='0',username=s)
     else:
         if not_exist_data(qq):
             await b50_yuleban.send("每天第一次查询自动刷新成绩，可能需要较长时间。若需手动刷新请发送 刷新成绩")
