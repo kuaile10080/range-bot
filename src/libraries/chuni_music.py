@@ -350,7 +350,7 @@ class DrawChuni(object):
         ratingBaseImg = Image.open(self.pic_dir + self._findRaPic()).convert('RGBA')
         ratingBaseDraw = ImageDraw.Draw(ratingBaseImg)
         font1 = ImageFont.truetype('src/static/msyh.ttc', 22, encoding='unic')
-        ratingBaseDraw.text((60, 3), f"{self.playerRating*100%100/100}", 'black', font1)
+        ratingBaseDraw.text((60, 3), f"{self.playerRating*100//100/100}", 'black', font1)
         ratingBaseImg = self._resizePic(ratingBaseImg, 0.95)
         self.img.paste(ratingBaseImg, (119, 10), mask=ratingBaseImg.split()[3])
 
@@ -396,11 +396,11 @@ class DrawChuni(object):
         font = ImageFont.truetype('src/static/adobe_simhei.otf', 17, encoding='utf-8')
         dxImg = Image.open(self.pic_dir + 'UI_RSL_MBase_Parts_01.png').convert('RGBA')
         imgdraw = ImageDraw.Draw(dxImg)
-        imgdraw.text((14,22), f"r10:{self.r10ra*100%100/100}", (0,0,0), font)
+        imgdraw.text((14,22), f"r10:{self.r10ra*100//100/100}", (0,0,0), font)
         self.img.paste(dxImg, (self.COLOUMS_IMG[7] , 65), mask=dxImg.split()[3])
         sdImg = Image.open(self.pic_dir + 'UI_RSL_MBase_Parts_02.png').convert('RGBA')
         imgdraw = ImageDraw.Draw(sdImg)
-        imgdraw.text((14,22), f"b30:{self.b30ra*100%100/100}" , (0,0,0), font)
+        imgdraw.text((14,22), f"b30:{self.b30ra*100//100/100}" , (0,0,0), font)
         self.img.paste(sdImg, (self.COLOUMS_IMG[7] - 124, 65), mask=sdImg.split()[3])
 
         # self.img.show()
