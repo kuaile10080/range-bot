@@ -72,8 +72,9 @@ async def _capoo(event: Event, message: Message = CommandArg()):
     
 
 
-"""-----------机厅几（开发中qy|bl|hsh|yt|rs|wy|lw|zc|wxh|sm|tyg|sjh|wd）-----------"""
-jt_sh = ['qy','bl','hsh','tyg','sjh','wd']
+"""-----------机厅几(开发中)-----------"""
+jt_sh = ['qy','bl','hsh','tyg','sjhc','sjhm','wdc','wdm']
+jt_sh.extend(['wd','sjh'])
 jt_zb = ['yt','rs','wy','zc','wxh','sm']
 jt_jn = ['lw']
 group_sh = ['751302572','775613195','780012208','742829700','646232811','698699856','606964743']
@@ -81,8 +82,17 @@ group_sh.extend(MAIN_GROUPS)
 group_zb = ['419134739','610587231',TEST_GROUP]
 group_jn = ['784593881',TEST_GROUP]
 
-jtregex = r"(?i)^(qy|bl|hsh|yt|rs|wy|lw|zc|wxh|sm|tyg|sjh|wd)(j|几|[0-9]+)$"
-jtmax = {"qy":40,"bl":40,"hsh":20,"yt":50,"rs":30,"wy":30,"lw":30,"zc":30,"wxh":30,"sm":30,"tyg":30,"sjh":50,"wd":30}
+jtregex_warn = r"(?i)^(sjh|wd)(j|几|[0-9]+|([\+＋\-－])(\d+))$"
+jtwarn = on_regex(jtregex_warn, priority = PRIORITY_BASE*1-1, block = True)
+@jtwarn.handle()
+async def _jtwarn(event: Event):
+    msg = re.match(jtregex_warn,str(event.get_message()).strip().lower()).groups()
+    if (str(re.match("group_(.+)_(.+)",event.get_session_id()).groups()[0]) in group_sh) and (msg[0] in jt_sh) \
+        or (str(re.match("group_(.+)_(.+)",event.get_session_id()).groups()[0]) in group_zb) and (msg[0] in jt_zb)\
+            or (str(re.match("group_(.+)_(.+)",event.get_session_id()).groups()[0]) in group_jn) and (msg[0] in jt_jn):
+        await jtwarn.finish(f"{msg[0]}同时有maimai和chunithm\n使用{msg[0]}m上报maimai人数\n使用{msg[0]}c上报chunithm人数。")
+
+jtregex = r"(?i)^(qy|bl|hsh|yt|rs|wy|lw|zc|wxh|sm|tyg|sjhc|sjhm|wdc|wdm)(j|几|[0-9]+)$"
 jtj = on_regex(jtregex, priority = PRIORITY_BASE*1, block = True)
 @jtj.handle()
 async def _jtj(event: Event):
@@ -107,7 +117,7 @@ async def _jtj(event: Event):
                     await jtj.finish(f"{m}分钟前{msg[0]}{num}  {source}")
             else:
                 num = int(msg[1])
-                if (num > jtmax[msg[0]]) | (num < 0):
+                if (num > 30) | (num < 0):
                     try:
                         db.ping()
                         cursor = db.cursor()
@@ -137,7 +147,7 @@ async def _jtj(event: Event):
         else:
             await jtj.finish("看看几点了")
 
-jtaddre = r"(?i)^(qy|bl|hsh|yt|rs|wy|lw|zc|wxh|sm|tyg|sjh|wd)([\+＋\-－])(\d+)$"
+jtaddre = r"(?i)^(qy|bl|hsh|yt|rs|wy|lw|zc|wxh|sm|tyg|sjhc|sjhm|wdc|wdm)([\+＋\-－])(\d+)$"
 jtadd = on_regex(jtaddre, priority = PRIORITY_BASE*1, block = True)
 @jtadd.handle()
 async def _jtadd(event: Event):
@@ -157,7 +167,7 @@ async def _jtadd(event: Event):
             else:
                 num = num - int(msg[2])
                 oper = "MINUS"
-            if (0 <= num <= jtmax[msg[0]]):
+            if (0 <= num <= 30):
                 jtjson['num'] = num
                 jtjson['time'] = time.time()
                 jtjson['source'] = user
