@@ -538,37 +538,52 @@ async def _levelquery(event: Event):
 singlequery = on_command("info",priority = DEFAULT_PRIORITY, block = True)
 @singlequery.handle()
 async def _singlequery(event: Event, message: Message = CommandArg()):
-    msg = str(message).strip()
+    o_msg = str(message).strip()
+    msg = o_msg
     diff = {'绿':0,'黄':1,'红':2,'紫':3,'白':4}
     if msg[0] in diff:
         diff = diff[msg[0]]
         msg = msg[1:]
     else:
         diff = -1
-    music = None
+    music1 = None
+    music2 = None
     try:
         id = int(msg)
-        music = total_list.by_id(str(id))
-        if music == None:
+        music1 = total_list.by_id(str(id))
+        if music1 == None:
             raise Exception
     except:
         if msg == "":
             await singlequery.finish("请输入正确的查询命令，格式：info+id或info+部分歌名。")
         else:
-            name = msg
-            res = total_list.filt_by_name(title_search=name)
-            if len(res) == 0:
+            res1 = total_list.filt_by_name(title_search=msg)
+            res2 = total_list.filt_by_name(title_search=o_msg)
+            if len(res1) == len(res2) == 0:
                 await singlequery.finish("没有找到这样的乐曲。")
-            elif len(res) == 1:
-                music = res[0]
-            else:
-                for i in range(len(res)):
-                    if res[i]['title'].lower().strip() == name.lower().strip():
-                        music = res[i]
+
+            if len(res1) == 1:
+                music1 = res1[0]
+            elif len(res1) > 1:
+                for i in range(len(res1)):
+                    if res1[i]['title'].lower().strip() == msg.lower().strip():
+                        music1 = res1[i]
                         break
-                if music == None:
-                    music = random.choice(res)
-    id = int(music.id)
+                if music1 == None:
+                    music1 = random.choice(res1)
+
+            if len(res2) == 1:
+                music2 = res2[0]
+                if music1 != None and (music1.id != music2.id):
+                    music1 = music2
+                    diff = -1
+            elif len(res2) > 1:
+                for i in range(len(res2)):
+                    if res2[i]['title'].lower().strip() == o_msg.lower().strip():
+                        music2 = res2[i]
+                        break
+                if music2 == None:
+                    music2 = random.choice(res2)
 
     qq = str(event.get_user_id())
     if not_exist_data(qq):
@@ -576,12 +591,21 @@ async def _singlequery(event: Event, message: Message = CommandArg()):
     player_data,success = await read_full_data(qq)
     if success == 400:
         await singlequery.finish("未找到此玩家，请确登陆https://www.diving-fish.com/maimaidx/prober/ 录入分数，并正确填写用户名与QQ号。")
-    records = [{},{},{},{},{}]
+    records1 = [{},{},{},{},{}]
+    records2 = [{},{},{},{},{}]
     for rec in player_data['records']:
-        if rec['song_id'] == id:
-            records[4-rec['level_index']] = rec
-    if records == [{},{},{},{},{}]:
-        await singlequery.finish(f"您查询的是{music.title}\n您还没有打过这首歌。")
+        if music1 != None and rec['song_id'] == int(music1.id):
+            records1[rec['level_index']] = rec
+        if music2 != None and rec['song_id'] == int(music2.id):
+            records2[rec['level_index']] = rec
+    if records1 == records2 == [{},{},{},{},{}]:
+        if music1 == None:
+            title = music2.title
+        elif music2 == None:
+            title = music1.title
+        else:
+            title = music1.title + "或" + music2.title
+        await singlequery.finish(f"您查询的是{title}\n没有查到成绩。")
     else:
         imgs = []
         with open("src/static/mai/rgplct.json","r",encoding="utf-8") as f:
@@ -589,24 +613,16 @@ async def _singlequery(event: Event, message: Message = CommandArg()):
         flag = False
         if qq in rgplct:
             flag = rgplct[qq]
-        if diff == -1:
-            for rec in records:
-                if rec == {}:
-                    continue
-                else:
-                    img = await draw_new_info(rec,music,plct=flag)
+        if diff == -1 or records1[diff] == {}:
+            for rec in records2:
+                if rec != {}:
+                    img = await draw_new_info(rec,music2,plct=flag)
                     imgs.append(img)
         else:
-            for rec in records:
-                if rec == {}:
-                    continue
-                elif rec['level_index'] == diff:
-                    img = await draw_new_info(rec,music,plct=flag)
-                    imgs.append(img)
-            if len(imgs) == 0:
-                await singlequery.finish(f"您查询的是{music.title}\n您还没有打过该难度谱面。")
+            img = await draw_new_info(records1[diff],music1,plct=flag)
+            imgs.append(img)
+
         width_sum = 5
-        imgs.reverse()
         for img in imgs:
             width_sum += img.size[0]+5
         final_img = Image.new("RGB",(width_sum,imgs[0].size[1]+10),(255,255,255))
