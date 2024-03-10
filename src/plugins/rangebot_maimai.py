@@ -550,8 +550,8 @@ async def _singlequery(event: Event, message: Message = CommandArg()):
     music2 = None
     try:
         id = int(msg)
-        music1 = total_list.by_id(str(id))
-        if music1 == None:
+        music2 = total_list.by_id(str(id))
+        if music2 == None:
             raise Exception
     except:
         if msg == "":
@@ -602,6 +602,8 @@ async def _singlequery(event: Event, message: Message = CommandArg()):
         if music1 == None:
             title = music2.title
         elif music2 == None:
+            title = music1.title
+        elif music1.title == music2.title:
             title = music1.title
         else:
             title = music1.title + "或" + music2.title
