@@ -205,7 +205,7 @@ SETU_TIMING = 30
 setu_dir = 'src/static/setu/'
 sjst = on_keyword(['色图','涩图','瑟图'], rule = setu_checker, priority = PRIORITY_BASE*10, block = True) #取消priority = 10 
 @sjst.handle()
-async def sjst_handle(event: Event):
+async def _sjst_handle(event: Event):
     timelist = readjson(static_dir + "seturecord.json")
     if re.match("group_(.+)_(.+)",event.get_session_id()):
         groupid = str(re.match("group_(.+)_(.+)",event.get_session_id()).groups()[0])
@@ -243,7 +243,7 @@ fududict = {}
 """-----------复读-----------"""
 fudu = on_message(priority = PRIORITY_BASE*1000, block = True)  
 @fudu.handle()
-async def fudu_handle(event: Event):
+async def _fudu_handle(event: Event):
     global fududict
     msg = json.loads(event.json())["message"]
     if len(msg)!=1 or msg[0]["type"]!="text":
@@ -278,7 +278,7 @@ async def fudu_handle(event: Event):
 daydaykeywords = ['自卑','焦虑','急','[CQ:face,id=107]']
 dayday = on_message(priority = PRIORITY_BASE*10, block = False, rule = dayday_checker)
 @dayday.handle()
-async def dayday_handle(event: Event, matcher: Matcher):
+async def _dayday_handle(event: Event, matcher: Matcher):
     s = str(event.get_message())
     for word in daydaykeywords:
         if word in s:
@@ -289,7 +289,7 @@ async def dayday_handle(event: Event, matcher: Matcher):
 
 """-----------gre-----------"""
 # with open("src/static/gre/GRE_3.json",encoding='utf-8')as fp:
-with open("src/static/gre/TOEFL_3.json",encoding='utf-8')as fp:
+with open("src/static/gre/TOEFL_2.json",encoding='utf-8')as fp:
     gre_dict = fp.read().split('\n')[:-1]
     gre_dict = [json.loads(item) for item in gre_dict]
 gre_temp = {}
@@ -297,7 +297,7 @@ gre_status = 0
 ans_pattern = ""
 gre_event = on_message(priority = 2, block = False, rule = gre_checker)
 @gre_event.handle()
-async def gre_handle(event: Event,matcher: Matcher):
+async def _gre_handle(event: Event,matcher: Matcher):
     global gre_temp, gre_status, gre_dict, ans_pattern
     s = str(event.get_message()).lower().strip()
     if gre_status != 0:
@@ -416,7 +416,7 @@ async def gre_handle(event: Event,matcher: Matcher):
 """-----------gre rank-----------"""
 gre_rank = on_regex(r"^gre rank$", priority = PRIORITY_BASE*10-1, block = True, rule = gre_checker)
 @gre_rank.handle()
-async def gre_rank_handle(event: Event):
+async def _gre_rank_handle(event: Event):
     with open("src/static/gre/rank.json","r",encoding='utf-8')as fp:
         rank = json.load(fp)
     rank = sorted(rank.items(), key=lambda x: int(x[1]["right"])/int(x[1]["trys"]), reverse=True)
@@ -463,6 +463,40 @@ async def gre_rank_handle(event: Event):
     url = "base64://" + encoded.decode('utf-8')
     await gre_rank.finish(MessageSegment.text("积分系统暂时下线") + MessageSegment.image(url))
 
+gre_cikuliebiao = on_regex(r"^词库列表$", priority = PRIORITY_BASE*10-1, block = True, rule = gre_checker)
+@gre_cikuliebiao.handle()
+async def _gre_cikuliebiao_handle(event: Event):
+    image_path = "src/static/gre/目录.png"
+    with open(image_path,"rb")as fp:
+        encoded = base64.b64encode(fp.read())
+    url = "base64://" + encoded.decode('utf-8')
+    await gre_cikuliebiao.finish(MessageSegment.image(url))
+
+gre_qieciku = on_command("切词库", priority = PRIORITY_BASE*10-1, block = True, rule = gre_checker)
+@gre_qieciku.handle()
+async def _gre_qieciku_handle(event: Event, message: Message = CommandArg()):
+    global gre_status
+    if gre_status != 0:
+        await gre_qieciku.finish("请先结束当前单词")
+    global gre_dict
+    msg = str(message).strip()
+    if msg == "":
+        await gre_qieciku.finish("请输入词库序号")
+    elif not msg.isdigit():
+        await gre_qieciku.finish("请输入词库序号")
+    else:
+        msg = int(msg)
+        if msg>81 or msg<1:
+            await gre_qieciku.finish("请输入正确的词库序号")
+        else:
+            with open("src/static/gre/目录.json","r",encoding='utf-8')as fp:
+                mulu = json.load(fp)
+            msg = msg-1
+            fname = mulu[msg]["文件名"]
+            with open("src/static/gre/"+fname,encoding='utf-8')as fp:
+                gre_dict = fp.read().split('\n')[:-1]
+                gre_dict = [json.loads(item) for item in gre_dict]
+            await gre_qieciku.finish(f"已切换到{mulu[msg]['标题']}")
 
 
 """-----------daimao-----------"""
