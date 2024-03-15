@@ -288,19 +288,20 @@ async def dayday_handle(event: Event, matcher: Matcher):
     return
 
 """-----------gre-----------"""
-with open("src/static/gre/GRE_3.json",encoding='utf-8')as fp:
+# with open("src/static/gre/GRE_3.json",encoding='utf-8')as fp:
+with open("src/static/gre/TOEFL_3.json",encoding='utf-8')as fp:
     gre_dict = fp.read().split('\n')[:-1]
     gre_dict = [json.loads(item) for item in gre_dict]
 gre_temp = {}
 gre_status = 0
 ans_pattern = ""
-gre_event = on_message(priority = PRIORITY_BASE*10-1, block = False, rule = gre_checker)
+gre_event = on_message(priority = 2, block = False, rule = gre_checker)
 @gre_event.handle()
 async def gre_handle(event: Event,matcher: Matcher):
     global gre_temp, gre_status, gre_dict, ans_pattern
     s = str(event.get_message()).lower().strip()
     if gre_status != 0:
-        if s in ["重置","reset"]:
+        if s in ["重置"]:
             gre_status = 0
             matcher.stop_propagation()
             await gre_event.finish("已重置")
@@ -457,7 +458,10 @@ async def gre_rank_handle(event: Event):
 
     plt.savefig("src/static/gre/rank.png")
     plt.close()
-    await gre_rank.finish(MessageSegment.text("积分系统暂时下线") + MessageSegment.image("file:///" + os.path.realpath("src/static/gre/rank.png")))
+    with open("src/static/gre/rank.png","rb")as fp:
+        encoded = base64.b64encode(fp.read())
+    url = "base64://" + encoded.decode('utf-8')
+    await gre_rank.finish(MessageSegment.text("积分系统暂时下线") + MessageSegment.image(url))
 
 
 
