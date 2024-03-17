@@ -78,27 +78,30 @@ total_list, music_data = get_chuni_music_list()
 
 
 #开抄————————————————————————————————————————————————————————————————————————————
-chuni_ra_list = [(1010000,2.15),
-                 (1009000,2.15),
-                 (1007500,2.00),
-                 (1005000,1.50),
-                 (1000000,1.00),
-                 (990000,0.60),
-                 (975000,0.00),
-                 (925000,-3.00),
-                 (900000,-5.00)]
+chuni_ra_list = [(1009000,215,100,0),
+                 (1007500,200,100,1),
+                 (1005000,150,50,1),
+                 (1000000,100,100,1),
+                 (990000,60,250,1),
+                 (975000,0,250,1),
+                 (925000,-300,100,0.6),
+                 (900000,-500,125,1)]
 
-def cal_chuni_ra(score:int,ds:float)->float:
+def cal_chuni_ra_int100(score:int,ds:float)->int:
+    ds = round(ds*100)
     if score <= 500000:
-        return 0
+        res = 0
     elif score <= 800000:
-        return (score-500000)/800000*(ds-5)/2
+        res = (score-500000)/800000*(ds-500)/2
     elif score <= 900000:
-        return (score-800000)/100000*(ds-5)/2 + (ds-5)/2
+        res = (score-800000)/100000*(ds-500)/2 + (ds-500)/2
     else:
         for i in range(len(chuni_ra_list)):
             if score >= chuni_ra_list[i][0]:
-                return ds + (score-chuni_ra_list[i][0])/(chuni_ra_list[i-1][0]-chuni_ra_list[i][0])*(chuni_ra_list[i-1][1]-chuni_ra_list[i][1]) + chuni_ra_list[i][1]
+                res = ds + chuni_ra_list[i][1] + (score - chuni_ra_list[i][0])//chuni_ra_list[i][2]*chuni_ra_list[i][3]
+                break
+    res = int(res)
+    return max(0,res)
 
 
 class DrawChuni(object):
@@ -106,17 +109,15 @@ class DrawChuni(object):
         self.b30 = b30
         self.r10 = r10
         self.qq = qq
-        self.b30ra = 0
-        self.r10ra = 0
-        self.playerRating = 0.0
+        self.b30ra_int100 = 0
+        self.r10ra_int100 = 0
+        self.playerRating_int100 = 0
         for song in b30:
-            self.b30ra += cal_chuni_ra(song["score"],song["ds"])
+            self.b30ra_int100 += cal_chuni_ra_int100(song["score"],song["ds"])
         for song in r10:
-            self.r10ra += cal_chuni_ra(song["score"],song["ds"])
-        self.playerRating = self.b30ra + self.r10ra
-        self.b30ra = self.b30ra/30
-        self.r10ra = self.r10ra/10
-        self.playerRating = self.playerRating/40
+            self.r10ra_int100 += cal_chuni_ra_int100(song["score"],song["ds"])
+        self.playerRating_int100 = self.b30ra_int100 + self.r10ra_int100
+        self.playerRating = self.playerRating_int100//40/100
         if nickname == None or nickname == "":
             self.nickname = "chunithm"
         else:
@@ -249,6 +250,7 @@ class DrawChuni(object):
             i = num // 6
             j = num % 6
             chartInfo = b30[num]
+            chartInfo["ra"] = cal_chuni_ra_int100(chartInfo["score"],chartInfo["ds"])/100
             temp = get_chuni_cover_by_title(chartInfo["title"])
             temp = self._resizePic(temp, itemW / temp.size[0])
             temp = temp.crop((0, (temp.size[1] - itemH) / 2, itemW, (temp.size[1] + itemH) / 2))
@@ -293,6 +295,7 @@ class DrawChuni(object):
             i = num // 2
             j = num % 2
             chartInfo = r10[num]
+            chartInfo["ra"] = cal_chuni_ra_int100(chartInfo["score"],chartInfo["ds"])/100
             temp = get_chuni_cover_by_title(chartInfo["title"])
             temp = self._resizePic(temp, itemW / temp.size[0])
             temp = temp.crop((0, (temp.size[1] - itemH) / 2, itemW, (temp.size[1] + itemH) / 2))
@@ -350,7 +353,7 @@ class DrawChuni(object):
         ratingBaseImg = Image.open(self.pic_dir + self._findRaPic()).convert('RGBA')
         ratingBaseDraw = ImageDraw.Draw(ratingBaseImg)
         font1 = ImageFont.truetype('src/static/msyh.ttc', 22, encoding='unic')
-        ratingBaseDraw.text((60, 3), f"{self.playerRating*100//1/100}", 'black', font1)
+        ratingBaseDraw.text((60, 3), f"{self.playerRating}", 'black', font1)
         ratingBaseImg = self._resizePic(ratingBaseImg, 0.95)
         self.img.paste(ratingBaseImg, (119, 10), mask=ratingBaseImg.split()[3])
 
@@ -396,11 +399,11 @@ class DrawChuni(object):
         font = ImageFont.truetype('src/static/adobe_simhei.otf', 17, encoding='utf-8')
         dxImg = Image.open(self.pic_dir + 'UI_RSL_MBase_Parts_01.png').convert('RGBA')
         imgdraw = ImageDraw.Draw(dxImg)
-        imgdraw.text((14,22), f"r10:{self.r10ra*100//1/100}", (0,0,0), font)
+        imgdraw.text((14,22), f"r10:{self.r10ra_int100//10/100}", (0,0,0), font)
         self.img.paste(dxImg, (self.COLOUMS_IMG[7] , 65), mask=dxImg.split()[3])
         sdImg = Image.open(self.pic_dir + 'UI_RSL_MBase_Parts_02.png').convert('RGBA')
         imgdraw = ImageDraw.Draw(sdImg)
-        imgdraw.text((14,22), f"b30:{self.b30ra*100//1/100}" , (0,0,0), font)
+        imgdraw.text((14,22), f"b30:{self.b30ra_int100//30/100}" , (0,0,0), font)
         self.img.paste(sdImg, (self.COLOUMS_IMG[7] - 124, 65), mask=sdImg.split()[3])
 
         # self.img.show()
