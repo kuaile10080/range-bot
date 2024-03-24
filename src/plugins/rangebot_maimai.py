@@ -673,7 +673,7 @@ async def _random_niubi(event: Event, message: Message = CommandArg()):
             records.append(rec)
     # records.sort(key = lambda x:x['compare_value'],reverse = True)
     if len(records) == 0:
-        await random_niubi.finish("您没有很牛逼的成绩，无法随机牛逼。")
+        await random_niubi.finish(MessageSegment.at(qq) + MessageSegment.text("您没有很牛逼的成绩，无法随机牛逼。"))
     # records = records[:min(n*10,len(records))]
     draw_list = random.sample(records,min(n,len(records)))
     imgs = []
@@ -720,7 +720,7 @@ async def _random_caibi(event: Event, message: Message = CommandArg()):
             records.append(rec)
     # records.sort(key = lambda x:x['compare_value'],reverse = True)
     if len(records) == 0:
-        await random_caibi.finish("您没有很菜逼的成绩，无法随机菜逼。")
+        await random_caibi.finish(MessageSegment.at(qq) + MessageSegment.text("您没有很菜逼的成绩，无法随机菜逼。"))
     # records = records[:min(n*10,len(records))]
     draw_list = random.sample(records,min(n,len(records)))
     imgs = []
