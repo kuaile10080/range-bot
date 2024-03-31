@@ -32,9 +32,18 @@ async def offlineinit():
     async with aiohttp.request('GET', 'https://api.yuzuchan.moe/maimaidx/maimaidxalias') as resp:
         if resp.status == 200:
             s += "all_alias.json下载成功\n"
+
             with open("src/static/all_alias.json", "w", encoding= "utf-8") as f:
                 j = await resp.json()
-                json.dump(j, f, ensure_ascii=False)
+                content = j['content']
+                format_js = {}
+                for item in content:
+                    format_js[item["SongID"]] = {
+                        "Name": item["Name"],
+                        "Alias": item["Alias"]
+                    }
+
+                json.dump(format_js, f, ensure_ascii=False)
         else:
             s += "all_alias.json下载失败\n"
             k=0
