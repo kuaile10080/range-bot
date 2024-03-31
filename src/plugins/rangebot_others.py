@@ -638,5 +638,12 @@ async def _mirror_img(event: Event, message: Message = CommandArg()):
     url = "base64://" + encoded.decode('utf-8')
     await mirror_img.finish(MessageSegment.image(url))
 
-
-
+# 什么意思
+shenmeyisi = on_keyword(['什么意思'], priority = PRIORITY_BASE*10, block = True, rule=rng_checker)
+@shenmeyisi.handle()
+async def _shenmeyisi_handle(event: Event):
+    path = "src/static/什么意思.mp3"
+    with open(path,"rb")as fp:
+        encoded = base64.b64encode(fp.read())
+    url = "base64://" + encoded.decode('utf-8')
+    await shenmeyisi.finish(MessageSegment.record(url))
