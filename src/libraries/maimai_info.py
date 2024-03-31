@@ -150,7 +150,7 @@ async def draw_new_info(record:dict,music:Music,plct = False)->Image.Image:
     font_score = ImageFont.truetype("src/static/MFZhiShang_Noncommercial-Regular.otf", 20,encoding="utf-8")
 
     if is_fools_day():
-        score_text = f"{int(achievement*10000):>8d}".replace(" ","   ")
+        score_text = f"{int(achievement*10000):>7d}".replace(" ","   ")
     else:
         score_text = f"{achievement:>8.4f}".replace(" ","   ")
     score_text += " %"

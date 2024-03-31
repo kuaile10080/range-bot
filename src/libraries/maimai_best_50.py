@@ -255,7 +255,7 @@ class DrawBest(object):
             font = ImageFont.truetype(titleFontName, 12, encoding='utf-8')
 
             if is_fools_day():
-                tempDraw.text((7, 28), f'{"%d" % chartInfo.achievement*1000}%', 'red', font)
+                tempDraw.text((7, 28), f'{"%d" % int(chartInfo.achievement*10000)}%', 'red', font)
             else:
                 tempDraw.text((7, 28), f'{"%.4f" % chartInfo.achievement}%', 'white', font)
 
