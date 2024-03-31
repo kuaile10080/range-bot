@@ -3,6 +3,7 @@ from src.libraries.maimaidx_music import Music
 from src.libraries.image import get_music_cover
 from src.libraries.maimaidx_music import compute_ra
 from src.libraries.static_lists_and_dicts import version_icon_path, genre_icon_path, level_index_to_file
+from src.libraries.tool import is_fools_day
 
 assets_path = "src/static/mai/newinfo/"
 cover_path = "src/static/mai/cover/"
@@ -147,7 +148,11 @@ async def draw_new_info(record:dict,music:Music,plct = False)->Image.Image:
 
     # 分数
     font_score = ImageFont.truetype("src/static/MFZhiShang_Noncommercial-Regular.otf", 20,encoding="utf-8")
-    score_text = f"{achievement:>8.4f}".replace(" ","   ")
+
+    if is_fools_day():
+        score_text = f"{int(achievement*10000):>8d}".replace(" ","   ")
+    else:
+        score_text = f"{achievement:>8.4f}".replace(" ","   ")
     score_text += " %"
     temp_img = Image.new('RGBA', (font_score.getbbox(score_text)[2], font_score.getbbox(score_text)[3]), color = (0, 0, 0,0))
     temp_img_draw = ImageDraw.Draw(temp_img)

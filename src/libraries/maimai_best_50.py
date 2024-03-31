@@ -9,6 +9,7 @@ from PIL import Image, ImageDraw, ImageFont, ImageFilter
 from src.libraries.maimaidx_music import total_list, compute_ra
 from src.libraries.image import get_music_cover, get_qq_logo
 from src.libraries.static_lists_and_dicts import platename_to_file, pnconvert
+from src.libraries.tool import is_fools_day
 
 scoreRank = 'D C B BB BBB A AA AAA S S+ SS SS+ SSS SSS+'.split(' ')
 combo = ' FC FC+ AP AP+'.split(' ')
@@ -211,6 +212,10 @@ class DrawBest(object):
         COLOUMS_RATING = [86-5, 100-6, 115-7, 130-8, 145-9]
         theRa = self.playerRating
         i = 4
+
+        if is_fools_day():
+            theRa += 10000
+
         while theRa:
             digit = theRa % 10
             theRa = theRa // 10
@@ -249,7 +254,11 @@ class DrawBest(object):
             tempDraw.text((8, 8), title, 'white', font)
             font = ImageFont.truetype(titleFontName, 12, encoding='utf-8')
 
-            tempDraw.text((7, 28), f'{"%.4f" % chartInfo.achievement}%', 'white', font)
+            if is_fools_day():
+                tempDraw.text((7, 28), f'{"%d" % chartInfo.achievement*1000}%', 'red', font)
+            else:
+                tempDraw.text((7, 28), f'{"%.4f" % chartInfo.achievement}%', 'white', font)
+
             rankImg = Image.open(self.pic_dir + f'UI_GAM_Rank_{rankPic[chartInfo.scoreId]}.png').convert('RGBA')
             rankImg = self._resizePic(rankImg, 0.5)
             temp.paste(rankImg, (50, 61), rankImg.split()[3])
@@ -297,7 +306,11 @@ class DrawBest(object):
             tempDraw.text((8, 8), title, 'white', font)
             font = ImageFont.truetype(titleFontName, 12, encoding='utf-8')
 
-            tempDraw.text((7, 28), f'{"%.4f" % chartInfo.achievement}%', 'white', font)
+            if is_fools_day():
+                tempDraw.text((7, 28), f'{"%d" % int(chartInfo.achievement*10000)}%', 'red', font)
+            else:
+                tempDraw.text((7, 28), f'{"%.4f" % chartInfo.achievement}%', 'white', font)
+
             rankImg = Image.open(self.pic_dir + f'UI_GAM_Rank_{rankPic[chartInfo.scoreId]}.png').convert('RGBA')
             rankImg = self._resizePic(rankImg, 0.5)
             temp.paste(rankImg, (50, 61), rankImg.split()[3])
@@ -413,39 +426,6 @@ class DrawBest(object):
 
     def getDir(self):
         return self.img
-
-
-# def computeRa(ds: float, achievement: float) -> int:
-#     baseRa = 22.4 
-#     if achievement < 50:
-#         baseRa = 7.0
-#     elif achievement < 60:
-#         baseRa = 8.0 
-#     elif achievement < 70:
-#         baseRa = 9.6 
-#     elif achievement < 75:
-#         baseRa = 11.2 
-#     elif achievement < 80:
-#         baseRa = 12.0 
-#     elif achievement < 90:
-#         baseRa = 13.6 
-#     elif achievement < 94:
-#         baseRa = 15.2 
-#     elif achievement < 97:
-#         baseRa = 16.8 
-#     elif achievement < 98:
-#         baseRa = 20.0 
-#     elif achievement < 99:
-#         baseRa = 20.3
-#     elif achievement < 99.5:
-#         baseRa = 20.8 
-#     elif achievement < 100:
-#         baseRa = 21.1 
-#     elif achievement < 100.5:
-#         baseRa = 21.6 
-
-#     return math.floor(ds * (min(100.5, achievement) / 100) * baseRa)
-
 
 async def generate50(payload: Dict) -> Tuple[Optional[Image.Image], int]:
     async with aiohttp.request("POST", "https://www.diving-fish.com/api/maimaidxprober/query/player", json=payload) as resp:

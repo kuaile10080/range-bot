@@ -71,3 +71,6 @@ def convert_cn2jp(text:str) -> str:
 def get_nickname_from_event(event_str: str) -> str:
     event_json = json.loads(event_str)
     return event_json["sender"]["nickname"]
+
+def is_fools_day() -> bool:
+    return datetime.datetime.now().month == 4 and datetime.datetime.now().day == 1
