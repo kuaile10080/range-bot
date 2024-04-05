@@ -642,8 +642,18 @@ async def _mirror_img(event: Event, message: Message = CommandArg()):
 shenmeyisi = on_keyword(['什么意思'], priority = PRIORITY_BASE*10, block = True, rule=rng_checker)
 @shenmeyisi.handle()
 async def _shenmeyisi_handle(event: Event):
-    path = "src/static/什么意思.mp3"
+    path = "src/static/others/什么意思.mp3"
     with open(path,"rb")as fp:
         encoded = base64.b64encode(fp.read())
     url = "base64://" + encoded.decode('utf-8')
     await shenmeyisi.finish(MessageSegment.record(url))
+
+# 什么意思
+f8fq = on_keyword(['飞马','飞8','f8fq','分钱'], priority = PRIORITY_BASE*10, block = True, rule=rng_checker)
+@f8fq.handle()
+async def _f8fq_handle(event: Event):
+    path = "src/static/others/f8fq.mp3"
+    with open(path,"rb")as fp:
+        encoded = base64.b64encode(fp.read())
+    url = "base64://" + encoded.decode('utf-8')
+    await f8fq.finish(MessageSegment.record(url))
