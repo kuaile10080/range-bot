@@ -55,7 +55,7 @@ async def _jrog(event: Event):
                 s = "\n"
                 for id in ongeki_music:
                     for i,chart in enumerate(ongeki_music[id]["charts"]):
-                        if chart["ds"] == ds1:
+                        if ("ds" in chart.keys()) and (chart["ds"] == ds1):
                             s += f"{id}. [{diffs[i]}:{ds1}] {ongeki_music[id]['title']}\n"
                 if s == "\n":
                     await osearch_music.finish("没有找到这样的歌")
@@ -74,7 +74,7 @@ async def _jrog(event: Event):
                 count = 0
                 for id in ongeki_music:
                     for i,chart in enumerate(ongeki_music[id]["charts"]):
-                        if float(ds1) <= float(chart["ds"]) <= float(ds2):
+                        if ("ds" in chart.keys()) and (float(ds1) <= float(chart["ds"]) <= float(ds2)):
                             count += 1
                             s += f"{id}. [{diffs[i]}:{chart['ds']}] {ongeki_music[id]['title']}\n"
                 if s == "\n":
