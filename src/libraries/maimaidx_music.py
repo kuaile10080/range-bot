@@ -202,10 +202,8 @@ class MusicList(List[Music]):
         dxflag = False
         if title_search.startswith("标"):
             sdflag = True
-            title_search = title_search[1:]
         elif title_search.startswith("dx"):
             dxflag = True
-            title_search = title_search[2:]
 
         new_list = MusicList()
         title_temp_equal = MusicList()
@@ -281,7 +279,7 @@ def refresh_alias_temp():
                 alias_data[key]["Alias"].remove(item)
     
     with open("src/static/all_alias_temp.json","w",encoding="utf-8") as fp:
-        json.dump(alias_data,fp,ensure_ascii=False,indent=4)
+        json.dump(alias_data,fp)
     return True
 
 
@@ -310,24 +308,15 @@ def get_cn_version(music: Music)->str:
 #obj_stats = requests.get('https://www.diving-fish.com/api/maimaidxprober/chart_stats').json()
 def refresh_music_list():
     with open("src/static/music_data.json", "r", encoding="utf-8") as mdatafile, \
-        open("src/static/chart_stats.json", "r", encoding="utf-8") as cstatsfile, \
-        open("src/static/all_alias.json", "r", encoding="utf-8") as aliasfile:
+        open("src/static/chart_stats.json", "r", encoding="utf-8") as cstatsfile:
         obj_data = json.load(mdatafile)
         obj_stats = json.load(cstatsfile)
-        obj_alias = json.load(aliasfile)
     obj_stats = obj_stats["charts"]
     _music_data = obj_data
     _total_list: MusicList = MusicList(obj_data)
-    _alias_data = obj_alias
             
     for __i in range(len(_total_list)):
         _total_list[__i] = Music(_total_list[__i])
-        id = _total_list[__i]['id']
-        if id in _alias_data:
-            _total_list[__i]['Alias'] = _alias_data[id]["Alias"]
-        else:
-            _total_list[__i]['Alias'] = []
-        _total_list[__i].alias = _total_list[__i]['Alias']
         _total_list[__i]['cn_version'] = get_cn_version(_total_list[__i])
         _total_list[__i].cn_version = _total_list[__i]['cn_version']
         try:
@@ -337,10 +326,25 @@ def refresh_music_list():
         for __j in range(len(_total_list[__i].charts)):
             _total_list[__i].charts[__j] = Chart(_total_list[__i].charts[__j])
             _total_list[__i].stats[__j] = Stats(_total_list[__i].stats[__j])
-    return _total_list, _music_data, _alias_data
+    return _total_list, _music_data
 
-refresh_alias_temp()
-total_list, music_data, alias_data = refresh_music_list()
+# init alias
+
+total_list, music_data = refresh_music_list()
 music_data_byidstr = {}
+
+with open("src/static/all_alias.json", "r", encoding="utf-8") as aliasfile:
+        alias_data = json.load(aliasfile)
+
 for music in music_data:
     music_data_byidstr[music['id']] = music
+    if music['id'] not in alias_data:
+        alias_data[music['id']] = {
+            "Name": music['title'],
+            "Alias": []
+        }
+with open("src/static/all_alias.json","w",encoding="utf-8") as fp:
+    json.dump(alias_data,fp)
+
+
+refresh_alias_temp()

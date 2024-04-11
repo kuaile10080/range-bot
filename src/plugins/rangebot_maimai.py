@@ -186,8 +186,8 @@ update_music_data = on_command("更新歌曲列表", priority = DEFAULT_PRIORITY
 async def _update_music_data(event: Event, message: Message = CommandArg()):
     status,strr = await offlineinit()
     if status == 1:
-        global total_list, music_data, alias_data
-        total_list, music_data, alias_data = refresh_music_list()
+        global total_list, music_data
+        total_list, music_data = refresh_music_list()
         await update_music_data.finish(strr)
     else:
         await update_music_data.finish(strr)
