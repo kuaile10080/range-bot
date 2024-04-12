@@ -456,21 +456,26 @@ async def _refresh_data(event: Event, message: Message = CommandArg()):
 
 
 
-levelquery = on_regex(r"^([0-9]+)([＋\+]?)(?:进度|完成表|完成度)$",priority = DEFAULT_PRIORITY, block = True)
+levelquery = on_regex(r"^([0-9]+)([＋\+]?)(?:进度|完成表|完成度|定数表)$",priority = DEFAULT_PRIORITY, block = True)
 @levelquery.handle()
 async def _levelquery(event: Event):
-    regex = r"^([0-9]+)([＋\+]?)(?:进度|完成表|完成度)$"
+    regex = r"^([0-9]+)([＋\+]?)(?:进度|完成表|完成度|定数表)$"
     res = re.match(regex, str(event.get_message()))
     level = int(res.group(1))
     if (level >= 15) or (level <= 0):
         await levelquery.finish("蓝的盆")
     
     qq = str(event.get_user_id())
-    if not_exist_data(qq):
-        await levelquery.send("每天第一次查询自动刷新成绩，可能需要较长时间。若需手动刷新请发送 刷新成绩")
-    player_data,success = await read_full_data(qq)
-    if success == 400:
-        await levelquery.finish("未找到此玩家，请确登陆https://www.diving-fish.com/maimaidx/prober/ 录入分数，并正确填写用户名与QQ号。")
+    if str(event.get_message()).endswith("定数表"):
+        player_data = {
+            'records':[]
+        }
+    else:
+        if not_exist_data(qq):
+            await levelquery.send("每天第一次查询自动刷新成绩，可能需要较长时间。若需手动刷新请发送 刷新成绩")
+        player_data,success = await read_full_data(qq)
+        if success == 400:
+            await levelquery.finish("未找到此玩家，请确登陆https://www.diving-fish.com/maimaidx/prober/ 录入分数，并正确填写用户名与QQ号。")
     
     plus = res.group(2)
     records = {}
