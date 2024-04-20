@@ -81,7 +81,7 @@ group_sh = ['751302572','775613195','780012208','742829700','646232811','6986998
 group_sh.extend(MAIN_GROUPS)
 group_zb = ['419134739','610587231',TEST_GROUP]
 group_jn = ['784593881',TEST_GROUP]
-group_qp = ['956305246']
+group_qp = ['956305246',TEST_GROUP]
 
 jtregex_warn = r"(?i)^(sjh|wd)(j|几|[0-9]+|([\+＋\-－])(\d+))$"
 jtwarn = on_regex(jtregex_warn, priority = PRIORITY_BASE*1-1, block = True)
