@@ -653,7 +653,7 @@ def get_compare_value(record:dict):
 
 
 """------------随机牛逼/随机丢人------------"""
-random_niubi = on_command('随机牛逼', priority = DEFAULT_PRIORITY, block = True, rule = to_me())
+random_niubi = on_command('随机牛逼', priority = DEFAULT_PRIORITY, block = True)
 @random_niubi.handle()
 async def _random_niubi(event: Event, message: Message = CommandArg()):
     msg = str(message).strip()
@@ -700,7 +700,7 @@ async def _random_niubi(event: Event, message: Message = CommandArg()):
     img_draw.text((width_sum-156,27),"Range-Bot",(0,0,0),font_title)
     await random_niubi.finish(MessageSegment.at(qq)+MessageSegment.image(f"base64://{str(image_to_base64(final_img), encoding='utf-8')}"))
 
-random_caibi = on_command('随机菜逼', aliases={'随机丢人'}, priority = DEFAULT_PRIORITY, block = True, rule = to_me())
+random_caibi = on_command('随机菜逼', aliases={'随机丢人'}, priority = DEFAULT_PRIORITY, block = True)
 @random_caibi.handle()
 async def _random_caibi(event: Event, message: Message = CommandArg()):
     msg = str(message).strip()
