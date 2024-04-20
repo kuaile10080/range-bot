@@ -92,7 +92,7 @@ zlh/舟立绘 <干员名> <1/2> -》 查询明日方舟干员普通/精2立绘
 如果发现成绩不同步请发送 刷新成绩 
 b40/b50无需刷新，同步水鱼'''
 
-help_str_rg = "神秘功能帮助请发送rghelp" + "\n" + help_str
+help_str_rg = "神秘歇逼了" + "\n" + help_str
 
 help_b64str = f"base64://{str(image_to_base64(text_to_image(help_str)), encoding='utf-8')}"
 help_b64str_rg = f"base64://{str(image_to_base64(text_to_image(help_str_rg)), encoding='utf-8')}"
@@ -108,13 +108,3 @@ async def _(event: Event):
         await help.finish(MessageSegment.image(help_b64str_rg))
     else:
         await help.finish(MessageSegment.image(help_b64str))
-
-help_rg = on_command('rghelp', priority = DEFAULT_PRIORITY, block = True, rule = maiapi_checker)
-@help_rg.handle()
-async def _(event: Event):
-    if str(event.get_message()).strip() != "rghelp":
-        return
-    with open("src/static/mai/rghelp.png","rb")as fp:
-        encoded = base64.b64encode(fp.read())
-    url = "base64://" + encoded.decode('utf-8')
-    await help.send(MessageSegment.image(url))
