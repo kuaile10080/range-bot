@@ -505,6 +505,8 @@ async def _levelquery(event: Event):
             record_selected[f"{rec['song_id']}_{rec['level_index']}"] = tmp
             
     for music in music_data:
+        if int(music["id"]) >= 100000:
+            continue
         for i,ds in enumerate(music['ds']):
             if str(ds) in records:
                 if f"{music['id']}_{i}" in record_selected:
