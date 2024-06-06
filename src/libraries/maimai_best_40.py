@@ -432,7 +432,7 @@ async def generateap40(player_data,qq) -> Image.Image:
     dx_best = BestList(15)
     for rec in player_data['records']:
         if rec['fc'] in ['ap','app']:
-            if total_list.by_id(rec["song_id"]).cn_version == "舞萌DX2023":
+            if total_list.by_id(rec["song_id"]).cn_version == "舞萌DX2024":
                 dx_best.push(ChartInfo.from_json(rec))
             else:
                 sd_best.push(ChartInfo.from_json(rec))
@@ -445,7 +445,7 @@ async def generateb40_by_player_data(player_data,qq) -> Image.Image:
     sd_best = BestList(25)
     dx_best = BestList(15)
     for rec in player_data['records']:
-        if total_list.by_id(rec["song_id"]).cn_version == "舞萌DX2023":
+        if total_list.by_id(rec["song_id"]).cn_version == "舞萌DX2024":
             dx_best.push(ChartInfo.from_json(rec))
         else:
             sd_best.push(ChartInfo.from_json(rec))

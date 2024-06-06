@@ -7,7 +7,15 @@ fontpath = "src/static/msyh.ttc"
 cover_dir = 'src/static/mai/cover/'
 
 def get_cover_len5_id(mid) -> str:
-    return f'{int(mid):05d}'
+    mid = int(mid)
+    if mid < 100000:
+        return f'{int(mid):05d}'
+    else:
+        mid = mid % 100000
+        if mid >= 20000:
+            return f'{(10000 + mid % 10000):05d}'
+        else:
+            return f'{mid:05d}'
 
 def draw_text(img_pil, text, offset_x):
     draw = ImageDraw.Draw(img_pil)
@@ -64,6 +72,8 @@ def get_music_cover(mid) -> Image.Image:
             mid += 10000
         elif 10000<mid<11000:
             mid -= 10000
+        else:
+            return Image.open('src/static/mai/cover/00000.png').convert('RGB')
         new_cover_path = f'{cover_dir}{get_cover_len5_id(mid)}.png'
         if os.path.exists(new_cover_path):
             with open(new_cover_path, 'rb') as fp:

@@ -237,13 +237,13 @@ async def _plate(event: Event):
     version = pnconvert[res[0]]
     if version == "霸":
         version = "舞"
-    if version not in "祭祝":
-        ids = musicGroup[version]
-    else:
+    if version in "新的":
         ids = []
         for music in total_list:
             if music.cn_version == ptv["祭"]:
                 ids.append(music.id)
+    else:
+        ids = musicGroup[version]
     if version == "舞":
         remids = musicGroup["舞ReMASTER"]
     else:
@@ -431,7 +431,7 @@ async def _plate(event: Event):
     elif version in "宙星":
         s = "请注意，国服宙代与星代成就需一同清谱舞萌DX2022版本获得\n"
     elif version in "祭祝":
-        s = "舞萌DX2023目前尚未更新完成，以下仅展示当前曲目\n"
+        s = "请注意，国服祭代与祝代成就需一同清谱舞萌DX2023版本获得\n"
     elif version in "真" and res[1] == "将":
         s = "真代没有真将，但是我可以假装帮你查\n"
     else:

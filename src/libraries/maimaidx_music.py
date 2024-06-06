@@ -300,7 +300,7 @@ def get_cn_version(music: Music)->str:
         else:
             return version_list[music.id]
     else:
-        return "舞萌DX2023"
+        return "舞萌DX2024"
             
 
 #OFFLINE

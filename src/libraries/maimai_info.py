@@ -2,7 +2,7 @@ from PIL import Image, ImageDraw, ImageFont
 from src.libraries.maimaidx_music import Music
 from src.libraries.image import get_music_cover
 from src.libraries.maimaidx_music import compute_ra
-from src.libraries.static_lists_and_dicts import version_icon_path, genre_icon_path, level_index_to_file
+from src.libraries.static_lists_and_dicts import version_icon_path, genre_icon_path, level_index_to_file, info_to_file_dict
 from src.libraries.tool import is_fools_day
 
 assets_path = "src/static/mai/newinfo/"
@@ -16,31 +16,6 @@ async def draw_new_info(record:dict,music:Music,plct = False)->Image.Image:
         "Expert": "EXP",
         "Master": "MST",
         "Re:MASTER": "MST_Re",
-    }
-
-    info_to_file_dict = {
-        "sssp": "SSSp",
-        "sss": "SSS",
-        "ssp": "SSp",
-        "ss": "SS",
-        "sp": "Sp",
-        "s": "S",
-        "aaa": "AAA",
-        "aa": "AA",
-        "a": "A",
-        "bbb": "BBB",
-        "bb": "BB",
-        "b": "B",
-        "c": "C",
-        "d": "D",
-        "fc": "FC",
-        "fcp": "FCp",
-        "ap": "AP",
-        "app": "APp",
-        "fs": "FS",
-        "fsp": "FSp",
-        "fsd": "FSD",
-        "fsdp": "FSDp"
     }
 
     diff = diff_replace[record["level_label"]]
@@ -164,9 +139,9 @@ async def draw_new_info(record:dict,music:Music,plct = False)->Image.Image:
     temp_img = Image.open(assets_path + f"UI_MSS_Rank_{rank}.png").convert("RGBA")
     img.paste(temp_img,(183,570),temp_img)
     temp_img = Image.open(assets_path + f"UI_MSS_MBase_Icon_{fc}.png").convert("RGBA")
-    img.paste(temp_img,(255,570),temp_img)
+    img.paste(temp_img,(250,570),temp_img)
     temp_img = Image.open(assets_path + f"UI_MSS_MBase_Icon_{fs}.png").convert("RGBA")
-    img.paste(temp_img,(321,570),temp_img)
+    img.paste(temp_img,(316,570),temp_img)
 
     # DX分
     font_dxscore = ImageFont.truetype("src/static/Tahoma.ttf", 20,encoding="utf-8")
@@ -238,9 +213,11 @@ def draw_music_info(music:dict)->Image.Image:
     if len(music['ds'])==5:
         jump = 143
         chats_sum = 5
-    else:
+    elif len(music['ds'])==4:
         jump = 191
         chats_sum = 4
+    else:
+        pass
 
     # 打开背景
     bg = Image.open(f"{assets_path}BG_{chats_sum}.png").convert("RGBA")

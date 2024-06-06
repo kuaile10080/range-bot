@@ -120,16 +120,17 @@ async def _(event: Event):
     regex = "^([绿黄红紫白老]?) ?id ?([0-9]+)"
     groups = re.match(regex, str(event.get_message())).groups()
     level_labels = ['绿', '黄', '红', '紫', '白']
-    if groups[0] == "":
-        name = groups[1].strip()
-        music = total_list.by_id(name)
+    id = int(groups[1].strip())
+    if groups[0] == "" and id<100000:
+        id = groups[1].strip()
+        music = total_list.by_id(id)
         if music is None:
             await query_chart.finish("未找到该谱面")
         else:
             await query_chart.finish(song_MessageSegment2(music))
-    elif groups[0] == "老":
-        name = groups[1].strip()
-        music = total_list.by_id(name)
+    elif groups[0] == "老" or id>=100000:
+        id = groups[1].strip()
+        music = total_list.by_id(id)
         if music is None:
             await query_chart.finish("未找到该谱面")
         else:
@@ -138,8 +139,8 @@ async def _(event: Event):
         try:
             level_index = level_labels.index(groups[0])
             level_name = ['Basic', 'Advanced', 'Expert', 'Master', 'Re: MASTER']
-            name = groups[1].strip()
-            music = total_list.by_id(name)
+            id = groups[1].strip()
+            music = total_list.by_id(id)
             chart = music['charts'][level_index]
 #             info = f'''
 # 曲师: {music['basic_info']['artist']}

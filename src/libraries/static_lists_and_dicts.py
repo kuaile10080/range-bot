@@ -178,7 +178,8 @@ version_icon_path = {
     "舞萌DX": "UI_CMN_TabTitle_MaimaiTitle_Ver200.png",
     "舞萌DX2021": "UI_CMN_TabTitle_MaimaiTitle_Ver214.png",
     "舞萌DX2022": "UI_CMN_TabTitle_MaimaiTitle_Ver220.png",
-    "舞萌DX2023": "UI_CMN_TabTitle_MaimaiTitle_Ver230.png"
+    "舞萌DX2023": "UI_CMN_TabTitle_MaimaiTitle_Ver230.png",
+    "舞萌DX2024": "UI_CMN_TabTitle_MaimaiTitle_Ver240.png"
 }
 
 genre_icon_path = {
@@ -193,7 +194,8 @@ genre_icon_path = {
     "ゲームバラエティ": "UI_CMN_TabTitle_Variety.png",
     "niconicoボーカロイド": "UI_CMN_TabTitle_Niconico.png",
     "東方Project": "UI_CMN_TabTitle_Toho.png",
-    "オンゲキCHUNITHM": "UI_CMN_TabTitle_Chugeki.png"
+    "オンゲキCHUNITHM": "UI_CMN_TabTitle_Chugeki.png",
+    "宴会場": "UI_CMN_TabTitle_Utage.png"
 }
 
 info_to_file_dict = {
@@ -215,10 +217,13 @@ info_to_file_dict = {
     "fcp": "FCp",
     "ap": "AP",
     "app": "APp",
+    "sync": "SP",
     "fs": "FS",
     "fsp": "FSp",
     "fsd": "FSD",
-    "fsdp": "FSDp"
+    "fsdp": "FSDp",
+    "fdx": "FSD",
+    "fdxp": "FSDp"
 }
 
 SCORE_COEFFICIENT_TABLE = [

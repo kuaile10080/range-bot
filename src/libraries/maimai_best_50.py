@@ -47,8 +47,13 @@ class ChartInfo(object):
         ri = rate.index(data["rate"])
         fc = ['', 'fc', 'fcp', 'ap', 'app']
         fi = fc.index(data["fc"])
-        fs = ['', 'fs', 'fsp', 'fsd', 'fsdp']
-        fsi = fs.index(data["fs"])
+        fs = ['', 'sync', 'fs', 'fsp', 'fsd', 'fsdp']
+        if data["fs"] == 'fdx':
+            fsi = 4
+        elif data["fs"] == 'fdxp':
+            fsi = 5
+        else:
+            fsi = fs.index(data["fs"])
         return cls(
             idNum=data["song_id"],
             title=data["title"],
@@ -232,7 +237,7 @@ class DrawBest(object):
         levelTriagle = [(itemW, 0), (itemW - 27, 0), (itemW, 27)]
         rankPic = 'D C B BB BBB A AA AAA S Sp SS SSp SSS SSSp'.split(' ')
         comboPic = ' FC FCp AP APp'.split(' ')
-        fsPic = ' FS FSp FSD FSDp'.split(' ')
+        fsPic = ' SP FS FSp FSD FSDp'.split(' ')
         imgDraw = ImageDraw.Draw(img)
         titleFontName = 'src/static/adobe_simhei.otf'
         for num in range(0, len(sdBest)):
@@ -458,7 +463,7 @@ async def generateap50(player_data,qq) -> Image.Image:
     dx_best = BestList(15)
     for rec in player_data['records']:
         if rec['fc'] in ['ap','app']:
-            if total_list.by_id(rec["song_id"]).cn_version == "舞萌DX2023":
+            if total_list.by_id(rec["song_id"]).cn_version == "舞萌DX2024":
                 dx_best.push(ChartInfo.from_json(rec))
             else:
                 sd_best.push(ChartInfo.from_json(rec))
@@ -471,7 +476,7 @@ async def generateb50_by_player_data(player_data,qq,yule=False) -> Image.Image:
     sd_best = BestList(35)
     dx_best = BestList(15)
     for rec in player_data['records']:
-        if total_list.by_id(rec["song_id"]).cn_version == "舞萌DX2023":
+        if total_list.by_id(rec["song_id"]).cn_version == "舞萌DX2024":
             dx_best.push(ChartInfo.from_json(rec))
         else:
             sd_best.push(ChartInfo.from_json(rec))
@@ -523,7 +528,7 @@ async def generateb50_water_msg(player_data,qq):
     sd_best = BestList(35)
     dx_best = BestList(15)
     for rec in player_data['records']:
-        if total_list.by_id(rec["song_id"]).cn_version == "舞萌DX2023":
+        if total_list.by_id(rec["song_id"]).cn_version == "舞萌DX2024":
             dx_best.push(ChartInfo.from_json(rec))
         else:
             sd_best.push(ChartInfo.from_json(rec))

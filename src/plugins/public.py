@@ -12,10 +12,12 @@ DEFAULT_PRIORITY = 5
 #         raise IgnoredException("not reply group temp message")
 
 help_str = '''最近更新：
-随机牛逼(抄的提比bot) -》 随机一个牛逼成绩
-随机牛逼 <数量>(抄的提比bot) -》 随机牛逼成绩，最多10个
-随机菜逼/随机丢人(抄的提比bot) -》 随机一个菜逼成绩
-随机菜逼/随机丢人 <数量>(抄的提比bot) -》 随机菜逼成绩，最多10个
+bot开发者已经上班了，后面很难再有大更新了，随缘维护。
+如果不能接受可以把bot踢出群聊。
+
+目前大部分功能已经恢复。
+宴谱查分还没有写，查宴谱的UI也没有画。
+有其他问题请联系CDRange。
 
 diving-fish功能：
 b40 b50 —》 查分
