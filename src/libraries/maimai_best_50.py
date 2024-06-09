@@ -52,8 +52,13 @@ class ChartInfo(object):
             fsi = 4
         elif data["fs"] == 'fdxp':
             fsi = 5
+        elif data["fs"] == 'sp':
+            fsi = 1
         else:
-            fsi = fs.index(data["fs"])
+            try:
+                fsi = fs.index(data["fs"])
+            except:
+                fsi = 0     
         return cls(
             idNum=data["song_id"],
             title=data["title"],
