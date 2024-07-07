@@ -25,8 +25,7 @@ def search_music_by_parttitle(s:str) -> list:
     res = []
     for id in ongeki_music:
         if s in lowwidth(ongeki_music[id]["title"]).lower():
-            if (int(id)<8000) or (int(id)>=8000 and ongeki_music[id]["bas_id"]==""):
-                res.append(ongeki_music[id])
+            res.append(ongeki_music[id])
     return res
 
 def search_music_by_artist(s:str) -> list:
@@ -34,8 +33,7 @@ def search_music_by_artist(s:str) -> list:
     res = []
     for id in ongeki_music:
         if s in lowwidth(ongeki_music[id]["artist"]).lower():
-            if (int(id)<8000) or (int(id)>=8000 and ongeki_music[id]["bas_id"]==""):
-                res.append(ongeki_music[id])
+            res.append(ongeki_music[id])
     return res
 
 
