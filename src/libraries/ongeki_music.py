@@ -44,6 +44,8 @@ def get_len4_id(id) -> str:
     return str(int(id)).zfill(4)
 
 def get_ongeki_cover_by_id(id) -> Image.Image:
+    if os.path.exists(f"{path}cover/{get_len4_id(id)}.png"):
+        return Image.open(f"{path}cover/{get_len4_id(id)}.png")
     if os.path.exists(f"{path}cover/UI_Jacket_{get_len4_id(id)}.png"):
         return Image.open(f"{path}cover/UI_Jacket_{get_len4_id(id)}.png")
     elif os.path.exists(f"{path}cover/{ongeki_music[str(int(id))]['sort_id']}.png"):
