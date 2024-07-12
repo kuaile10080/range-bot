@@ -71,3 +71,36 @@ def osong_txt(music: dict):
         MessageSegment.text(f"章节: {music['chapter']}\n") + \
         MessageSegment.text(f"角色: {music['character']}\n") + \
         MessageSegment.text(s)
+
+def randmusics_level(msg:str)->list[dict]:
+    res = []
+    for music in ongeki_music:
+        for chart in ongeki_music[music]["charts"]:
+            if chart!={} and chart["level"]==msg:
+                res.append(ongeki_music[music])
+    return res
+
+
+def randmusics_ds(msg:str)->list[dict]:
+    res = []
+    for music in ongeki_music:
+        for chart in ongeki_music[music]["charts"]:
+            if chart!={} and chart["ds"]==msg:
+                res.append(ongeki_music[music])
+    return res
+
+def randmusics_info(msg:str)->list[dict]:
+    res = []
+    msg = msg.lower()
+    for music in ongeki_music:
+        if msg in ongeki_music[music]["title"].lower().replace(" ","") or \
+            msg in ongeki_music[music]["artist"].lower().replace(" ","") or \
+            msg in ongeki_music[music]["chapter"].lower().replace(" ","") or \
+            msg in ongeki_music[music]["character"].lower().replace(" ",""):
+                res.append(ongeki_music[music])
+        else:
+            for chart in ongeki_music[music]["charts"]:
+                if chart!={} and msg in chart["charter"]:
+                    res.append(ongeki_music[music])
+    return res
+    

@@ -10,6 +10,39 @@ from src.libraries.tool import hash
 import re, random
 DEFAULT_PRIORITY = 10
 
+orand = on_regex(r'^o随(\d)*个(.*)', priority = DEFAULT_PRIORITY, block=True)
+@orand.handle()
+async def _orand(event: Event):
+    msg = str(event.get_message())
+    pattern = r'^o随(\d)*个(.*)'
+    match = re.match(pattern, msg)
+    if not match:
+        return
+    num = match.group(1)
+    if num == None:
+        num = 1
+    else:
+        num = int(num)
+    msg2 = match.group(2).strip()
+    if re.match(r'^\d+\+?$', msg2):
+        musics = randmusics_level(msg2)
+    else:
+        if re.match(r'^\d*\.\d+$', msg2):
+            musics = randmusics_ds(msg2)
+        else:
+            musics = randmusics_info(msg2)
+    if len(musics) == 0:
+        await orand.finish("没有找到这样的歌")
+    res = random.sample(musics, min(num,len(musics)))
+    if len(res) == 1:
+        await orand.finish(osong_txt(res[0]))
+    else:
+        s = "\n"
+        for music in res:
+                s += f"{music['id']}. {music['title']} 【{music['ds']}】\n"
+        await orand.finish(MessageSegment.image(f"base64://{str(image_to_base64(text_to_image(s)), encoding='utf-8')}"))
+
+
 osearch_music = on_regex(r"^o(.*)查歌(.+)",priority = DEFAULT_PRIORITY, block=True)
 @osearch_music.handle()
 async def _jrog(event: Event):

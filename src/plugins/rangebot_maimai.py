@@ -346,6 +346,8 @@ async def _plate(event: Event):
     records = {}
     for id in ids:
         music = total_list.by_id(id)
+        if music == None:
+            continue
         lev = music["level"][3]
         if lev not in records:
             records[lev] = []
