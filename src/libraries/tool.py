@@ -11,61 +11,74 @@ def hash(qq) -> int:
 async def offlineinit():
     s = ""
     k=1
-    async with aiohttp.request('GET', 'https://www.diving-fish.com/api/maimaidxprober/music_data') as resp:
-        if resp.status == 200:
-            s += "music_data.json下载成功\n"
-            with open("src/static/music_data.json", "w", encoding= "utf-8") as f:
-                j = await resp.json()
-                json.dump(j, f, ensure_ascii=False)
-        else:
-            s += "music_data.json下载失败\n"
-            k=0
-    async with aiohttp.request('GET', 'https://www.diving-fish.com/api/maimaidxprober/chart_stats') as resp:
-        if resp.status == 200:
-            s += "chart_stats.json下载成功\n"
-            with open("src/static/chart_stats.json", "w", encoding= "utf-8") as f:
-                j = await resp.json()
-                json.dump(j, f, ensure_ascii=False)
-        else:
-            s += "chart_stats.json下载失败\n"
-            k=0
-    async with aiohttp.request('GET', 'https://api.yuzuchan.moe/maimaidx/maimaidxalias') as resp:
-        if resp.status == 200:
-            s += "all_alias.json下载成功\n"
+    try:
+        async with aiohttp.request('GET', 'https://www.diving-fish.com/api/maimaidxprober/music_data') as resp:
+            if resp.status == 200:
+                s += "music_data.json下载成功\n"
+                with open("src/static/music_data.json", "w", encoding= "utf-8") as f:
+                    j = await resp.json()
+                    json.dump(j, f, ensure_ascii=False)
+            else:
+                s += "music_data.json下载失败\n"
+                k=0
+    except:
+                s += "music_data.json下载失败\n"
+                k=0
+    try:
+        async with aiohttp.request('GET', 'https://www.diving-fish.com/api/maimaidxprober/chart_stats') as resp:
+            if resp.status == 200:
+                s += "chart_stats.json下载成功\n"
+                with open("src/static/chart_stats.json", "w", encoding= "utf-8") as f:
+                    j = await resp.json()
+                    json.dump(j, f, ensure_ascii=False)
+            else:
+                s += "chart_stats.json下载失败\n"
+                k=0
+    except:
+                s += "chart_stats.json下载失败\n"
+                k=0
+    try:
+        async with aiohttp.request('GET', 'https://api.yuzuchan.moe/maimaidx/maimaidxalias') as resp:
+            if resp.status == 200:
+                s += "all_alias.json下载成功\n"
+                with open("src/static/all_alias.json", "w", encoding= "utf-8") as f:
+                    j = await resp.json()
+                    content = j['content']
+                    format_js = {}
+                    for item in content:
+                        format_js[item["SongID"]] = {
+                            "Name": item["Name"],
+                            "Alias": item["Alias"]
+                        }
 
-            with open("src/static/all_alias.json", "w", encoding= "utf-8") as f:
-                j = await resp.json()
-                content = j['content']
-                format_js = {}
-                for item in content:
-                    format_js[item["SongID"]] = {
-                        "Name": item["Name"],
-                        "Alias": item["Alias"]
-                    }
-
-                json.dump(format_js, f, ensure_ascii=False)
-        else:
-            s += "all_alias.json下载失败\n"
-            k=0
-    async with aiohttp.request('GET', 'https://www.diving-fish.com/api/chunithmprober/music_data') as resp:
-        if resp.status == 200:
-            s += "chunithm_music_data.json下载成功\n"
-            with open("src/static/chunithm/chuni_music_g.json", "w", encoding= "utf-8") as f:
-                j = await resp.json()
-                json.dump(j, f, ensure_ascii=False)
-        else:
-            s += "chunithm_music_data.json下载失败\n"
-            k=0
-    #"https://chunithm.sega.jp/storage/json/music.json"
-    async with aiohttp.request('GET', 'https://chunithm.sega.jp/storage/json/music.json') as resp:
-        if resp.status == 200:
-            s += "chunithm_music.json下载成功\n"
-            with open("src/static/chunithm/chuni_music.json", "w", encoding= "utf-8") as f:
-                j = await resp.json()
-                json.dump(j, f, ensure_ascii=False)
-        else:
-            s += "chunithm_music.json下载失败\n"
-            k=0
+                    json.dump(format_js, f, ensure_ascii=False)
+            else:
+                s += "all_alias.json下载失败\n"
+    except:
+                s += "all_alias.json下载失败\n"
+    try:
+        async with aiohttp.request('GET', 'https://www.diving-fish.com/api/chunithmprober/music_data') as resp:
+            if resp.status == 200:
+                s += "chunithm_music_data.json下载成功\n"
+                with open("src/static/chunithm/chuni_music_g.json", "w", encoding= "utf-8") as f:
+                    j = await resp.json()
+                    json.dump(j, f, ensure_ascii=False)
+            else:
+                s += "chunithm_music_data.json下载失败\n"
+    except:
+                s += "chunithm_music_data.json下载失败\n"
+    try:
+        #"https://chunithm.sega.jp/storage/json/music.json"
+        async with aiohttp.request('GET', 'https://chunithm.sega.jp/storage/json/music.json') as resp:
+            if resp.status == 200:
+                s += "chunithm_music.json下载成功\n"
+                with open("src/static/chunithm/chuni_music.json", "w", encoding= "utf-8") as f:
+                    j = await resp.json()
+                    json.dump(j, f, ensure_ascii=False)
+            else:
+                s += "chunithm_music.json下载失败\n"
+    except:
+                s += "chunithm_music.json下载失败\n"
     return k,s
 
 with open("src/static/kanjic2j_xcj.dat","rb")as fp:
