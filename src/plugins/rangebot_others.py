@@ -74,8 +74,8 @@ async def _capoo(event: Event, message: Message = CommandArg()):
 
 """-----------机厅几(开发中)-----------"""
 jt_sh = ['qy','bl','tyg','sjhc','sjhm','wdc','wdm','wd','sjh','lzm']
-jt_qp = ['tc','jwh']
-jt_zb = ['yt','rs','wy','zc','wxh','sm']
+jt_qp = ['tc']
+jt_zb = ['yt','wy','zc','wxh','sm']
 jt_jn = ['lw']
 group_sh = ['751302572','775613195','780012208','742829700','646232811','698699856','606964743','654128738']
 group_sh.extend(MAIN_GROUPS)
@@ -93,7 +93,7 @@ async def _jtwarn(event: Event):
             or (str(re.match("group_(.+)_(.+)",event.get_session_id()).groups()[0]) in group_jn) and (msg[0] in jt_jn):
         await jtwarn.finish(f"{msg[0]}同时有maimai和chunithm\n使用{msg[0]}m上报maimai人数\n使用{msg[0]}c上报chunithm人数。")
 
-jtregex = r"(?i)^(qy|bl|yt|rs|wy|lw|zc|wxh|sm|tyg|sjhc|sjhm|wdc|wdm|tc|jwh|lzm)(j|几|[0-9]+)$"
+jtregex = r"(?i)^(qy|bl|yt|wy|lw|zc|wxh|sm|tyg|sjhc|sjhm|wdc|wdm|tc|lzm)(j|几|[0-9]+)$"
 jtj = on_regex(jtregex, priority = PRIORITY_BASE*1, block = True)
 @jtj.handle()
 async def _jtj(event: Event):
@@ -149,7 +149,7 @@ async def _jtj(event: Event):
         else:
             await jtj.finish("看看几点了")
 
-jtaddre = r"(?i)^(qy|bl|yt|rs|wy|lw|zc|wxh|sm|tyg|sjhc|sjhm|wdc|wdm|tc|jwh|lzm)([\+＋\-－])(\d+)$"
+jtaddre = r"(?i)^(qy|bl|yt|wy|lw|zc|wxh|sm|tyg|sjhc|sjhm|wdc|wdm|tc|lzm)([\+＋\-－])(\d+)$"
 jtadd = on_regex(jtaddre, priority = PRIORITY_BASE*1, block = True)
 @jtadd.handle()
 async def _jtadd(event: Event):
