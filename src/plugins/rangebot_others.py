@@ -73,7 +73,7 @@ async def _capoo(event: Event, message: Message = CommandArg()):
 
 
 """-----------机厅几(开发中)-----------"""
-jt_sh = ['qy','bl','tyg','sjhc','sjhm','wdc','wdm','sjh','lzm']
+jt_sh = ['qy','bl','tyg','sjhc','sjhm','wdc','wdm','wd','sjh','lzm']
 jt_qp = ['tc']
 jt_zb = ['yt','wy','zc','wxh','sm','wd']
 jt_jn = ['lw']
@@ -88,9 +88,7 @@ jtwarn = on_regex(jtregex_warn, priority = PRIORITY_BASE*1-1, block = True)
 @jtwarn.handle()
 async def _jtwarn(event: Event):
     msg = re.match(jtregex_warn,str(event.get_message()).strip().lower()).groups()
-    if (str(re.match("group_(.+)_(.+)",event.get_session_id()).groups()[0]) in group_sh) and (msg[0] in jt_sh) \
-        or (str(re.match("group_(.+)_(.+)",event.get_session_id()).groups()[0]) in group_zb) and (msg[0] in jt_zb)\
-            or (str(re.match("group_(.+)_(.+)",event.get_session_id()).groups()[0]) in group_jn) and (msg[0] in jt_jn):
+    if (str(re.match("group_(.+)_(.+)",event.get_session_id()).groups()[0]) in group_sh):
         await jtwarn.finish(f"{msg[0]}同时有maimai和chunithm\n使用{msg[0]}m上报maimai人数\n使用{msg[0]}c上报chunithm人数。")
 
 jtregex = r"(?i)^(qy|bl|yt|wy|lw|zc|wxh|sm|tyg|sjhc|sjhm|wdc|wdm|tc|lzm|wd)(j|几|[0-9]+)$"
@@ -212,6 +210,7 @@ async def _(event: Event):
     for s in haishilist:
         if s.strip() == "":
             await rghaishi.finish("蓝的盆")
+    random.seed()
     await rghaishi.finish(random.choice(haishilist))
 
 
