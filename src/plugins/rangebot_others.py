@@ -73,9 +73,9 @@ async def _capoo(event: Event, message: Message = CommandArg()):
 
 
 """-----------机厅几(开发中)-----------"""
-jt_sh = ['qy','bl','tyg','sjhc','sjhm','wdc','wdm','wd','sjh','lzm']
+jt_sh = ['qy','bl','tyg','sjhc','sjhm','wdc','wdm','sjh','lzm']
 jt_qp = ['tc']
-jt_zb = ['yt','wy','zc','wxh','sm']
+jt_zb = ['yt','wy','zc','wxh','sm','wd']
 jt_jn = ['lw']
 group_sh = ['751302572','775613195','780012208','742829700','646232811','698699856','606964743','654128738']
 group_sh.extend(MAIN_GROUPS)
@@ -93,7 +93,7 @@ async def _jtwarn(event: Event):
             or (str(re.match("group_(.+)_(.+)",event.get_session_id()).groups()[0]) in group_jn) and (msg[0] in jt_jn):
         await jtwarn.finish(f"{msg[0]}同时有maimai和chunithm\n使用{msg[0]}m上报maimai人数\n使用{msg[0]}c上报chunithm人数。")
 
-jtregex = r"(?i)^(qy|bl|yt|wy|lw|zc|wxh|sm|tyg|sjhc|sjhm|wdc|wdm|tc|lzm)(j|几|[0-9]+)$"
+jtregex = r"(?i)^(qy|bl|yt|wy|lw|zc|wxh|sm|tyg|sjhc|sjhm|wdc|wdm|tc|lzm|wd)(j|几|[0-9]+)$"
 jtj = on_regex(jtregex, priority = PRIORITY_BASE*1, block = True)
 @jtj.handle()
 async def _jtj(event: Event):
@@ -149,7 +149,7 @@ async def _jtj(event: Event):
         else:
             await jtj.finish("看看几点了")
 
-jtaddre = r"(?i)^(qy|bl|yt|wy|lw|zc|wxh|sm|tyg|sjhc|sjhm|wdc|wdm|tc|lzm)([\+＋\-－])(\d+)$"
+jtaddre = r"(?i)^(qy|bl|yt|wy|lw|zc|wxh|sm|tyg|sjhc|sjhm|wdc|wdm|tc|lzm|wd)([\+＋\-－])(\d+)$"
 jtadd = on_regex(jtaddre, priority = PRIORITY_BASE*1, block = True)
 @jtadd.handle()
 async def _jtadd(event: Event):
@@ -207,10 +207,12 @@ rghaishi = on_regex(r"^range.*还是.*", priority = PRIORITY_BASE*5, block = Tru
 @rghaishi.handle()
 async def _(event: Event):
     haishilist = str(event.get_message())[5:].strip().split("还是")
+    if len(set(haishilist)) != len(haishilist):
+        await rghaishi.finish("蓝的盆")
     for s in haishilist:
-        if len(set(haishilist)) != len(haishilist) or (s.strip() == ""):
+        if s.strip() == "":
             await rghaishi.finish("蓝的盆")
-        await rghaishi.finish(haishilist[random.randint(0,len(haishilist)-1)].strip())
+    await rghaishi.finish(random.choice(haishilist))
 
 
 SETU_TIMING = 30
