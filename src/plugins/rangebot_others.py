@@ -73,7 +73,7 @@ async def _capoo(event: Event, message: Message = CommandArg()):
 
 
 """-----------机厅几(开发中)-----------"""
-jt_sh = ['qy','bl','tyg','sjhc','sjhm','wdc','wdm','wd','sjh','lzm']
+jt_sh = ['qy','hsh','bl','tyg','sjhc','sjhm','wdc','wdm','sjh','lzm']
 jt_qp = ['tc']
 jt_zb = ['yt','wy','zc','wxh','sm','wd']
 jt_jn = ['lw']
@@ -84,22 +84,21 @@ group_jn = ['784593881',TEST_GROUP]
 group_qp = ['956305246',TEST_GROUP]
 
 jtregex_warn = r"(?i)^(sjh|wd)(j|几|[0-9]+|([\+＋\-－])(\d+))$"
-jtwarn = on_regex(jtregex_warn, priority = PRIORITY_BASE*1-1, block = True)
-@jtwarn.handle()
-async def _jtwarn(event: Event):
-    msg = re.match(jtregex_warn,str(event.get_message()).strip().lower()).groups()
-    if (str(re.match("group_(.+)_(.+)",event.get_session_id()).groups()[0]) in group_sh):
-        await jtwarn.finish(f"{msg[0]}同时有maimai和chunithm\n使用{msg[0]}m上报maimai人数\n使用{msg[0]}c上报chunithm人数。")
 
-jtregex = r"(?i)^(qy|bl|yt|wy|lw|zc|wxh|sm|tyg|sjhc|sjhm|wdc|wdm|tc|lzm|wd)(j|几|[0-9]+)$"
+jtregex = r"(?i)^(qy|hsh|bl|yt|wy|lw|zc|wxh|sm|tyg|sjhc|sjhm|wdc|wdm|tc|lzm|wd)(j|几|[0-9]+)$"
 jtj = on_regex(jtregex, priority = PRIORITY_BASE*1, block = True)
 @jtj.handle()
 async def _jtj(event: Event):
+    group_id = str(re.match("group_(.+)_(.+)",event.get_session_id()).groups()[0])
+    msg = re.match(jtregex_warn,str(event.get_message()).strip().lower())
+    if msg and (group_id in group_sh):
+        msg = msg.groups()
+        await jtj.finish(f"{msg[0]}同时有maimai和chunithm\n使用{msg[0]}m上报maimai人数\n使用{msg[0]}c上报chunithm人数。")
     msg = re.match(jtregex,str(event.get_message()).strip().lower()).groups()
-    if    (str(re.match("group_(.+)_(.+)",event.get_session_id()).groups()[0]) in group_sh) and (msg[0] in jt_sh)\
-        or(str(re.match("group_(.+)_(.+)",event.get_session_id()).groups()[0]) in group_zb) and (msg[0] in jt_zb)\
-        or(str(re.match("group_(.+)_(.+)",event.get_session_id()).groups()[0]) in group_jn) and (msg[0] in jt_jn)\
-        or(str(re.match("group_(.+)_(.+)",event.get_session_id()).groups()[0]) in group_qp) and (msg[0] in jt_qp):
+    if    (group_id in group_sh) and (msg[0] in jt_sh)\
+        or(group_id in group_zb) and (msg[0] in jt_zb)\
+        or(group_id in group_jn) and (msg[0] in jt_jn)\
+        or(group_id in group_qp) and (msg[0] in jt_qp):
         if (8 < int(time.strftime("%H")) < 23):
             user = str(event.get_user_id())
             if msg[1] in ["j","几"]:
@@ -147,15 +146,16 @@ async def _jtj(event: Event):
         else:
             await jtj.finish("看看几点了")
 
-jtaddre = r"(?i)^(qy|bl|yt|wy|lw|zc|wxh|sm|tyg|sjhc|sjhm|wdc|wdm|tc|lzm|wd)([\+＋\-－])(\d+)$"
+jtaddre = r"(?i)^(qy|hsh|bl|yt|wy|lw|zc|wxh|sm|tyg|sjhc|sjhm|wdc|wdm|tc|lzm|wd)([\+＋\-－])(\d+)$"
 jtadd = on_regex(jtaddre, priority = PRIORITY_BASE*1, block = True)
 @jtadd.handle()
 async def _jtadd(event: Event):
+    group_id = str(re.match("group_(.+)_(.+)",event.get_session_id()).groups()[0])
     msg = re.match(jtaddre,str(event.get_message()).strip().lower()).groups()
-    if    (str(re.match("group_(.+)_(.+)",event.get_session_id()).groups()[0]) in group_sh) and (msg[0] in jt_sh)\
-        or(str(re.match("group_(.+)_(.+)",event.get_session_id()).groups()[0]) in group_zb) and (msg[0] in jt_zb)\
-        or(str(re.match("group_(.+)_(.+)",event.get_session_id()).groups()[0]) in group_jn) and (msg[0] in jt_jn)\
-        or(str(re.match("group_(.+)_(.+)",event.get_session_id()).groups()[0]) in group_qp) and (msg[0] in jt_qp):
+    if    (group_id in group_sh) and (msg[0] in jt_sh)\
+        or(group_id in group_zb) and (msg[0] in jt_zb)\
+        or(group_id in group_jn) and (msg[0] in jt_jn)\
+        or(group_id in group_qp) and (msg[0] in jt_qp):
         if (8 < int(time.strftime("%H")) < 23):
             user = str(event.get_user_id())
             if int(msg[2]) > 30 or int(msg[2]) <= 0:
