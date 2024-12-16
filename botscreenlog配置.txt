@@ -1,0 +1,32 @@
+screen -L -t maibot -S maibot
+screen -L -t maibot -S lgr
+
+
+
+/etc/screenrc
+#....
+logfile /home/ubuntu/myfiles/screenlog/%t.log
+
+
+
+/etc/crontab
+0 5 * * * root /home/ubuntu/myfiles/renamelog.sh
+
+
+
+renamelog.sh
+↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+#! /bin/sh
+
+mv /home/ubuntu/myfiles/screenlog/lgr.log /home/ubuntu/myfiles/screenlog/lgr_$(date '+%F_%H_%M_%S').log 
+if [ $? -ne 0 ]; then
+    echo "$(date '+%Y-%m-%d %H:%M:%S') Error: Failed to move lgr.log" >> /home/ubuntu/myfiles/relogerror.log
+fi
+
+mv /home/ubuntu/myfiles/screenlog/maibot.log /home/ubuntu/myfiles/screenlog/maibot_$(date '+%F_%H_%M_%S').log
+if [ $? -ne 0 ]; then
+    echo "$(date '+%Y-%m-%d %H:%M:%S') Error: Failed to move maibot.log" >> /home/ubuntu/myfiles/relogerror.log
+fi
+
+echo success!
+↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑

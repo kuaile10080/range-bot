@@ -75,7 +75,7 @@ async def _capoo(event: Event, message: Message = CommandArg()):
 """-----------机厅几(开发中)-----------"""
 jt_sh = ['qy','hsh','bl','tyg','sjhc','sjhm','wdc','wdm','sjh','lzm']
 jt_qp = ['tc']
-jt_zb = ['yt','wy','wxh','sm','wd']
+jt_zb = ['yt','wy','wxh','sm','wd','bbw']
 jt_jn = ['lw']
 group_sh = ['751302572','775613195','780012208','742829700','646232811','698699856','606964743','654128738']
 group_sh.extend(MAIN_GROUPS)
@@ -85,7 +85,7 @@ group_qp = ['956305246',TEST_GROUP]
 
 jtregex_warn = r"(?i)^(sjh|wd)(j|几|[0-9]+|([\+＋\-－])(\d+))$"
 
-jtregex = r"(?i)^(qy|hsh|bl|yt|wy|lw|wxh|sm|tyg|sjhc|sjhm|wdc|wdm|tc|lzm|wd)(j|几|[0-9]+)$"
+jtregex = r"(?i)^(qy|hsh|bl|yt|wy|lw|wxh|sm|tyg|sjhc|sjhm|wdc|wdm|tc|lzm|wd|bbw)(j|几|[0-9]+)$"
 jtj = on_regex(jtregex, priority = PRIORITY_BASE*1, block = True)
 @jtj.handle()
 async def _jtj(event: Event):
@@ -146,7 +146,7 @@ async def _jtj(event: Event):
         else:
             await jtj.finish("看看几点了")
 
-jtaddre = r"(?i)^(qy|hsh|bl|yt|wy|lw|wxh|sm|tyg|sjhc|sjhm|wdc|wdm|tc|lzm|wd)([\+＋\-－])(\d+)$"
+jtaddre = r"(?i)^(qy|hsh|bl|yt|wy|lw|wxh|sm|tyg|sjhc|sjhm|wdc|wdm|tc|lzm|wd|bbw)([\+＋\-－])(\d+)$"
 jtadd = on_regex(jtaddre, priority = PRIORITY_BASE*1, block = True)
 @jtadd.handle()
 async def _jtadd(event: Event):
